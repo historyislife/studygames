@@ -97,7 +97,7 @@ class Main extends Phaser.Scene{
   this.input.on("pointermove",(pointer)=>{
     if(!playing)return;
     this.poi.x=Phaser.Math.Clamp(pointer.x,36,W-36);
-    this.poi.y=Phaser.Math.Clamp(pointer.y,180,610);
+    this.poi.y=Phaser.Math.Clamp(pointer.y,180,640);
     if(this.carryBall && this.carryBall.active){
       this.carryBall.x=this.poi.x;
       this.carryBall.y=this.poi.y;
@@ -109,7 +109,7 @@ class Main extends Phaser.Scene{
   this.input.on("pointerdown",(pointer)=>{
     if(!playing || this.carryBall)return;
     this.poi.x=Phaser.Math.Clamp(pointer.x,36,W-36);
-    this.poi.y=Phaser.Math.Clamp(pointer.y,180,610);
+    this.poi.y=Phaser.Math.Clamp(pointer.y,180,640);
     this.pointerHeld=true;
 
     let best=null;
@@ -140,9 +140,14 @@ class Main extends Phaser.Scene{
     // count it as successfully placed in the bowl.
     const poolBottom = 552;
     const ballRadius = 32 * (ball.scaleX || 1);
+
+    // Treat the ball as "out of the pool" once roughly the lower third
+    // has crossed the visible bottom edge. This is intentionally lenient
+    // for touch screens.
+    const crossedBottom = (ball.y + ballRadius * 0.35) >= poolBottom;
     const inBowl =
-      (ball.y + ballRadius >= poolBottom) &&
-      Math.abs(ball.x - W/2) <= 175;
+      crossedBottom &&
+      Math.abs(ball.x - W/2) <= 190;
 
     if(inBowl){
       const c=ball.getData("char");
