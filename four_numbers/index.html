@@ -61,12 +61,34 @@
     .num{width:50px;height:66px;font-size:31px}
     .op{width:32px;height:32px;font-size:20px}
   }
+
+  @media(max-width:600px){
+    html,body{height:100%;overflow:hidden}
+    body{padding:4px;align-items:stretch}
+    .game{height:100dvh;min-height:0;padding:8px 8px 7px;border-radius:12px;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden}
+    h1{font-size:21px;line-height:1.05;margin:0 0 2px}
+    .sub{font-size:11px;line-height:1.2;margin:0 0 5px}
+    .difficulty{margin:2px 0 5px}.difficulty label{font-size:10px;margin-bottom:2px}.difficulty select{font-size:13px;padding:6px 8px;height:34px}
+    .top{margin:3px 0 5px;gap:5px;min-height:61px}
+    .targetBox{padding:5px 10px;border-radius:10px;min-width:90px}
+    #target{font-size:31px}
+    .stat{padding:5px 4px;border-radius:9px}.stat strong{font-size:18px}.label{font-size:9px}
+    .expression{min-height:82px;height:82px;padding:7px 3px;gap:3px;border-radius:11px}
+    .num{width:clamp(48px,15vw,62px);height:60px;font-size:clamp(28px,8vw,36px);border-radius:10px}
+    .op{width:clamp(31px,9vw,39px);height:clamp(31px,9vw,39px);font-size:21px}
+    .result{min-height:43px;height:43px;padding:4px 2px;font-size:14px;line-height:1.2}
+    .buttons{gap:5px;flex-wrap:nowrap}.buttons button.action{flex:1 1 0;padding:8px 3px;font-size:12px;white-space:nowrap}.buttons button.primary{flex-basis:0}
+    .help{font-size:10px;line-height:1.25;margin-top:5px}
+  }
+  @media(max-width:600px) and (max-height:600px){
+    .sub,.help{display:none}.game{padding-top:5px}.expression{height:72px;min-height:72px}.num{height:52px}.result{height:36px;min-height:36px}.top{min-height:54px}
+  }
 </style>
 </head>
 <body>
 <main class="game">
   <h1>FOUR NUMBERS</h1>
-  <div class="sub">4つの数字をすべて使って TARGET を作れ</div>
+  <div class="sub">4つの数字をぜんぶ使って 答えを作ろう</div>
 
   <div class="difficulty">
     <label for="difficulty">難易度</label>
@@ -79,25 +101,24 @@
   </div>
 
   <section class="top">
-    <div class="targetBox"><div class="label">TARGET</div><div id="target">--</div></div>
+    <div class="targetBox"><div class="label">めざす数</div><div id="target">--</div></div>
     <div class="stats">
-      <div class="stat"><span class="label">SCORE</span><strong id="score">0</strong></div>
-      <div class="stat"><span class="label">STREAK</span><strong id="streak">0</strong></div>
+      <div class="stat"><span class="label">せいかい</span><strong id="score">0</strong></div>
+      <div class="stat"><span class="label">れんぞく</span><strong id="streak">0</strong></div>
     </div>
   </section>
 
   <section id="expression" class="expression"></section>
-  <div id="result" class="result info">演算子をクリックして変更できます</div>
+  <div id="result" class="result info">記号をタップしてかえよう</div>
 
   <div class="buttons">
-    <button class="action primary" id="checkBtn">計算する</button>
-    <button class="action" id="answerBtn">答えを見る</button>
-    <button class="action" id="newBtn">新しい問題</button>
+    <button class="action primary" id="checkBtn">こたえあわせ</button>
+    <button class="action" id="answerBtn">こたえを見る</button>
+    <button class="action" id="newBtn">つぎの問題</button>
   </div>
 
   <div class="help">
-    数字の並び順は固定 ／ 使用できる演算子は難易度によって変わります<br>
-    通常の計算順序（×÷優先）で計算します。<kbd>Enter</kbd> でも判定できます。
+    数字のじゅんばんはそのまま。記号をかえて、めざす数を作ろう！
   </div>
 </main>
 <script>
@@ -138,7 +159,7 @@ function allOperatorSets(){
 function generatePuzzle(){
   solved=false;
   $('result').className='result info';
-  $('result').textContent='演算子をクリックして変更できます';
+  $('result').textContent='記号をタップしてかえよう';
   const operatorSets=allOperatorSets();
   for(let attempt=0;attempt<1000;attempt++){
     let nums;
@@ -182,7 +203,7 @@ function render(){
     box.appendChild(card);
     if(i<3){
       const b=document.createElement('button'); b.className='op'; b.textContent=OP_LABEL[ops[i]];
-      b.title='クリックして演算子を変更';
+      b.title='記号をかえる';
       b.onclick=()=>{const avail=allowedOps();ops[i]=avail[(avail.indexOf(ops[i])+1)%avail.length];render()};
       box.appendChild(b);
     }
@@ -202,7 +223,7 @@ function check(){
     r.className='result ok'; r.textContent=`正解！  ${expressionText(numbers,ops)} = ${target}`;
     if(!solved){score++;streak++;solved=true;$('score').textContent=score;$('streak').textContent=streak;}
   }else{
-    r.className='result ng'; r.textContent=`${expressionText(numbers,ops)} = ${shown}　→ TARGET は ${target}`;
+    r.className='result ng'; r.textContent=`${expressionText(numbers,ops)} = ${shown}　→ めざす数は ${target}`;
     if(!solved){streak=0;$('streak').textContent=streak;}
   }
 }
@@ -210,7 +231,7 @@ function check(){
 $('checkBtn').onclick=check;
 $('answerBtn').onclick=()=>{
   $('result').className='result info';
-  $('result').textContent=`解答例： ${expressionText(solution.nums,solution.ops)} = ${target}`;
+  $('result').textContent=`こたえ： ${expressionText(solution.nums,solution.ops)} = ${target}`;
   solved=true; streak=0; $('streak').textContent=streak;
 };
 $('newBtn').onclick=generatePuzzle;
