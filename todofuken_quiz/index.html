@@ -5,108 +5,63 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>都道府県 比較クイズ</title>
 
+
 <style>
-:root{
-  --bg:#f5f7fb;--card:#ffffff;--text:#142033;--muted:#687386;--line:#e4e8f0;
-  --blue:#2563eb;--blue-soft:#eaf1ff;--purple:#7c3aed;--purple-soft:#f2ebff;
-  --ok:#16803a;--ok-soft:#edf9f0;--ng:#b42318;--ng-soft:#fff0ee;
-}
+:root{--bg:#f5f7fb;--card:#fff;--text:#142033;--muted:#687386;--line:#e4e8f0;--blue:#2563eb;--blue-soft:#eaf1ff;--purple:#7c3aed;--purple-soft:#f2ebff;--ok:#16803a;--ok-soft:#edf9f0;--ng:#b42318;--ng-soft:#fff0ee}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI","Hiragino Kaku Gothic ProN",system-ui,sans-serif}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI","Hiragino Kaku Gothic ProN",system-ui,sans-serif}
 body{min-height:100dvh}
 button{font:inherit}
-.app{width:100%;max-width:520px;margin:0 auto;min-height:100dvh;padding:10px 10px 22px}
-.header{
-  display:flex;justify-content:space-between;align-items:center;gap:10px;
-  padding:8px 2px 10px;position:sticky;top:0;background:linear-gradient(var(--bg) 78%,transparent);
-  z-index:5
-}
-.header h1{margin:0;font-size:20px;line-height:1.2;font-weight:900}
-.subtitle{font-size:11px;color:var(--muted);margin-top:2px}
-.badge{
-  flex:0 0 auto;padding:7px 10px;border-radius:999px;background:var(--blue-soft);
-  color:#1d4ed8;font-size:12px;font-weight:900
-}
-.panel{
-  background:var(--card);border:1px solid var(--line);border-radius:18px;
-  box-shadow:0 8px 24px rgba(20,32,51,.06);padding:12px
-}
-.levels{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.level{
-  appearance:none;border:2px solid var(--line);background:#fafbfc;border-radius:14px;
-  padding:10px 8px;text-align:center;color:var(--text);min-height:64px
-}
-.level strong{display:block;font-size:15px}
-.level small{display:block;font-size:10px;line-height:1.35;color:var(--muted);margin-top:2px}
+.app{width:100%;max-width:520px;height:100dvh;margin:0 auto;padding:5px 7px 7px;display:flex;flex-direction:column;overflow:hidden}
+.header{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:1px 0 4px}
+.header h1{margin:0;font-size:16px;line-height:1.05;font-weight:900}
+.subtitle{font-size:8px;color:var(--muted);margin-top:1px}
+.badge{flex:0 0 auto;padding:4px 7px;border-radius:999px;background:var(--blue-soft);color:#1d4ed8;font-size:9px;font-weight:900}
+.panel{flex:1 1 auto;min-height:0;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:7px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 5px 15px rgba(20,32,51,.05)}
+.levels{flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:4px}
+.level{appearance:none;border:2px solid var(--line);background:#fafbfc;border-radius:10px;padding:5px 4px;text-align:center;color:var(--text);min-height:38px}
+.level strong{display:block;font-size:12px;line-height:1.05}
+.level small{display:block;font-size:7px;line-height:1.15;color:var(--muted);margin-top:1px}
 .level.active{border-color:var(--blue);background:var(--blue-soft)}
 .level[data-level="advanced"].active{border-color:var(--purple);background:var(--purple-soft)}
-
-.settings{
-  display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;margin-bottom:2px;
-  scrollbar-width:none
-}
+.settings{flex:0 0 auto;display:flex;gap:4px;overflow-x:auto;padding:0 0 3px;margin:0;scrollbar-width:none;min-height:25px}
 .settings::-webkit-scrollbar{display:none}
-.typebtn{
-  flex:0 0 auto;appearance:none;border:0;border-radius:999px;padding:8px 12px;
-  background:#eef1f5;color:#475467;font-size:12px;font-weight:800
-}
+.typebtn{flex:0 0 auto;appearance:none;border:0;border-radius:999px;padding:5px 8px;background:#eef1f5;color:#475467;font-size:9px;font-weight:800;line-height:1}
 .typebtn.active{background:#dbe7ff;color:#1d4ed8}
 .advanced .typebtn.active{background:#ede4ff;color:#6d28d9}
-
-.stats{
-  display:flex;justify-content:space-between;align-items:center;
-  font-size:12px;color:var(--muted);font-weight:800;padding:4px 2px 6px
-}
-.category{font-size:12px;font-weight:900;color:var(--blue);margin:4px 0 6px}
+#game{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.stats{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;font-size:9px;color:var(--muted);font-weight:800;padding:0 1px 2px}
+.category{flex:0 0 auto;font-size:9px;font-weight:900;color:var(--blue);margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .advanced .category{color:var(--purple)}
-.question{
-  font-size:clamp(22px,6vw,30px);font-weight:900;line-height:1.35;
-  margin:0 0 12px;letter-spacing:.01em
-}
-.options{display:grid;grid-template-columns:1fr;gap:8px}
-.option{
-  width:100%;min-height:58px;border:2px solid var(--line);border-radius:14px;
-  background:#fbfcfe;color:var(--text);font-size:18px;font-weight:900;
-  padding:12px 14px;text-align:left
-}
+.question{flex:0 0 auto;font-size:clamp(17px,5vw,22px);font-weight:900;line-height:1.2;margin:0 0 5px}
+.options{flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.option{width:100%;min-height:45px;border:2px solid var(--line);border-radius:10px;background:#fbfcfe;color:var(--text);font-size:14px;font-weight:900;padding:6px 4px;text-align:center;line-height:1.1}
 .option:active{transform:scale(.99)}
 .option.correct{border-color:#79c58c;background:var(--ok-soft);color:var(--ok)}
 .option.wrong{border-color:#f2aaa3;background:var(--ng-soft);color:var(--ng)}
 .option:disabled{opacity:1}
-.feedback{
-  display:none;margin-top:10px;padding:12px;border-radius:14px;background:#f7f8fa;
-  border:1px solid #eceff3
-}
+.feedback{flex:0 0 auto;display:none;margin-top:5px;padding:6px 7px;border-radius:9px;background:#f7f8fa;border:1px solid #eceff3;max-height:78px;overflow:hidden}
 .feedback.show{display:block}
-.feedback strong{display:block;font-size:17px;margin-bottom:6px}
-.detail{font-size:13px;line-height:1.55;color:#475467}
-.sourceLine{display:block;font-size:10px;line-height:1.45;color:var(--muted);margin-top:7px}
-.next{
-  display:none;width:100%;margin-top:10px;min-height:52px;border:0;border-radius:14px;
-  background:var(--blue);color:#fff;font-size:17px;font-weight:900
-}
+.feedback strong{display:block;font-size:12px;margin-bottom:2px;line-height:1.1}
+.detail{font-size:9px;line-height:1.25;color:#475467}
+.sourceLine{display:block;font-size:7px;line-height:1.15;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.next{flex:0 0 auto;display:none;width:100%;margin-top:5px;min-height:35px;border:0;border-radius:10px;background:var(--blue);color:#fff;font-size:13px;font-weight:900}
 .next.show{display:block}
 .advanced .next{background:var(--purple)}
-.note{
-  margin-top:10px;padding:10px;border-radius:12px;background:#f8fafc;
-  color:var(--muted);font-size:10px;line-height:1.5
-}
-.result{text-align:center;padding:22px 8px}
-.result .big{font-size:52px;font-weight:900;color:var(--blue);line-height:1}
+.note{flex:0 0 auto;margin-top:4px;padding:4px 5px;border-radius:8px;background:#f8fafc;color:var(--muted);font-size:6.5px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.result{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px}
+.result .big{font-size:40px;font-weight:900;color:var(--blue);line-height:1}
 .advanced .result .big{color:var(--purple)}
-.restart{
-  width:100%;min-height:50px;border:0;border-radius:14px;background:var(--blue);
-  color:white;font-size:17px;font-weight:900
-}
+.result p{font-size:11px;margin:6px 0}
+.restart{width:100%;min-height:38px;border:0;border-radius:10px;background:var(--blue);color:white;font-size:13px;font-weight:900}
 .advanced .restart{background:var(--purple)}
-
-@media (min-width:700px){
-  .app{max-width:620px;padding-top:18px}
-  .panel{padding:18px}
-  .question{font-size:32px}
-  .option{font-size:19px}
+@media(max-height:680px){
+  .header h1{font-size:14px}.subtitle{display:none}.level{min-height:32px;padding:3px}.level small{display:none}
+  .settings{min-height:22px}.question{font-size:16px;margin-bottom:4px}.option{min-height:40px;font-size:13px}
+  .feedback{max-height:66px;padding:5px}.next{min-height:32px}.note{display:none}
 }
 </style>
+
 
 </head>
 <body>
@@ -234,13 +189,13 @@ function setSettings() {
       const b=document.createElement("button"); b.className="typebtn"+(i===0?" active":""); b.textContent=label; b.dataset.mode=k;
       b.onclick=()=>changeMode(k,b); box.appendChild(b);
     });
-    $("#note").innerHTML=`人口：2025年国勢調査人口速報集計。面積：2025年10月1日時点の国土地理院面積。<br>東西南北：都道府県庁所在地の緯度・経度で比較。`;
+    $("#note").innerHTML=`人口：2025年国勢調査／面積：国土地理院／位置：県庁所在地`;
   } else {
     Object.entries(ADV_GROUPS).forEach(([k,label],i)=>{
       const b=document.createElement("button"); b.className="typebtn"+(i===0?" active":""); b.textContent=label; b.dataset.mode=k;
       b.onclick=()=>changeMode(k,b); box.appendChild(b);
     });
-    $("#note").innerHTML=`応用編は農林水産省・水産庁の公的統計を使用。品目ごとに調査年・指標が異なります。<br>基準となる都道府県は各品目の生産量上位10都道府県から出題します。未調査（…）・非公表（x）は候補から除外しています。`;
+    $("#note").innerHTML=`農水省・水産庁統計。基準県は各品目上位10県。`;
   }
 }
 
