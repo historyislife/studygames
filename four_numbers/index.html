@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Four Numbers Puzzle</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;}
+  body{min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#10141c;color:#f4f7fb;display:flex;align-items:center;justify-content:center;padding:18px}
+  .game{width:min(1000px,100%);background:#1a2230;border:1px solid #344258;border-radius:20px;padding:30px;box-shadow:0 18px 60px #0008}
+  h1{text-align:center;margin:0 0 8px;font-size:34px;letter-spacing:.08em}
+  .sub{text-align:center;color:#aeb9ca;margin-bottom:20px}
+  .difficulty{text-align:center;margin:10px 0 20px}.difficulty label{display:block;color:#9eabc0;font-size:13px;letter-spacing:.08em;margin-bottom:8px}.difficulty select{width:min(320px,100%);background:#111824;color:#f4f7fb;border:1px solid #43516a;border-radius:10px;padding:11px 14px;font-size:16px;cursor:pointer}
+  .top{display:flex;justify-content:center;gap:50px;align-items:center;margin:18px 0 28px}
+  .targetBox{text-align:center;background:#111824;border-radius:16px;padding:14px 34px;border:1px solid #3a4a63}
+  .label{font-size:13px;letter-spacing:.14em;color:#9eabc0}
+  #target{font-size:54px;font-weight:800;line-height:1.05;color:#ffd166}
+  .stats{display:flex;gap:14px}
+  .stat{background:#111824;border:1px solid #344258;border-radius:12px;padding:12px 20px;text-align:center;min-width:105px}
+  .stat strong{display:block;font-size:25px;margin-top:3px}
+  .expression{display:flex;align-items:center;justify-content:center;gap:13px;min-height:150px;padding:20px 10px;background:#141b27;border-radius:18px;border:1px solid #2e3a4e}
+  .num{width:112px;height:112px;border-radius:18px;background:#f7f9fc;color:#17202e;display:flex;align-items:center;justify-content:center;font-size:55px;font-weight:800;user-select:none;border:4px solid transparent;box-shadow:0 8px 20px #0005;flex:0 0 auto}
+  .op{width:72px;height:72px;border:0;border-radius:50%;background:#2b79c2;color:white;font-size:38px;font-weight:700;cursor:pointer;transition:.15s;box-shadow:0 5px 14px #0004;flex:0 0 auto}
+  .op:hover{transform:scale(1.08);background:#3894e7}
+  .result{text-align:center;min-height:65px;padding:15px;font-size:27px;font-weight:700}
+  .result.ok{color:#72e59a}.result.ng{color:#ff7f88}.result.info{color:#7cc7ff}
+  .buttons{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+  button.action{border:0;border-radius:12px;padding:14px 24px;font-size:17px;font-weight:700;cursor:pointer;background:#e8edf5;color:#17202e}
+  button.primary{background:#ffd166}
+  button.action:hover{filter:brightness(1.08)}
+  .help{text-align:center;color:#98a6ba;font-size:14px;margin-top:22px;line-height:1.7}
+  kbd{background:#0e141e;border:1px solid #43516a;border-bottom-width:3px;border-radius:5px;padding:2px 6px;color:#dce5f2}
+
+  @media(max-width:600px){
+    body{align-items:flex-start;padding:8px;background:#10141c}
+    .game{width:100%;min-height:calc(100vh - 16px);padding:18px 12px 20px;border-radius:15px}
+    h1{font-size:25px;letter-spacing:.05em}
+    .sub{font-size:13px;margin-bottom:14px}
+    .difficulty{margin:8px 0 14px}.difficulty label{margin-bottom:5px}.difficulty select{font-size:15px;padding:10px}
+    .top{gap:8px;margin:10px 0 14px;align-items:stretch}
+    .targetBox{padding:9px 15px;min-width:100px;display:flex;flex-direction:column;justify-content:center}
+    #target{font-size:40px}
+    .stats{gap:6px;flex:1}
+    .stat{padding:9px 7px;min-width:0;flex:1}
+    .stat strong{font-size:21px}
+    .label{font-size:10px}
+    .expression{gap:4px;min-height:104px;padding:13px 5px;border-radius:14px;overflow:hidden}
+    .num{width:clamp(52px,16vw,66px);height:72px;border-radius:12px;font-size:clamp(31px,9vw,40px);border-width:2px}
+    .op{width:clamp(35px,10vw,43px);height:clamp(35px,10vw,43px);font-size:24px}
+    .result{min-height:58px;padding:12px 4px;font-size:18px;display:flex;align-items:center;justify-content:center;line-height:1.4}
+    .buttons{gap:8px}
+    button.action{flex:1 1 calc(50% - 4px);padding:12px 7px;font-size:15px;min-width:0}
+    button.primary{flex-basis:100%}
+    .help{font-size:12px;margin-top:15px;line-height:1.55}
+    .help kbd{display:none}
+  }
+  @media(max-width:370px){
+    .game{padding-left:8px;padding-right:8px}
+    .expression{gap:2px;padding-left:3px;padding-right:3px}
+    .num{width:50px;height:66px;font-size:31px}
+    .op{width:32px;height:32px;font-size:20px}
+  }
+</style>
+</head>
+<body>
+<main class="game">
+  <h1>FOUR NUMBERS</h1>
+  <div class="sub">4つの数字をすべて使って TARGET を作れ</div>
+
+  <div class="difficulty">
+    <label for="difficulty">難易度</label>
+    <select id="difficulty">
+      <option value="veryeasy">とてもかんたん（小1～2）</option>
+      <option value="easy">かんたん（小3）</option>
+      <option value="normal" selected>ふつう（小4～5）</option>
+      <option value="hard">難しい（小6以上）</option>
+    </select>
+  </div>
+
+  <section class="top">
+    <div class="targetBox"><div class="label">TARGET</div><div id="target">--</div></div>
+    <div class="stats">
+      <div class="stat"><span class="label">SCORE</span><strong id="score">0</strong></div>
+      <div class="stat"><span class="label">STREAK</span><strong id="streak">0</strong></div>
+    </div>
+  </section>
+
+  <section id="expression" class="expression"></section>
+  <div id="result" class="result info">演算子をクリックして変更できます</div>
+
+  <div class="buttons">
+    <button class="action primary" id="checkBtn">計算する</button>
+    <button class="action" id="answerBtn">答えを見る</button>
+    <button class="action" id="newBtn">新しい問題</button>
+  </div>
+
+  <div class="help">
+    数字の並び順は固定 ／ 使用できる演算子は難易度によって変わります<br>
+    通常の計算順序（×÷優先）で計算します。<kbd>Enter</kbd> でも判定できます。
+  </div>
+</main>
+<script>
+const ALL_OPS = ['+','-','*','/'];
+const OP_LABEL = {'+':'＋','-':'−','*':'×','/':'÷'};
+let numbers=[], ops=['+','+','+'], target=0, solution=null, score=0, streak=0, difficulty='normal';
+let solved=false;
+
+const $=id=>document.getElementById(id);
+
+function evaluate(nums, operators){
+  // Standard precedence, left associative. Reject division by zero.
+  let values=[nums[0]], lowOps=[];
+  for(let i=0;i<3;i++){
+    const op=operators[i], n=nums[i+1];
+    if(op==='*') values[values.length-1]*=n;
+    else if(op==='/'){
+      if(n===0) return null;
+      values[values.length-1]/=n;
+    } else { lowOps.push(op); values.push(n); }
+  }
+  let v=values[0];
+  for(let i=0;i<lowOps.length;i++) v=lowOps[i]==='+'?v+values[i+1]:v-values[i+1];
+  return v;
+}
+
+function allowedOps(){
+  if(difficulty==='veryeasy') return ['+','-'];
+  if(difficulty==='easy') return ['+','-','*'];
+  return ALL_OPS;
+}
+function allOperatorSets(){
+  const avail=allowedOps(), out=[];
+  for(const a of avail)for(const b of avail)for(const c of avail)out.push([a,b,c]);
+  return out;
+}
+
+function generatePuzzle(){
+  solved=false;
+  $('result').className='result info';
+  $('result').textContent='演算子をクリックして変更できます';
+  const operatorSets=allOperatorSets();
+  for(let attempt=0;attempt<1000;attempt++){
+    let nums;
+    if(difficulty==='hard'){
+      nums=Array.from({length:3},()=>1+Math.floor(Math.random()*9));
+      nums.splice(Math.floor(Math.random()*4),0,10+Math.floor(Math.random()*10));
+    }else{
+      nums=Array.from({length:4},()=>1+Math.floor(Math.random()*9));
+    }
+    const sols=[];
+    for(const os of operatorSets){
+      const v=evaluate(nums,os);
+      if(v!==null && Number.isFinite(v) && Math.abs(v-Math.round(v))<1e-9 && v>=1 && v<=99){
+        sols.push({nums:nums.slice(),ops:os.slice(),value:Math.round(v)});
+      }
+    }
+    const uniqueTargets=[...new Set(sols.map(s=>s.value))];
+    const minTargets=difficulty==='veryeasy'?3:5;
+    if(uniqueTargets.length>=minTargets){
+      let pool=sols;
+      if(difficulty==='easy') pool=sols.filter(s=>s.ops.includes('*') && s.value>=5);
+      if(difficulty==='normal'||difficulty==='hard') pool=sols.filter(s=>s.ops.some(o=>o==='*'||o==='/') && s.value>=10);
+      if(!pool.length) pool=sols;
+      solution=pool[Math.floor(Math.random()*pool.length)];
+      numbers=nums.slice();
+      target=solution.value;
+      ops=['+','+','+'];
+      render(); return;
+    }
+  }
+}
+
+function render(){
+  $('target').textContent=target;
+  $('score').textContent=score;
+  $('streak').textContent=streak;
+  const box=$('expression'); box.innerHTML='';
+  numbers.forEach((n,i)=>{
+    const card=document.createElement('div');
+    card.className='num'; card.textContent=n;
+    box.appendChild(card);
+    if(i<3){
+      const b=document.createElement('button'); b.className='op'; b.textContent=OP_LABEL[ops[i]];
+      b.title='クリックして演算子を変更';
+      b.onclick=()=>{const avail=allowedOps();ops[i]=avail[(avail.indexOf(ops[i])+1)%avail.length];render()};
+      box.appendChild(b);
+    }
+  });
+}
+
+function expressionText(nums,operators){
+  return nums.map((n,i)=>i<3?`${n} ${OP_LABEL[operators[i]]} `:`${n}`).join('');
+}
+
+function check(){
+  const v=evaluate(numbers,ops);
+  const r=$('result');
+  if(v===null||!Number.isFinite(v)){r.className='result ng';r.textContent='計算できません';return;}
+  const shown=Math.abs(v-Math.round(v))<1e-10?Math.round(v):Math.round(v*100)/100;
+  if(Math.abs(v-target)<1e-9){
+    r.className='result ok'; r.textContent=`正解！  ${expressionText(numbers,ops)} = ${target}`;
+    if(!solved){score++;streak++;solved=true;$('score').textContent=score;$('streak').textContent=streak;}
+  }else{
+    r.className='result ng'; r.textContent=`${expressionText(numbers,ops)} = ${shown}　→ TARGET は ${target}`;
+    if(!solved){streak=0;$('streak').textContent=streak;}
+  }
+}
+
+$('checkBtn').onclick=check;
+$('answerBtn').onclick=()=>{
+  $('result').className='result info';
+  $('result').textContent=`解答例： ${expressionText(solution.nums,solution.ops)} = ${target}`;
+  solved=true; streak=0; $('streak').textContent=streak;
+};
+$('newBtn').onclick=generatePuzzle;
+$('difficulty').onchange=e=>{difficulty=e.target.value;score=0;streak=0;generatePuzzle();};
+document.addEventListener('keydown',e=>{if(e.key==='Enter')check()});
+
+generatePuzzle();
+</script>
+</body>
+</html>

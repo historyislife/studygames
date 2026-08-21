@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>都道府県 比較クイズ</title>
+
+<style>
+:root{
+  --bg:#f5f7fb;--card:#ffffff;--text:#142033;--muted:#687386;--line:#e4e8f0;
+  --blue:#2563eb;--blue-soft:#eaf1ff;--purple:#7c3aed;--purple-soft:#f2ebff;
+  --ok:#16803a;--ok-soft:#edf9f0;--ng:#b42318;--ng-soft:#fff0ee;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI","Hiragino Kaku Gothic ProN",system-ui,sans-serif}
+body{min-height:100dvh}
+button{font:inherit}
+.app{width:100%;max-width:520px;margin:0 auto;min-height:100dvh;padding:10px 10px 22px}
+.header{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:8px 2px 10px;position:sticky;top:0;background:linear-gradient(var(--bg) 78%,transparent);
+  z-index:5
+}
+.header h1{margin:0;font-size:20px;line-height:1.2;font-weight:900}
+.subtitle{font-size:11px;color:var(--muted);margin-top:2px}
+.badge{
+  flex:0 0 auto;padding:7px 10px;border-radius:999px;background:var(--blue-soft);
+  color:#1d4ed8;font-size:12px;font-weight:900
+}
+.panel{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 8px 24px rgba(20,32,51,.06);padding:12px
+}
+.levels{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.level{
+  appearance:none;border:2px solid var(--line);background:#fafbfc;border-radius:14px;
+  padding:10px 8px;text-align:center;color:var(--text);min-height:64px
+}
+.level strong{display:block;font-size:15px}
+.level small{display:block;font-size:10px;line-height:1.35;color:var(--muted);margin-top:2px}
+.level.active{border-color:var(--blue);background:var(--blue-soft)}
+.level[data-level="advanced"].active{border-color:var(--purple);background:var(--purple-soft)}
+
+.settings{
+  display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;margin-bottom:2px;
+  scrollbar-width:none
+}
+.settings::-webkit-scrollbar{display:none}
+.typebtn{
+  flex:0 0 auto;appearance:none;border:0;border-radius:999px;padding:8px 12px;
+  background:#eef1f5;color:#475467;font-size:12px;font-weight:800
+}
+.typebtn.active{background:#dbe7ff;color:#1d4ed8}
+.advanced .typebtn.active{background:#ede4ff;color:#6d28d9}
+
+.stats{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;color:var(--muted);font-weight:800;padding:4px 2px 6px
+}
+.category{font-size:12px;font-weight:900;color:var(--blue);margin:4px 0 6px}
+.advanced .category{color:var(--purple)}
+.question{
+  font-size:clamp(22px,6vw,30px);font-weight:900;line-height:1.35;
+  margin:0 0 12px;letter-spacing:.01em
+}
+.options{display:grid;grid-template-columns:1fr;gap:8px}
+.option{
+  width:100%;min-height:58px;border:2px solid var(--line);border-radius:14px;
+  background:#fbfcfe;color:var(--text);font-size:18px;font-weight:900;
+  padding:12px 14px;text-align:left
+}
+.option:active{transform:scale(.99)}
+.option.correct{border-color:#79c58c;background:var(--ok-soft);color:var(--ok)}
+.option.wrong{border-color:#f2aaa3;background:var(--ng-soft);color:var(--ng)}
+.option:disabled{opacity:1}
+.feedback{
+  display:none;margin-top:10px;padding:12px;border-radius:14px;background:#f7f8fa;
+  border:1px solid #eceff3
+}
+.feedback.show{display:block}
+.feedback strong{display:block;font-size:17px;margin-bottom:6px}
+.detail{font-size:13px;line-height:1.55;color:#475467}
+.sourceLine{display:block;font-size:10px;line-height:1.45;color:var(--muted);margin-top:7px}
+.next{
+  display:none;width:100%;margin-top:10px;min-height:52px;border:0;border-radius:14px;
+  background:var(--blue);color:#fff;font-size:17px;font-weight:900
+}
+.next.show{display:block}
+.advanced .next{background:var(--purple)}
+.note{
+  margin-top:10px;padding:10px;border-radius:12px;background:#f8fafc;
+  color:var(--muted);font-size:10px;line-height:1.5
+}
+.result{text-align:center;padding:22px 8px}
+.result .big{font-size:52px;font-weight:900;color:var(--blue);line-height:1}
+.advanced .result .big{color:var(--purple)}
+.restart{
+  width:100%;min-height:50px;border:0;border-radius:14px;background:var(--blue);
+  color:white;font-size:17px;font-weight:900
+}
+.advanced .restart{background:var(--purple)}
+
+@media (min-width:700px){
+  .app{max-width:620px;padding-top:18px}
+  .panel{padding:18px}
+  .question{font-size:32px}
+  .option{font-size:19px}
+}
+</style>
+
+</head>
+<body>
+<div class="app" id="app">
+  <div class="header">
+    <div><h1>都道府県 比較クイズ</h1><div class="subtitle">人口・面積・位置 ／ 農林水産・畜産</div></div>
+    <div class="badge" id="badge">基礎編</div>
+  </div>
+
+  <div class="panel">
+    <div class="levels">
+      <button class="level active" data-level="basic">
+        <strong>基礎編</strong>
+        <small>人口・面積・位置</small>
+      </button>
+      <button class="level" data-level="advanced">
+        <strong>応用編</strong>
+        <small>農林水産・畜産</small>
+      </button>
+    </div>
+
+    <div class="settings" id="settings"></div>
+
+    <div id="game">
+      <div class="stats"><span id="progress">1 / 10</span><span id="score">正解 0</span></div>
+      <div class="category" id="category"></div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next" id="next">次の問題</button>
+    </div>
+
+    <div class="note" id="note"></div>
+  </div>
+</div>
+
+<script>
+const prefectures = [
+  {name:"北海道",population:4985419,area:83422.27,lat:43.064310,lng:141.346879,capital:"札幌市"},
+  {name:"青森県",population:1140395,area:9645.11,lat:40.824589,lng:140.740548,capital:"青森市"},
+  {name:"岩手県",population:1125502,area:15275.05,lat:39.703526,lng:141.152696,capital:"盛岡市"},
+  {name:"宮城県",population:2227240,area:7282.34,lat:38.268579,lng:140.872072,capital:"仙台市"},
+  {name:"秋田県",population:882100,area:11637.69,lat:39.718626,lng:140.102381,capital:"秋田市"},
+  {name:"山形県",population:993127,area:9323.15,lat:38.240434,lng:140.363690,capital:"山形市"},
+  {name:"福島県",population:1711937,area:13784.41,lat:37.750029,lng:140.467771,capital:"福島市"},
+  {name:"茨城県",population:2791207,area:6098.32,lat:36.341737,lng:140.446824,capital:"水戸市"},
+  {name:"栃木県",population:1864833,area:6408.09,lat:36.565912,lng:139.883592,capital:"宇都宮市"},
+  {name:"群馬県",population:1867582,area:6362.28,lat:36.390688,lng:139.060453,capital:"前橋市"},
+  {name:"埼玉県",population:7287169,area:3797.75,lat:35.857033,lng:139.649012,capital:"さいたま市"},
+  {name:"千葉県",population:6258512,area:5156.48,lat:35.604560,lng:140.123154,capital:"千葉市"},
+  {name:"東京都",population:14246219,area:2199.94,lat:35.689501,lng:139.691722,capital:"新宿区"},
+  {name:"神奈川県",population:9193657,area:2416.55,lat:35.447734,lng:139.642537,capital:"横浜市"},
+  {name:"新潟県",population:2068476,area:12583.80,lat:37.902451,lng:139.023245,capital:"新潟市"},
+  {name:"富山県",population:985675,area:4247.55,lat:36.695265,lng:137.211305,capital:"富山市"},
+  {name:"石川県",population:1088221,area:4190.94,lat:36.594606,lng:136.625669,capital:"金沢市"},
+  {name:"福井県",population:729386,area:4190.56,lat:36.065209,lng:136.221720,capital:"福井市"},
+  {name:"山梨県",population:779912,area:4465.27,lat:35.664108,lng:138.568455,capital:"甲府市"},
+  {name:"長野県",population:1954950,area:13561.57,lat:36.651306,lng:138.180904,capital:"長野市"},
+  {name:"岐阜県",population:1891489,area:10621.29,lat:35.391174,lng:136.723657,capital:"岐阜市"},
+  {name:"静岡県",population:3468845,area:7777.00,lat:34.976944,lng:138.383056,capital:"静岡市"},
+  {name:"愛知県",population:7449403,area:5173.26,lat:35.180209,lng:136.906582,capital:"名古屋市"},
+  {name:"三重県",population:1694896,area:5774.48,lat:34.730278,lng:136.508611,capital:"津市"},
+  {name:"滋賀県",population:1392439,area:4017.38,lat:35.004513,lng:135.868568,capital:"大津市"},
+  {name:"京都府",population:2502747,area:4612.09,lat:35.021242,lng:135.755613,capital:"京都市"},
+  {name:"大阪府",population:8764578,area:1905.26,lat:34.686344,lng:135.520037,capital:"大阪市"},
+  {name:"兵庫県",population:5323825,area:8400.82,lat:34.691257,lng:135.183078,capital:"神戸市"},
+  {name:"奈良県",population:1269180,area:3690.94,lat:34.685274,lng:135.832861,capital:"奈良市"},
+  {name:"和歌山県",population:864262,area:4724.65,lat:34.226111,lng:135.167500,capital:"和歌山市"},
+  {name:"鳥取県",population:523732,area:3507.05,lat:35.503449,lng:134.238261,capital:"鳥取市"},
+  {name:"島根県",population:629460,area:6707.79,lat:35.472293,lng:133.050520,capital:"松江市"},
+  {name:"岡山県",population:1808664,area:7114.44,lat:34.661739,lng:133.935032,capital:"岡山市"},
+  {name:"広島県",population:2683399,area:8478.16,lat:34.396558,lng:132.459646,capital:"広島市"},
+  {name:"山口県",population:1264006,area:6112.90,lat:34.186041,lng:131.470654,capital:"山口市"},
+  {name:"徳島県",population:675489,area:4146.96,lat:34.065761,lng:134.559286,capital:"徳島市"},
+  {name:"香川県",population:907725,area:1876.83,lat:34.340112,lng:134.043291,capital:"高松市"},
+  {name:"愛媛県",population:1260088,area:5675.82,lat:33.841642,lng:132.765682,capital:"松山市"},
+  {name:"高知県",population:643437,area:7102.28,lat:33.559722,lng:133.531111,capital:"高知市"},
+  {name:"福岡県",population:5081879,area:4987.24,lat:33.606389,lng:130.417968,capital:"福岡市"},
+  {name:"佐賀県",population:781214,area:2440.64,lat:33.249351,lng:130.298792,capital:"佐賀市"},
+  {name:"長崎県",population:1232190,area:4131.21,lat:32.750040,lng:129.867251,capital:"長崎市"},
+  {name:"熊本県",population:1678090,area:7409.13,lat:32.789800,lng:130.741584,capital:"熊本市"},
+  {name:"大分県",population:1076875,area:6340.62,lat:33.238130,lng:131.612645,capital:"大分市"},
+  {name:"宮崎県",population:1018904,area:7734.16,lat:31.911034,lng:131.423887,capital:"宮崎市"},
+  {name:"鹿児島県",population:1512969,area:9186.04,lat:31.560171,lng:130.558025,capital:"鹿児島市"},
+  {name:"沖縄県",population:1468220,area:2282.11,lat:26.212445,lng:127.680922,capital:"那覇市"}
+];
+
+const appliedData = {"rice": {"item": "米", "metric": "収穫量", "unit": "t", "year": "2024年産", "rows": [{"name": "北海道", "value": 562400}, {"name": "青森県", "value": 264200}, {"name": "岩手県", "value": 258900}, {"name": "宮城県", "value": 366100}, {"name": "秋田県", "value": 490000}, {"name": "山形県", "value": 354500}, {"name": "福島県", "value": 356800}, {"name": "茨城県", "value": 338800}, {"name": "栃木県", "value": 286200}, {"name": "群馬県", "value": 71400}, {"name": "埼玉県", "value": 140900}, {"name": "千葉県", "value": 287900}, {"name": "東京都", "value": 443}, {"name": "神奈川県", "value": 13700}, {"name": "新潟県", "value": 622800}, {"name": "富山県", "value": 189000}, {"name": "石川県", "value": 116200}, {"name": "福井県", "value": 124800}, {"name": "山梨県", "value": 25000}, {"name": "長野県", "value": 187900}, {"name": "岐阜県", "value": 101900}, {"name": "静岡県", "value": 70200}, {"name": "愛知県", "value": 130200}, {"name": "三重県", "value": 120800}, {"name": "滋賀県", "value": 146800}, {"name": "京都府", "value": 71700}, {"name": "大阪府", "value": 20700}, {"name": "兵庫県", "value": 166900}, {"name": "奈良県", "value": 42100}, {"name": "和歌山県", "value": 28700}, {"name": "鳥取県", "value": 59200}, {"name": "島根県", "value": 80300}, {"name": "岡山県", "value": 142800}, {"name": "広島県", "value": 108400}, {"name": "山口県", "value": 86200}, {"name": "徳島県", "value": 46500}, {"name": "香川県", "value": 48200}, {"name": "愛媛県", "value": 63800}, {"name": "高知県", "value": 46700}, {"name": "福岡県", "value": 152200}, {"name": "佐賀県", "value": 113100}, {"name": "長崎県", "value": 45900}, {"name": "熊本県", "value": 153300}, {"name": "大分県", "value": 88400}, {"name": "宮崎県", "value": 69700}, {"name": "鹿児島県", "value": 80400}, {"name": "沖縄県", "value": 1950}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "wheat": {"item": "小麦", "metric": "収穫量", "unit": "t", "year": "2024年産", "rows": [{"name": "北海道", "value": 714200}, {"name": "青森県", "value": 2130}, {"name": "岩手県", "value": 9660}, {"name": "宮城県", "value": 5230}, {"name": "秋田県", "value": 1050}, {"name": "山形県", "value": 280}, {"name": "福島県", "value": 1580}, {"name": "茨城県", "value": 15200}, {"name": "栃木県", "value": 9030}, {"name": "群馬県", "value": 23300}, {"name": "埼玉県", "value": 21900}, {"name": "千葉県", "value": 2660}, {"name": "東京都", "value": 21}, {"name": "神奈川県", "value": 88}, {"name": "新潟県", "value": 612}, {"name": "富山県", "value": 124}, {"name": "石川県", "value": 167}, {"name": "福井県", "value": 681}, {"name": "山梨県", "value": 253}, {"name": "長野県", "value": 7600}, {"name": "岐阜県", "value": 10900}, {"name": "静岡県", "value": 1260}, {"name": "愛知県", "value": 28900}, {"name": "三重県", "value": 18800}, {"name": "滋賀県", "value": 21800}, {"name": "京都府", "value": 328}, {"name": "大阪府", "value": 2}, {"name": "兵庫県", "value": 3990}, {"name": "奈良県", "value": 373}, {"name": "和歌山県", "value": 40}, {"name": "鳥取県", "value": 284}, {"name": "島根県", "value": 219}, {"name": "岡山県", "value": 3680}, {"name": "広島県", "value": 439}, {"name": "山口県", "value": 4480}, {"name": "徳島県", "value": 220}, {"name": "香川県", "value": 6680}, {"name": "愛媛県", "value": 1300}, {"name": "高知県", "value": 5}, {"name": "福岡県", "value": 52800}, {"name": "佐賀県", "value": 36200}, {"name": "長崎県", "value": 1720}, {"name": "熊本県", "value": 12600}, {"name": "大分県", "value": 5930}, {"name": "宮崎県", "value": 144}, {"name": "鹿児島県", "value": 75}, {"name": "沖縄県", "value": 14}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "cabbage": {"item": "キャベツ", "metric": "収穫量", "unit": "t", "year": "2023年産", "rows": [{"name": "北海道", "value": 50700}, {"name": "青森県", "value": 14600}, {"name": "岩手県", "value": 26300}, {"name": "宮城県", "value": 4670}, {"name": "秋田県", "value": 5880}, {"name": "茨城県", "value": 101600}, {"name": "群馬県", "value": 282900}, {"name": "埼玉県", "value": 17200}, {"name": "千葉県", "value": 116000}, {"name": "東京都", "value": 6460}, {"name": "神奈川県", "value": 61600}, {"name": "富山県", "value": 2310}, {"name": "福井県", "value": 2600}, {"name": "山梨県", "value": 3070}, {"name": "長野県", "value": 70000}, {"name": "静岡県", "value": 22800}, {"name": "愛知県", "value": 272700}, {"name": "三重県", "value": 11900}, {"name": "滋賀県", "value": 10300}, {"name": "京都府", "value": 6330}, {"name": "大阪府", "value": 8640}, {"name": "兵庫県", "value": 24400}, {"name": "和歌山県", "value": 5730}, {"name": "鳥取県", "value": 3670}, {"name": "島根県", "value": 5470}, {"name": "岡山県", "value": 11200}, {"name": "広島県", "value": 11600}, {"name": "山口県", "value": 7220}, {"name": "徳島県", "value": 6830}, {"name": "香川県", "value": 9710}, {"name": "愛媛県", "value": 10600}, {"name": "福岡県", "value": 21900}, {"name": "佐賀県", "value": 6610}, {"name": "長崎県", "value": 11600}, {"name": "熊本県", "value": 46000}, {"name": "大分県", "value": 15600}, {"name": "宮崎県", "value": 22300}, {"name": "鹿児島県", "value": 72900}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "onion": {"item": "たまねぎ", "metric": "収穫量", "unit": "t", "year": "2023年産", "rows": [{"name": "北海道", "value": 752500}, {"name": "福島県", "value": 2940}, {"name": "茨城県", "value": 5710}, {"name": "栃木県", "value": 10500}, {"name": "群馬県", "value": 7950}, {"name": "埼玉県", "value": 4880}, {"name": "千葉県", "value": 5750}, {"name": "富山県", "value": 9360}, {"name": "長野県", "value": 5170}, {"name": "岐阜県", "value": 2390}, {"name": "静岡県", "value": 13200}, {"name": "愛知県", "value": 24300}, {"name": "三重県", "value": 3090}, {"name": "大阪府", "value": 3520}, {"name": "兵庫県", "value": 97800}, {"name": "和歌山県", "value": 4100}, {"name": "島根県", "value": 3880}, {"name": "岡山県", "value": 6120}, {"name": "山口県", "value": 4810}, {"name": "香川県", "value": 9540}, {"name": "愛媛県", "value": 7160}, {"name": "福岡県", "value": 4290}, {"name": "佐賀県", "value": 97600}, {"name": "長崎県", "value": 29900}, {"name": "熊本県", "value": 11700}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "tomato": {"item": "トマト", "metric": "収穫量", "unit": "t", "year": "2023年産", "rows": [{"name": "北海道", "value": 59300}, {"name": "青森県", "value": 16700}, {"name": "岩手県", "value": 9830}, {"name": "宮城県", "value": 7530}, {"name": "秋田県", "value": 6220}, {"name": "山形県", "value": 7670}, {"name": "福島県", "value": 21000}, {"name": "茨城県", "value": 41000}, {"name": "栃木県", "value": 31000}, {"name": "群馬県", "value": 20900}, {"name": "埼玉県", "value": 14600}, {"name": "千葉県", "value": 28900}, {"name": "神奈川県", "value": 11800}, {"name": "新潟県", "value": 8710}, {"name": "富山県", "value": 1610}, {"name": "石川県", "value": 2800}, {"name": "福井県", "value": 2130}, {"name": "山梨県", "value": 6160}, {"name": "長野県", "value": 14700}, {"name": "岐阜県", "value": 28400}, {"name": "静岡県", "value": 12900}, {"name": "愛知県", "value": 44500}, {"name": "三重県", "value": 8810}, {"name": "滋賀県", "value": 2930}, {"name": "京都府", "value": 4200}, {"name": "兵庫県", "value": 8120}, {"name": "奈良県", "value": 3190}, {"name": "和歌山県", "value": 3160}, {"name": "鳥取県", "value": 3170}, {"name": "島根県", "value": 4450}, {"name": "岡山県", "value": 5190}, {"name": "広島県", "value": 10900}, {"name": "山口県", "value": 3740}, {"name": "徳島県", "value": 5010}, {"name": "香川県", "value": 3030}, {"name": "愛媛県", "value": 6660}, {"name": "高知県", "value": 5570}, {"name": "福岡県", "value": 17600}, {"name": "佐賀県", "value": 3090}, {"name": "長崎県", "value": 11600}, {"name": "熊本県", "value": 132600}, {"name": "大分県", "value": 9750}, {"name": "宮崎県", "value": 16100}, {"name": "鹿児島県", "value": 4510}, {"name": "沖縄県", "value": 2810}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "mikan": {"item": "みかん", "metric": "収穫量", "unit": "t", "year": "2023年産", "rows": [{"name": "千葉県", "value": 986}, {"name": "神奈川県", "value": 13100}, {"name": "静岡県", "value": 99800}, {"name": "愛知県", "value": 21800}, {"name": "三重県", "value": 16300}, {"name": "大阪府", "value": 11500}, {"name": "和歌山県", "value": 143900}, {"name": "広島県", "value": 15600}, {"name": "山口県", "value": 5220}, {"name": "徳島県", "value": 9470}, {"name": "香川県", "value": 9890}, {"name": "愛媛県", "value": 111100}, {"name": "高知県", "value": 6330}, {"name": "福岡県", "value": 16500}, {"name": "佐賀県", "value": 40400}, {"name": "長崎県", "value": 43600}, {"name": "熊本県", "value": 80600}, {"name": "大分県", "value": 10200}, {"name": "宮崎県", "value": 6980}, {"name": "鹿児島県", "value": 12400}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "apple": {"item": "りんご", "metric": "収穫量", "unit": "t", "year": "2023年産", "rows": [{"name": "北海道", "value": 7220}, {"name": "青森県", "value": 374400}, {"name": "岩手県", "value": 31600}, {"name": "宮城県", "value": 2330}, {"name": "秋田県", "value": 16300}, {"name": "山形県", "value": 30300}, {"name": "福島県", "value": 18500}, {"name": "群馬県", "value": 6030}, {"name": "富山県", "value": 893}, {"name": "石川県", "value": 667}, {"name": "山梨県", "value": 686}, {"name": "長野県", "value": 106900}, {"name": "岐阜県", "value": 1330}, {"name": "広島県", "value": 1670}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "grape": {"item": "ぶどう", "metric": "収穫量", "unit": "t", "year": "2023年産", "rows": [{"name": "北海道", "value": 7760}, {"name": "青森県", "value": 3190}, {"name": "岩手県", "value": 2350}, {"name": "秋田県", "value": 1770}, {"name": "山形県", "value": 13800}, {"name": "福島県", "value": 2650}, {"name": "埼玉県", "value": 1170}, {"name": "新潟県", "value": 2010}, {"name": "石川県", "value": 834}, {"name": "福井県", "value": 136}, {"name": "山梨県", "value": 41700}, {"name": "長野県", "value": 31400}, {"name": "愛知県", "value": 3210}, {"name": "滋賀県", "value": 419}, {"name": "大阪府", "value": 3520}, {"name": "兵庫県", "value": 2250}, {"name": "鳥取県", "value": 501}, {"name": "島根県", "value": 2170}, {"name": "岡山県", "value": 15300}, {"name": "広島県", "value": 3040}, {"name": "香川県", "value": 1050}, {"name": "愛媛県", "value": 1480}, {"name": "福岡県", "value": 6850}, {"name": "大分県", "value": 2220}, {"name": "宮崎県", "value": 1120}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "pork": {"item": "豚肉", "metric": "枝肉生産量", "unit": "t", "year": "2023年", "rows": [{"name": "北海道", "value": 108995}, {"name": "青森県", "value": 89191}, {"name": "岩手県", "value": 29169}, {"name": "宮城県", "value": 27771}, {"name": "秋田県", "value": 24506}, {"name": "山形県", "value": 31562}, {"name": "福島県", "value": 17381}, {"name": "茨城県", "value": 85931}, {"name": "栃木県", "value": 28506}, {"name": "群馬県", "value": 58122}, {"name": "埼玉県", "value": 44510}, {"name": "千葉県", "value": 67885}, {"name": "東京都", "value": 16547}, {"name": "神奈川県", "value": 45121}, {"name": "新潟県", "value": 33963}, {"name": "富山県", "value": 7211}, {"name": "石川県", "value": 2576}, {"name": "山梨県", "value": 2912}, {"name": "長野県", "value": 8889}, {"name": "岐阜県", "value": 7078}, {"name": "静岡県", "value": 16333}, {"name": "愛知県", "value": 40636}, {"name": "三重県", "value": 13064}, {"name": "京都府", "value": 1555}, {"name": "大阪府", "value": 2775}, {"name": "兵庫県", "value": 7392}, {"name": "奈良県", "value": 585}, {"name": "鳥取県", "value": 6012}, {"name": "島根県", "value": 7328}, {"name": "岡山県", "value": 5226}, {"name": "広島県", "value": 4389}, {"name": "徳島県", "value": 17918}, {"name": "香川県", "value": 13046}, {"name": "愛媛県", "value": 13380}, {"name": "高知県", "value": 8006}, {"name": "福岡県", "value": 16253}, {"name": "佐賀県", "value": 7858}, {"name": "長崎県", "value": 45790}, {"name": "熊本県", "value": 13110}, {"name": "大分県", "value": 11449}, {"name": "宮崎県", "value": 79349}, {"name": "鹿児島県", "value": 200890}, {"name": "沖縄県", "value": 23667}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "chicken": {"item": "鶏肉用ブロイラー", "metric": "飼養羽数", "unit": "千羽", "year": "2024年2月1日", "rows": [{"name": "北海道", "value": 5531}, {"name": "青森県", "value": 7639}, {"name": "岩手県", "value": 23604}, {"name": "宮城県", "value": 1990}, {"name": "山形県", "value": 542}, {"name": "福島県", "value": 751}, {"name": "茨城県", "value": 1350}, {"name": "群馬県", "value": 1587}, {"name": "千葉県", "value": 1935}, {"name": "新潟県", "value": 1201}, {"name": "福井県", "value": 91}, {"name": "山梨県", "value": 392}, {"name": "長野県", "value": 696}, {"name": "岐阜県", "value": 939}, {"name": "静岡県", "value": 947}, {"name": "愛知県", "value": 962}, {"name": "三重県", "value": 662}, {"name": "京都府", "value": 535}, {"name": "兵庫県", "value": 2412}, {"name": "和歌山県", "value": 231}, {"name": "鳥取県", "value": 3151}, {"name": "島根県", "value": 377}, {"name": "岡山県", "value": 2840}, {"name": "広島県", "value": 647}, {"name": "山口県", "value": 1497}, {"name": "徳島県", "value": 3855}, {"name": "香川県", "value": 2119}, {"name": "愛媛県", "value": 957}, {"name": "高知県", "value": 397}, {"name": "福岡県", "value": 1168}, {"name": "佐賀県", "value": 3929}, {"name": "長崎県", "value": 3297}, {"name": "熊本県", "value": 3746}, {"name": "大分県", "value": 1782}, {"name": "宮崎県", "value": 28155}, {"name": "鹿児島県", "value": 32003}, {"name": "沖縄県", "value": 624}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "beef": {"item": "牛肉用の肉用牛", "metric": "飼養頭数", "unit": "頭", "year": "2024年2月1日", "rows": [{"name": "北海道", "value": 558500}, {"name": "青森県", "value": 55500}, {"name": "岩手県", "value": 87900}, {"name": "宮城県", "value": 79500}, {"name": "秋田県", "value": 18800}, {"name": "山形県", "value": 43200}, {"name": "福島県", "value": 50500}, {"name": "茨城県", "value": 52300}, {"name": "栃木県", "value": 86700}, {"name": "群馬県", "value": 56400}, {"name": "埼玉県", "value": 17400}, {"name": "千葉県", "value": 41700}, {"name": "東京都", "value": 740}, {"name": "神奈川県", "value": 5130}, {"name": "新潟県", "value": 12000}, {"name": "富山県", "value": 3860}, {"name": "石川県", "value": 3630}, {"name": "福井県", "value": 1960}, {"name": "山梨県", "value": 5210}, {"name": "長野県", "value": 21000}, {"name": "岐阜県", "value": 34000}, {"name": "静岡県", "value": 19900}, {"name": "愛知県", "value": 42300}, {"name": "三重県", "value": 31400}, {"name": "滋賀県", "value": 22000}, {"name": "京都府", "value": 5290}, {"name": "大阪府", "value": 780}, {"name": "兵庫県", "value": 58400}, {"name": "奈良県", "value": 3350}, {"name": "和歌山県", "value": 2870}, {"name": "鳥取県", "value": 21400}, {"name": "島根県", "value": 32400}, {"name": "岡山県", "value": 35500}, {"name": "広島県", "value": 27700}, {"name": "山口県", "value": 14500}, {"name": "徳島県", "value": 22900}, {"name": "香川県", "value": 22000}, {"name": "愛媛県", "value": 9910}, {"name": "高知県", "value": 6390}, {"name": "福岡県", "value": 23200}, {"name": "佐賀県", "value": 52200}, {"name": "長崎県", "value": 93500}, {"name": "熊本県", "value": 134000}, {"name": "大分県", "value": 54400}, {"name": "宮崎県", "value": 258200}, {"name": "鹿児島県", "value": 362700}, {"name": "沖縄県", "value": 79000}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "eggs": {"item": "卵", "metric": "鶏卵生産量", "unit": "t", "year": "2023年", "rows": [{"name": "北海道", "value": 72407}, {"name": "青森県", "value": 86373}, {"name": "岩手県", "value": 81402}, {"name": "宮城県", "value": 75476}, {"name": "秋田県", "value": 38135}, {"name": "山形県", "value": 8388}, {"name": "福島県", "value": 64224}, {"name": "茨城県", "value": 139729}, {"name": "栃木県", "value": 105723}, {"name": "群馬県", "value": 122337}, {"name": "埼玉県", "value": 30652}, {"name": "千葉県", "value": 153324}, {"name": "東京都", "value": 955}, {"name": "神奈川県", "value": 18911}, {"name": "新潟県", "value": 57425}, {"name": "富山県", "value": 13139}, {"name": "石川県", "value": 18686}, {"name": "福井県", "value": 13736}, {"name": "山梨県", "value": 9164}, {"name": "長野県", "value": 8309}, {"name": "岐阜県", "value": 62380}, {"name": "静岡県", "value": 93032}, {"name": "愛知県", "value": 116241}, {"name": "三重県", "value": 92088}, {"name": "滋賀県", "value": 3128}, {"name": "京都府", "value": 28321}, {"name": "大阪府", "value": 482}, {"name": "兵庫県", "value": 99427}, {"name": "奈良県", "value": 6039}, {"name": "和歌山県", "value": 4730}, {"name": "鳥取県", "value": 3445}, {"name": "島根県", "value": 14831}, {"name": "岡山県", "value": 135838}, {"name": "広島県", "value": 116953}, {"name": "山口県", "value": 21630}, {"name": "徳島県", "value": 12701}, {"name": "香川県", "value": 90802}, {"name": "愛媛県", "value": 27784}, {"name": "高知県", "value": 4872}, {"name": "福岡県", "value": 35486}, {"name": "佐賀県", "value": 4914}, {"name": "長崎県", "value": 28460}, {"name": "熊本県", "value": 43490}, {"name": "大分県", "value": 17103}, {"name": "宮崎県", "value": 55877}, {"name": "鹿児島県", "value": 169898}, {"name": "沖縄県", "value": 18493}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "milk": {"item": "牛乳", "metric": "牛乳生産量", "unit": "kl", "year": "2023年", "rows": [{"name": "北海道", "value": 455199}, {"name": "岩手県", "value": 68499}, {"name": "宮城県", "value": 55786}, {"name": "山形県", "value": 17407}, {"name": "福島県", "value": 41620}, {"name": "茨城県", "value": 180315}, {"name": "栃木県", "value": 159517}, {"name": "群馬県", "value": 78109}, {"name": "埼玉県", "value": 78124}, {"name": "千葉県", "value": 162425}, {"name": "東京都", "value": 58095}, {"name": "神奈川県", "value": 201593}, {"name": "新潟県", "value": 40470}, {"name": "石川県", "value": 23480}, {"name": "山梨県", "value": 1766}, {"name": "長野県", "value": 125938}, {"name": "岐阜県", "value": 115033}, {"name": "静岡県", "value": 58501}, {"name": "愛知県", "value": 129095}, {"name": "三重県", "value": 24991}, {"name": "滋賀県", "value": 21861}, {"name": "京都府", "value": 86208}, {"name": "大阪府", "value": 103209}, {"name": "兵庫県", "value": 113098}, {"name": "岡山県", "value": 113768}, {"name": "広島県", "value": 52316}, {"name": "山口県", "value": 22385}, {"name": "高知県", "value": 8170}, {"name": "福岡県", "value": 130195}, {"name": "佐賀県", "value": 9938}, {"name": "長崎県", "value": 10463}, {"name": "熊本県", "value": 102641}, {"name": "大分県", "value": 43351}, {"name": "宮崎県", "value": 23547}, {"name": "鹿児島県", "value": 8816}, {"name": "沖縄県", "value": 17394}], "source": "農林水産省「お役立ちデータ集2025」収録の公的統計"}, "sardine": {"item": "まいわし", "metric": "定置網漁業での漁獲量（2016～2018年平均）", "unit": "t", "year": "2016～2018年平均", "rows": [{"name": "北海道", "value": 6959}, {"name": "宮城県", "value": 19022}, {"name": "神奈川県", "value": 1501}, {"name": "富山県", "value": 6549}, {"name": "石川県", "value": 8331}, {"name": "高知県", "value": 529}, {"name": "長崎県", "value": 41}, {"name": "鹿児島県", "value": 26}, {"name": "沖縄県", "value": 0}], "source": "水産庁「定置網漁業の技術研究会中間とりまとめ」表2-2（農林水産省『漁業・養殖業生産統計』に基づく）"}, "mackerel": {"item": "さば類", "metric": "定置網漁業での漁獲量（2016～2018年平均）", "unit": "t", "year": "2016～2018年平均", "rows": [{"name": "北海道", "value": 3167}, {"name": "宮城県", "value": 12526}, {"name": "秋田県", "value": 34}, {"name": "神奈川県", "value": 1721}, {"name": "富山県", "value": 929}, {"name": "石川県", "value": 1428}, {"name": "高知県", "value": 1784}, {"name": "長崎県", "value": 451}, {"name": "鹿児島県", "value": 695}, {"name": "沖縄県", "value": 0}], "source": "水産庁「定置網漁業の技術研究会中間とりまとめ」表2-2（農林水産省『漁業・養殖業生産統計』に基づく）"}, "yellowtail": {"item": "ぶり類", "metric": "定置網漁業での漁獲量（2016～2018年平均）", "unit": "t", "year": "2016～2018年平均", "rows": [{"name": "北海道", "value": 6809}, {"name": "宮城県", "value": 2908}, {"name": "秋田県", "value": 734}, {"name": "神奈川県", "value": 1466}, {"name": "富山県", "value": 1484}, {"name": "石川県", "value": 2412}, {"name": "高知県", "value": 2936}, {"name": "長崎県", "value": 2654}, {"name": "鹿児島県", "value": 958}, {"name": "沖縄県", "value": 5}], "source": "水産庁「定置網漁業の技術研究会中間とりまとめ」表2-2（農林水産省『漁業・養殖業生産統計』に基づく）"}};
+
+const BASIC_TYPES = {
+  popMore: {group:"population",label:"人口",text:b=>`${b.name}より人口が多い都道府県は？`,value:p=>p.population,valid:(x,b)=>x.population>b.population},
+  popLess: {group:"population",label:"人口",text:b=>`${b.name}より人口が少ない都道府県は？`,value:p=>p.population,valid:(x,b)=>x.population<b.population},
+  areaMore:{group:"area",label:"面積",text:b=>`${b.name}より面積が広い都道府県は？`,value:p=>p.area,valid:(x,b)=>x.area>b.area},
+  areaLess:{group:"area",label:"面積",text:b=>`${b.name}より面積が狭い都道府県は？`,value:p=>p.area,valid:(x,b)=>x.area<b.area},
+  north:{group:"position",label:"位置・北",text:b=>`${b.name}より北にある都道府県は？`,value:p=>p.lat,valid:(x,b)=>x.lat>b.lat},
+  south:{group:"position",label:"位置・南",text:b=>`${b.name}より南にある都道府県は？`,value:p=>p.lat,valid:(x,b)=>x.lat<b.lat},
+  east:{group:"position",label:"位置・東",text:b=>`${b.name}より東にある都道府県は？`,value:p=>p.lng,valid:(x,b)=>x.lng>b.lng},
+  west:{group:"position",label:"位置・西",text:b=>`${b.name}より西にある都道府県は？`,value:p=>p.lng,valid:(x,b)=>x.lng<b.lng}
+};
+
+const ADV_GROUPS = {
+  all:"全部", grain:"穀物", vegetable:"野菜", fruit:"果物", fish:"魚介", livestock:"畜産"
+};
+const ADV_KEYS = {
+  grain:["rice","wheat"],
+  vegetable:["cabbage","onion","tomato"],
+  fruit:["mikan","apple","grape"],
+  fish:["sardine","mackerel","yellowtail"],
+  livestock:["chicken","pork","beef","eggs","milk"]
+};
+const KEY_GROUP = Object.fromEntries(Object.entries(ADV_KEYS).flatMap(([g,ks])=>ks.map(k=>[k,g])));
+
+let level="basic", mode="all", qNo=0, score=0, answered=false, current=null;
+const TOTAL=10;
+const $=s=>document.querySelector(s);
+const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+const fmt=n=>Number(n).toLocaleString("ja-JP");
+
+function setSettings() {
+  const box=$("#settings");
+  box.innerHTML="";
+  if(level==="basic") {
+    const opts=[["all","全部"],["population","人口"],["area","面積"],["position","東西南北"]];
+    opts.forEach(([k,label],i)=>{
+      const b=document.createElement("button"); b.className="typebtn"+(i===0?" active":""); b.textContent=label; b.dataset.mode=k;
+      b.onclick=()=>changeMode(k,b); box.appendChild(b);
+    });
+    $("#note").innerHTML=`人口：2025年国勢調査人口速報集計。面積：2025年10月1日時点の国土地理院面積。<br>東西南北：都道府県庁所在地の緯度・経度で比較。`;
+  } else {
+    Object.entries(ADV_GROUPS).forEach(([k,label],i)=>{
+      const b=document.createElement("button"); b.className="typebtn"+(i===0?" active":""); b.textContent=label; b.dataset.mode=k;
+      b.onclick=()=>changeMode(k,b); box.appendChild(b);
+    });
+    $("#note").innerHTML=`応用編は農林水産省・水産庁の公的統計を使用。品目ごとに調査年・指標が異なります。<br>基準となる都道府県は各品目の生産量上位10都道府県から出題します。未調査（…）・非公表（x）は候補から除外しています。`;
+  }
+}
+
+function changeMode(k,b) {
+  mode=k; qNo=0; score=0;
+  document.querySelectorAll(".typebtn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  resetGameDOM(); render();
+}
+
+function resetGameDOM() {
+  $("#game").innerHTML=`<div class="stats"><span id="progress"></span><span id="score"></span></div>
+  <div class="category" id="category"></div><div class="question" id="question"></div>
+  <div class="options" id="options"></div><div class="feedback" id="feedback"></div>
+  <button class="next" id="next">次の問題</button>`;
+  $("#next").onclick=nextQuestion;
+}
+
+function basicPoolTypes() {
+  return Object.entries(BASIC_TYPES).filter(([k,t])=>mode==="all" || t.group===mode);
+}
+
+function makeBasic() {
+  for(let tries=0;tries<300;tries++) {
+    const pool=basicPoolTypes(); const [key,t]=pool[Math.floor(Math.random()*pool.length)];
+    const base=prefectures[Math.floor(Math.random()*prefectures.length)];
+    const others=prefectures.filter(p=>p!==base);
+    const pos=others.filter(p=>t.valid(p,base)), neg=others.filter(p=>!t.valid(p,base));
+    if(!pos.length||neg.length<3) continue;
+    const dist=p=>Math.abs(t.value(p)-t.value(base));
+    pos.sort((a,b)=>dist(a)-dist(b)); neg.sort((a,b)=>dist(a)-dist(b));
+    const correct=pos[Math.floor(Math.random()*Math.min(8,pos.length))];
+    const distractors=shuffle(neg.slice(0,Math.min(14,neg.length))).slice(0,3);
+    return {kind:"basic",key,t,base,correct,choices:shuffle([correct,...distractors])};
+  }
+}
+
+function advKeyPool() {
+  if(mode==="all") return Object.keys(appliedData);
+  return ADV_KEYS[mode] || Object.keys(appliedData);
+}
+
+function makeAdvanced() {
+  for(let tries=0;tries<300;tries++) {
+    const keys=advKeyPool(), key=keys[Math.floor(Math.random()*keys.length)], d=appliedData[key];
+    const rows=d.rows.filter(r=>typeof r.value==="number");
+    if(rows.length<4) continue;
+
+    // 応用編では基準となる都道府県を、その品目の生産量上位10都道府県に限定
+    // これにより、知名度の低い少量生産県同士の比較ばかりになるのを防ぐ
+    const ranked=[...rows].sort((a,b)=>b.value-a.value);
+    const basePool=ranked.slice(0,Math.min(10,ranked.length));
+    const base=basePool[Math.floor(Math.random()*basePool.length)];
+
+    const direction=Math.random()<.5?"more":"less";
+    const pos=rows.filter(r=>r.name!==base.name && (direction==="more"?r.value>base.value:r.value<base.value));
+    const neg=rows.filter(r=>r.name!==base.name && !(direction==="more"?r.value>base.value:r.value<base.value));
+    if(!pos.length||neg.length<3) continue;
+    const dist=r=>Math.abs(r.value-base.value);
+    pos.sort((a,b)=>dist(a)-dist(b)); neg.sort((a,b)=>dist(a)-dist(b));
+    const correct=pos[Math.floor(Math.random()*Math.min(6,pos.length))];
+    const distractors=shuffle(neg.slice(0,Math.min(12,neg.length))).slice(0,3);
+    return {kind:"advanced",key,d,base,direction,correct,choices:shuffle([correct,...distractors])};
+  }
+}
+
+function render() {
+  answered=false; current=level==="basic"?makeBasic():makeAdvanced();
+  $("#progress").textContent=`${qNo+1} / ${TOTAL}`;
+  $("#score").textContent=`正解 ${score}`;
+  $("#feedback").className="feedback"; $("#feedback").innerHTML="";
+  $("#next").className="next"; $("#options").innerHTML="";
+  if(current.kind==="basic") {
+    $("#category").textContent=`基礎編 ｜ ${current.t.label}`;
+    $("#question").textContent=current.t.text(current.base);
+  } else {
+    const group=ADV_GROUPS[KEY_GROUP[current.key]];
+    $("#category").textContent=`応用編 ｜ ${group} ｜ ${current.d.item}`;
+    $("#question").textContent=`${current.base.name}より${current.d.item}の${current.d.metric}が${current.direction==="more"?"多い":"少ない"}都道府県は？`;
+  }
+  current.choices.forEach(p=>{
+    const b=document.createElement("button"); b.className="option"; b.textContent=p.name;
+    b.onclick=()=>answer(p,b); $("#options").appendChild(b);
+  });
+}
+
+function basicValueText(p,key) {
+  if(key.startsWith("pop")) return fmt(p.population)+"人";
+  if(key.startsWith("area")) return p.area.toLocaleString("ja-JP",{minimumFractionDigits:2,maximumFractionDigits:2})+"km²";
+  if(key==="north"||key==="south") return `県庁所在地 ${p.capital}：北緯 ${p.lat.toFixed(3)}°`;
+  return `県庁所在地 ${p.capital}：東経 ${p.lng.toFixed(3)}°`;
+}
+
+function answer(p,button) {
+  if(answered) return; answered=true;
+  const ok=p===current.correct; if(ok) score++;
+  [...document.querySelectorAll(".option")].forEach((b,i)=>{
+    b.disabled=true; const target=current.choices[i];
+    if(target===current.correct) b.classList.add("correct"); else if(b===button) b.classList.add("wrong");
+  });
+  const f=$("#feedback"); f.className="feedback show";
+  if(current.kind==="basic") {
+    f.innerHTML=`<strong>${ok?"正解！":"残念！ 正解は "+current.correct.name}</strong>
+      <div class="detail">${current.base.name}：${basicValueText(current.base,current.key)}<br>
+      ${current.correct.name}：${basicValueText(current.correct,current.key)}
+      ${current.t.group==="position"?"<br><small>※都道府県庁所在地で比較</small>":""}</div>`;
+  } else {
+    f.innerHTML=`<strong>${ok?"正解！":"残念！ 正解は "+current.correct.name}</strong>
+      <div class="detail">${current.base.name}：${fmt(current.base.value)} ${current.d.unit}<br>
+      ${current.correct.name}：${fmt(current.correct.value)} ${current.d.unit}<br>
+      <span class="sourceLine">${current.d.year} ｜ ${current.d.metric}<br>出典：${current.d.source}</span></div>`;
+  }
+  $("#score").textContent=`正解 ${score}`; $("#next").className="next show";
+  $("#next").textContent=qNo===TOTAL-1?"結果を見る":"次の問題";
+}
+
+function nextQuestion() {
+  qNo++; if(qNo>=TOTAL) showResult(); else render();
+}
+
+function showResult() {
+  $("#game").innerHTML=`<div class="result"><div style="font-weight:800;color:#667085">${level==="basic"?"基礎編":"応用編"} 10問終了</div>
+    <div class="big">${score} / ${TOTAL}</div>
+    <p>${score>=9?"都道府県博士級！":score>=7?"かなり詳しいです！":score>=5?"いい調子です！":"もう一度挑戦して覚えよう！"}</p>
+    <button class="restart" id="again">もう一度</button></div>`;
+  $("#again").onclick=()=>{qNo=0;score=0;resetGameDOM();render();};
+}
+
+document.querySelectorAll(".level").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll(".level").forEach(x=>x.classList.remove("active")); b.classList.add("active");
+    level=b.dataset.level; mode="all"; qNo=0; score=0;
+    $("#app").className="app "+(level==="advanced"?"advanced":"");
+    $("#badge").textContent=level==="basic"?"基礎編":"応用編";
+    setSettings(); resetGameDOM(); render();
+  };
+});
+
+setSettings(); resetGameDOM(); render();
+</script>
+</body>
+</html>

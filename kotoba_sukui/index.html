@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ことばすくい</title>
+<style>
+  html,body{margin:0;height:100%;background:#101827;overflow:hidden;font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",sans-serif}
+  #game{width:100%;height:100%}
+  canvas{display:block;margin:auto;touch-action:none}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+</head>
+<body>
+<div id="game"></div>
+<script>
+(() => {
+const W=430,H=760;
+const WORDS=[
+  ["学校","がっこう"],["青空","あおぞら"],["火山","かざん"],["森林","しんりん"],
+  ["海水","かいすい"],["雨雲","あまぐも"],["電車","でんしゃ"],["国語","こくご"],
+  ["算数","さんすう"],["音楽","おんがく"],["読書","どくしょ"],["作文","さくぶん"],
+  ["運動","うんどう"],["公園","こうえん"],["時計","とけい"],["道路","どうろ"],
+  ["動物","どうぶつ"],["植物","しょくぶつ"],["野菜","やさい"],["星空","ほしぞら"],
+  ["朝日","あさひ"],["夕日","ゆうひ"],["雪山","ゆきやま"],["草原","そうげん"]
+];
+const KANJI="学青空火山森海水雨雲電車国語算数音楽読書作文運動公園時計道路物植野菜星朝夕雪草原上下左右大小中天気月日川田石花虫糸人木金土白赤村町先生年";
+let target=null, balls=[], bowl=[], score=0, timeLeft=60, playing=true;
+
+class Main extends Phaser.Scene{
+ constructor(){super("main")}
+ create(){
+  this.cameras.main.setBackgroundColor("#15233c");
+
+  this.add.rectangle(W/2,36,W,72,0xf6d47b).setStrokeStyle(4,0xc54b2c);
+  this.add.text(18,7,"ことばすくい",{
+    fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',
+    fontSize:"28px",fontStyle:"bold",color:"#7e291d",
+    padding:{top:10,bottom:7,left:3,right:3}
+  }).setDepth(5);
+  this.scoreText=this.add.text(270,10,"得点 0",{
+    fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',
+    fontSize:"18px",fontStyle:"bold",color:"#7e291d",
+    padding:{top:8,bottom:6,left:3,right:3}
+  });
+  this.timeText=this.add.text(352,10,"60秒",{
+    fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',
+    fontSize:"18px",fontStyle:"bold",color:"#7e291d",
+    padding:{top:8,bottom:6,left:3,right:3}
+  });
+
+  this.add.rectangle(W/2,116,W-20,72,0x8edff2).setStrokeStyle(4,0xffffff,0.75);
+  this.add.text(20,88,"お題",{
+    fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',
+    fontSize:"18px",color:"#18344a",padding:{top:7,bottom:5,left:2,right:2}
+  });
+  this.targetText=this.add.text(78,83,"",{
+    fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',
+    fontSize:"34px",fontStyle:"bold",color:"#17324f",
+    padding:{top:10,bottom:8,left:4,right:4}
+  });
+  this.yomiText=this.add.text(160,101,"",{
+    fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',
+    fontSize:"16px",color:"#315a70",padding:{top:7,bottom:5,left:3,right:3}
+  });
+
+  this.add.rectangle(W/2,352,W-18,400,0x47b9db).setStrokeStyle(6,0xeefbff);
+  this.waterG=this.add.graphics();
+  this.waterG.lineStyle(2,0xffffff,0.25);
+  for(let y=185;y<525;y+=46){
+    this.waterG.beginPath();
+    for(let x=10;x<=W-10;x+=22){
+      this.waterG.lineTo(x,y+Math.sin((x+y)/34)*4);
+    }
+    this.waterG.strokePath();
+  }
+
+  this.help=this.add.text(W/2,562,"ボールをクリックしたまま、下のお皿へ運ぼう！",{
+    fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',
+    fontSize:"16px",color:"#ffffff",backgroundColor:"#164d65",
+    padding:{left:10,right:10,top:8,bottom:6},
+    align:"center"
+  }).setOrigin(0.5);
+
+  this.add.ellipse(W/2,681,330,100,0xf6f0dd).setStrokeStyle(6,0xb66736);
+  this.add.ellipse(W/2,653,290,48,0xe2cba8).setStrokeStyle(4,0xb66736);
+  this.plateBalls=[];
+
+  this.poi=this.add.container(W/2,470).setDepth(50);
+  this.poiRing=this.add.circle(0,0,34,0xfaf5d5,0.42).setStrokeStyle(6,0xffe3a1);
+  this.poiStick=this.add.rectangle(-42,34,80,9,0xe6b35c).setRotation(-0.65);
+  this.poi.add([this.poiStick,this.poiRing]);
+
+  this.carryBall=null;
+  this.pointerHeld=false;
+
+  this.input.on("pointermove",(pointer)=>{
+    if(!playing)return;
+    this.poi.x=Phaser.Math.Clamp(pointer.x,36,W-36);
+    this.poi.y=Phaser.Math.Clamp(pointer.y,180,610);
+    if(this.carryBall && this.carryBall.active){
+      this.carryBall.x=this.poi.x;
+      this.carryBall.y=this.poi.y;
+      this.carryBall.rotation += this.carryBall.getData("spin") * 0.018;
+      this.carryBall.setDepth(60);
+    }
+  });
+
+  this.input.on("pointerdown",(pointer)=>{
+    if(!playing || this.carryBall)return;
+    this.poi.x=Phaser.Math.Clamp(pointer.x,36,W-36);
+    this.poi.y=Phaser.Math.Clamp(pointer.y,180,610);
+    this.pointerHeld=true;
+
+    let best=null;
+    let bestDist=9999;
+    for(const b of balls){
+      if(!b.active || b.getData("carried"))continue;
+      const d=Phaser.Math.Distance.Between(this.poi.x,this.poi.y,b.x,b.y);
+      if(d<34 && d<bestDist){best=b;bestDist=d;}
+    }
+    if(best){
+      this.carryBall=best;
+      best.setData("carried",true);
+      best.setData("isBall",false);
+      best.disableInteractive();
+      best.setDepth(60);
+      best.x=this.poi.x;
+      best.y=this.poi.y;
+    }
+  });
+
+  this.input.on("pointerup",(pointer)=>{
+    this.pointerHeld=false;
+    if(!playing || !this.carryBall)return;
+    const ball=this.carryBall;
+    this.carryBall=null;
+    const inBowl = pointer.y >= 620 && Math.abs(pointer.x - W/2) <= 150;
+
+    if(inBowl){
+      const c=ball.getData("char");
+      ball.setData("carried",false);
+      balls=balls.filter(x=>x!==ball);
+      bowl.push(c);
+      this.placeBallOnPlate(ball,bowl.length-1);
+      if(bowl.length>=target[0].length) this.checkWord();
+    }else{
+      ball.setData("carried",false);
+      ball.setData("isBall",true);
+      ball.setDepth(10);
+      ball.x=Phaser.Math.Clamp(pointer.x,34,W-34);
+      ball.y=Phaser.Math.Clamp(pointer.y,185,515);
+      ball.setData("vx",Phaser.Math.FloatBetween(18,40)*(Math.random()<.5?-1:1));
+      ball.setInteractive(new Phaser.Geom.Circle(0,0,32),Phaser.Geom.Circle.Contains);
+      this.tweens.add({
+        targets:ball,y:Math.min(515,ball.y+14),duration:160,yoyo:true,ease:"Sine.easeOut"
+      });
+    }
+  });
+
+  this.time.addEvent({delay:1000,loop:true,callback:()=>{
+    if(!playing)return;
+    timeLeft--;
+    this.timeText.setText(timeLeft+"秒");
+    if(timeLeft<=0)this.gameOver();
+  }});
+
+  this.pickTarget();
+  this.spawnSet();
+ }
+
+ placeBallOnPlate(ball,index){
+   ball.setDepth(40);
+   ball.setScale(0.72);
+   ball.disableInteractive();
+   const total=target[0].length;
+   const spacing=72;
+   const startX=W/2-((total-1)*spacing)/2;
+   const tx=startX+index*spacing;
+   const ty=649;
+   this.tweens.add({
+     targets:ball,x:tx,y:ty,scale:0.72,duration:240,ease:"Back.easeOut"
+   });
+   this.plateBalls.push(ball);
+ }
+
+ pickTarget(){
+   target=Phaser.Utils.Array.GetRandom(WORDS);
+   bowl=[];
+   if(this.plateBalls){
+     this.plateBalls.forEach(b=>{ if(b && b.active) b.destroy(); });
+     this.plateBalls=[];
+   }
+   this.targetText.setText("？？");
+   this.yomiText.setText("「"+target[1]+"」を作ろう");
+ }
+ spawnSet(){
+   balls.forEach(b=>b.destroy());
+   balls=[];
+   const needed=[...target[0]];
+   const chars=[...needed];
+   while(chars.length<8){
+     const c=KANJI[Phaser.Math.Between(0,KANJI.length-1)];
+     if(!chars.includes(c) || Math.random()<0.35) chars.push(c);
+   }
+   Phaser.Utils.Array.Shuffle(chars);
+   chars.forEach((c,i)=>this.makeBall(c,i));
+ }
+ makeBall(c,i){
+   const cols=3;
+   const x=82+(i%cols)*132+Phaser.Math.Between(-12,12);
+   const y=225+Math.floor(i/cols)*112+Phaser.Math.Between(-10,10);
+   const color=Phaser.Display.Color.HSVToRGB((i*0.083+Math.random()*0.08)%1,0.55,1).color;
+   const cont=this.add.container(x,y).setDepth(10);
+   const shadow=this.add.circle(4,6,31,0x000000,0.16);
+   const circle=this.add.circle(0,0,31,color).setStrokeStyle(4,0xffffff,0.92);
+   const shine=this.add.circle(-10,-11,7,0xffffff,0.55);
+   const text=this.add.text(0,2,c,{
+     fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',
+     fontSize:"32px",
+     fontStyle:"bold",
+     color:"#172234",
+     padding:{left:8,right:8,top:10,bottom:8}
+   }).setOrigin(0.5).setDepth(100);
+   cont.add([shadow,circle,shine,text]);
+   cont.bringToTop(text);
+   cont.setSize(64,64).setInteractive(new Phaser.Geom.Circle(0,0,32),Phaser.Geom.Circle.Contains);
+   cont.setData("isBall",true);cont.setData("char",c);cont.setData("phase",Math.random()*6.28);
+   cont.setData("vx",Phaser.Math.FloatBetween(20,55)*(Math.random()<.5?-1:1));
+   cont.setData("spin",Phaser.Math.FloatBetween(-1.8,1.8));
+   cont.setData("r",32);
+   cont.setData("label",text);
+   balls.push(cont);
+ }
+ update(time,delta){
+   if(!playing)return;
+
+   // Move balls.
+   balls.forEach(b=>{
+     if(!b.active || b.getData("carried"))return;
+     const vx=b.getData("vx");
+     b.x+=vx*delta/1000;
+     b.y+=Math.sin(time/420+b.getData("phase"))*0.22;
+
+     // Rotate the entire ball, including its kanji, continuously through 360 degrees.
+     b.rotation += b.getData("spin") * delta / 1000;
+
+     const label=b.getData("label");
+     if(label){
+       label.rotation = 0;
+       b.bringToTop(label);
+     }
+
+     if(b.x<34){b.x=34;b.setData("vx",Math.abs(vx))}
+     if(b.x>W-34){b.x=W-34;b.setData("vx",-Math.abs(vx))}
+     if(b.y<185)b.y=185;
+     if(b.y>515)b.y=515;
+   });
+
+   // Simple elastic collision: balls never remain overlapped.
+   for(let i=0;i<balls.length;i++){
+     const a=balls[i];
+     if(!a.active || a.getData("carried"))continue;
+     for(let j=i+1;j<balls.length;j++){
+       const b=balls[j];
+       if(!b.active || b.getData("carried"))continue;
+
+       const ra=a.getData("r")||32, rb=b.getData("r")||32;
+       let dx=b.x-a.x, dy=b.y-a.y;
+       let dist=Math.sqrt(dx*dx+dy*dy);
+       const minDist=ra+rb+2;
+
+       if(dist<minDist){
+         if(dist<0.001){
+           dx=1; dy=0; dist=1;
+         }
+         const nx=dx/dist, ny=dy/dist;
+         const overlap=minDist-dist;
+
+         // Push both apart equally.
+         a.x-=nx*overlap*0.5;
+         a.y-=ny*overlap*0.5;
+         b.x+=nx*overlap*0.5;
+         b.y+=ny*overlap*0.5;
+
+         // Make them bounce apart horizontally.
+         const av=a.getData("vx"), bv=b.getData("vx");
+         if(Math.sign(av)===Math.sign(bv)){
+           a.setData("vx",-av);
+           b.setData("vx",-bv);
+         }else{
+           a.setData("vx",bv);
+           b.setData("vx",av);
+         }
+
+         a.x=Phaser.Math.Clamp(a.x,34,W-34);
+         b.x=Phaser.Math.Clamp(b.x,34,W-34);
+         a.y=Phaser.Math.Clamp(a.y,185,515);
+         b.y=Phaser.Math.Clamp(b.y,185,515);
+
+         const la=a.getData("label"), lb=b.getData("label");
+         if(la){
+           la.rotation=0;
+           a.bringToTop(la);
+         }
+         if(lb){
+           lb.rotation=0;
+           b.bringToTop(lb);
+         }
+       }
+     }
+   }
+ }
+ checkScoop(){
+   const px=this.poi.x,py=this.poi.y;
+   for(const b of [...balls]){
+     if(!b.active)continue;
+     const d=Phaser.Math.Distance.Between(px,py,b.x,b.y);
+     if(d<42){this.scoopBall(b);break}
+   }
+ }
+ scoopBall(ball){
+   if(!ball.active)return;
+   const c=ball.getData("char");
+   ball.disableInteractive();
+   ball.setData("isBall",false);
+   balls=balls.filter(x=>x!==ball);
+   this.tweens.add({
+     targets:ball,x:W/2+(bowl.length-0.5)*48,y:478,scale:0.55,duration:330,ease:"Back.easeIn",
+     onComplete:()=>ball.destroy()
+   });
+   bowl.push(c);
+   this.updateBowl();
+   if(bowl.length>=target[0].length) this.checkWord();
+ }
+ updateBowl(){}
+ checkWord(){
+   const made=bowl.join("");
+   if(made===target[0]){
+     score+=100+timeLeft;
+     this.scoreText.setText("得点 "+score);
+     this.targetText.setText(target[0]);
+     this.flashMessage("せいかい！ +"+(100+timeLeft), "#fff3a1");
+     this.time.delayedCall(800,()=>{if(playing){this.pickTarget();this.spawnSet()}});
+   }else{
+     score=Math.max(0,score-20);
+     this.scoreText.setText("得点 "+score);
+     this.flashMessage("ざんねん！ もう一度", "#ffd3d3");
+     this.time.delayedCall(650,()=>{if(playing){
+       bowl=[];
+       if(this.plateBalls){
+         this.plateBalls.forEach(b=>{if(b&&b.active)b.destroy();});
+         this.plateBalls=[];
+       }
+       this.spawnSet();
+     }});
+   }
+ }
+ flashMessage(msg,color){
+   const t=this.add.text(W/2,H/2,msg,{fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',fontSize:"46px",fontStyle:"bold",color:"#7e291d",backgroundColor:color,padding:{left:20,right:20,top:18,bottom:14}}).setOrigin(.5).setDepth(100);
+   this.tweens.add({targets:t,y:H/2-35,alpha:0,duration:800,ease:"Cubic.easeOut",onComplete:()=>t.destroy()});
+ }
+ gameOver(){
+   playing=false;
+   const shade=this.add.rectangle(W/2,H/2,W,H,0x000000,.62).setDepth(200);
+   const panel=this.add.rectangle(W/2,H/2,360,260,0xfff4d0).setStrokeStyle(8,0xe16d3a).setDepth(201);
+   this.add.text(W/2,H/2-90,"おしまい！",{fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',fontSize:"50px",fontStyle:"bold",color:"#7e291d",padding:{top:12,bottom:10,left:6,right:6}}).setOrigin(.5).setDepth(202);
+   this.add.text(W/2,H/2-20,"得点 "+score,{fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',fontSize:"38px",color:"#26384f",padding:{top:10,bottom:8,left:5,right:5}}).setOrigin(.5).setDepth(202);
+   const btn=this.add.rectangle(W/2,H/2+70,220,58,0x52b788).setStrokeStyle(4,0xffffff).setDepth(202).setInteractive({useHandCursor:true});
+   this.add.text(W/2,H/2+66,"もう一回",{fontFamily:'"Yu Gothic","Hiragino Kaku Gothic ProN","Meiryo",sans-serif',fontSize:"28px",fontStyle:"bold",color:"#ffffff",padding:{top:8,bottom:6,left:4,right:4}}).setOrigin(.5).setDepth(203);
+   btn.on("pointerdown",()=>location.reload());
+ }
+}
+
+new Phaser.Game({
+ type:Phaser.AUTO,
+ parent:"game",
+ width:W,height:H,
+ backgroundColor:"#15233c",
+ scale:{mode:Phaser.Scale.FIT,autoCenter:Phaser.Scale.CENTER_BOTH},
+ scene:[Main]
+});
+})();
+</script>
+</body>
+</html>
