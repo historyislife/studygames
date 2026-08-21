@@ -135,7 +135,14 @@ class Main extends Phaser.Scene{
     if(!playing || !this.carryBall)return;
     const ball=this.carryBall;
     this.carryBall=null;
-    const inBowl = pointer.y >= 620 && Math.abs(pointer.x - W/2) <= 150;
+    // Mobile-friendly release:
+    // if the carried ball has started to cross below the pool's bottom edge,
+    // count it as successfully placed in the bowl.
+    const poolBottom = 552;
+    const ballRadius = 32 * (ball.scaleX || 1);
+    const inBowl =
+      (ball.y + ballRadius >= poolBottom) &&
+      Math.abs(ball.x - W/2) <= 175;
 
     if(inBowl){
       const c=ball.getData("char");
