@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>熟語スロット</title>
+<style>
+:root{--bg:#f4f1e8;--panel:#fffdf6;--ink:#202020;--accent:#c83f2d;--gold:#d49a2a;--line:#ddd3bd;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif}
+body{display:flex;justify-content:center}
+#app{width:min(100vw,520px);height:100dvh;min-height:560px;padding:max(10px,env(safe-area-inset-top)) 14px max(10px,env(safe-area-inset-bottom));display:grid;grid-template-rows:auto auto 1fr auto;gap:10px}
+header{display:flex;align-items:center;justify-content:space-between}
+h1{font-size:clamp(22px,6vw,30px);margin:0;letter-spacing:.08em}.tag{font-size:12px;color:#776d5d}
+.status{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:7px 5px;text-align:center}.stat b{display:block;font-size:19px}.stat span{font-size:11px;color:#776d5d}
+main{min-height:0;background:var(--panel);border:2px solid var(--line);border-radius:20px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 5px 0 #e1d8c6}
+#questionNo{font-size:13px;color:#7b705f;margin-bottom:8px}.jukugo{display:flex;align-items:flex-start;justify-content:center;gap:1px;min-height:150px;font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-weight:700;font-size:clamp(58px,17vw,88px);white-space:nowrap}.charCell,.slotCell{width:1.02em;display:flex;flex-direction:column;align-items:center}.char{height:1.22em;width:1.02em;display:flex;align-items:center;justify-content:center;text-align:center}.slot{height:1.22em;width:1.02em;border:3px solid var(--gold);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:#fff9dc;color:var(--accent);box-shadow:inset 0 0 0 2px #f1df9b;overflow:hidden}.slot.stopped{border-color:#4b8b58;background:#eef8ed;color:#286638}.slot.wrong{border-color:#c83f2d;background:#fff0ed;color:#a82d20}
+.miniStop{margin-top:8px;width:100%;min-width:0;height:38px;border:0;border-radius:9px;background:var(--accent);color:#fff;font-weight:900;font-size:clamp(10px,3vw,14px);padding:0 2px;box-shadow:0 3px 0 #8f291d}.miniStop:active{transform:translateY(2px);box-shadow:0 1px 0 #8f291d}.miniStop:disabled{opacity:.3;box-shadow:none}.miniStop.ready{outline:3px solid #f0bd43;outline-offset:2px}#hint{margin-top:12px;min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:14px;line-height:1.5;color:#655c50;padding:0 8px}.speed{font-size:12px;color:#998c76;margin-top:6px}
+.controls{display:grid;grid-template-columns:1fr;gap:8px}.btn{border:0;border-radius:16px;min-height:62px;font-weight:800;font-size:23px;letter-spacing:.08em;cursor:pointer}.stop{background:var(--accent);color:white;box-shadow:0 5px 0 #8f291d}.stop:active{transform:translateY(3px);box-shadow:0 2px 0 #8f291d}.next{background:#397c4a;color:#fff;box-shadow:0 5px 0 #275733}.btn:disabled{opacity:.45;filter:grayscale(.25);box-shadow:none}
+.overlay{position:fixed;inset:0;background:rgba(31,27,21,.72);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}.card{width:min(92vw,440px);background:#fffdf6;border-radius:22px;padding:24px;text-align:center;box-shadow:0 12px 40px #0005}.card h2{margin:0 0 10px;font-size:30px}.card p{line-height:1.65;color:#5e5548}.card button{width:100%;border:0;border-radius:15px;padding:15px;font-size:19px;font-weight:800;background:var(--accent);color:#fff}.hidden{display:none!important}.resultWord{font-family:"Yu Mincho",serif;font-size:34px;font-weight:700;color:#9e2d20;margin:8px 0}.small{font-size:12px;color:#887d6d}
+@media(max-height:650px){#app{gap:6px;padding-top:6px;padding-bottom:6px}h1{font-size:22px}.stat{padding:4px}.stat b{font-size:16px}main{padding:7px}.jukugo{font-size:clamp(50px,14vw,68px);min-height:120px}#hint{margin-top:5px;min-height:34px}.btn{min-height:52px;font-size:20px}}
+</style>
+</head>
+<body>
+<div id="app">
+<header><div><h1>熟語スロット</h1><div class="tag">数字を止めて四字熟語を完成！</div></div><div class="small">全10問</div></header>
+<section class="status"><div class="stat"><b id="score">0</b><span>スコア</span></div><div class="stat"><b id="streak">0</b><span>れんぞく</span></div><div class="stat"><b id="rounds">0</b><span>スロット周回</span></div></section>
+<main><div id="questionNo">第1問</div><div class="jukugo" id="jukugo"></div><div id="hint">正しい数字が来たら「ストップ！」</div><div class="speed" id="speedText">スピード ×1.00</div></main>
+<section class="controls"><button class="btn next hidden" id="nextBtn">次の問題へ</button></section>
+</div>
+<div class="overlay" id="startOverlay"><div class="card"><h2>熟語スロット</h2><p>四字熟語の数字がスロットになっています。<br>正しい数字を目押しして完成させよう！<br><b>数字が1周するたびに速くなります。</b></p><button id="startBtn">ゲームスタート</button></div></div>
+<div class="overlay hidden" id="endOverlay"><div class="card"><h2>結果発表</h2><div class="resultWord" id="finalScore"></div><p id="finalText"></p><button id="restartBtn">もう一度あそぶ</button></div></div>
+<script>
+const NUMS=['一','二','三','四','五','六','七','八','九','十','百','千','万'];
+const QUESTIONS=[
+ {w:'千変万化', blanks:[0], a:['千'], m:'さまざまに変化すること。'},
+ {w:'五里霧中', blanks:[0], a:['五'], m:'手がかりがなく、どうしてよいか分からないこと。'},
+ {w:'一石二鳥', blanks:[0,2], a:['一','二'], m:'一つのことをして、二つの利益を得ること。'},
+ {w:'一日千秋', blanks:[0,2], a:['一','千'], m:'一日が千年にも感じるほど、待ち遠しいこと。'},
+ {w:'十人十色', blanks:[0,2], a:['十','十'], m:'人それぞれ好みや考え方が違うこと。'},
+ {w:'一長一短', blanks:[0,2], a:['一','一'], m:'長所もあれば短所もあること。'},
+ {w:'四方八方', blanks:[0,2], a:['四','八'], m:'あらゆる方向、いたるところ。'},
+ {w:'七転八倒', blanks:[0,2], a:['七','八'], m:'苦痛などで激しく転げ回ること。'},
+ {w:'三日天下', blanks:[0], a:['三'], m:'権力や地位がごく短い間しか続かないこと。'},
+ {w:'百発百中', blanks:[0,2], a:['百','百'], m:'狙ったものが必ず当たること。'},
+ {w:'九死一生', blanks:[0,2], a:['九','一'], m:'ほとんど助からない危険から、かろうじて助かること。'},
+ {w:'四六時中', blanks:[0,1], a:['四','六'], m:'一日中、いつも。'},
+ {w:'三寒四温', blanks:[0,2], a:['三','四'], m:'寒い日と暖かい日を繰り返しながら春に近づくこと。'},
+ {w:'五臓六腑', blanks:[0,2], a:['五','六'], m:'体の内臓全体のこと。'},
+ {w:'一騎当千', blanks:[0,3], a:['一','千'], m:'一人で千人を相手にできるほど強いこと。'},
+ {w:'八方美人', blanks:[0], a:['八'], m:'誰に対してもよく思われようとすること。'},
+ {w:'二束三文', blanks:[0,2], a:['二','三'], m:'非常に安い値段のこと。'},
+ {w:'一朝一夕', blanks:[0,2], a:['一','一'], m:'わずかな期間、短い時間。'},
+ {w:'四苦八苦', blanks:[0,2], a:['四','八'], m:'たいへん苦労すること。'},
+ {w:'七転八起', blanks:[0,2], a:['七','八'], m:'何度失敗しても立ち上がること。'}
+];
+let deck=[],qIndex=0,score=0,streak=0,current=null,slotEls=[],activeSlot=0,numIndex=0,rounds=0,delay=420,timer=null,running=false;
+const $=s=>document.querySelector(s);
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function resetGame(){deck=shuffle(QUESTIONS).slice(0,10);qIndex=0;score=0;streak=0;$('#score').textContent=0;$('#streak').textContent=0;showQuestion()}
+function showQuestion(){clearTimeout(timer);current=deck[qIndex];activeSlot=0;numIndex=Math.floor(Math.random()*NUMS.length);rounds=0;delay=420;running=true;slotEls=[];$('#rounds').textContent=0;$('#questionNo').textContent=`第${qIndex+1}問 / 10`;$('#hint').textContent=current.blanks.length>1?'光っているSTOPを順番に押そう！':'正しい数字が来たら真下のSTOP！';$('#speedText').textContent='スピード ×1.00';$('#nextBtn').classList.add('hidden');
+ const box=$('#jukugo');box.innerHTML='';[...current.w].forEach((c,i)=>{let k=current.blanks.indexOf(i);let cell=document.createElement('span');if(k>=0){cell.className='slotCell';let e=document.createElement('span');e.className='slot';e.dataset.slot=k;e.textContent=k===0?NUMS[numIndex]:'？';let b=document.createElement('button');b.className='miniStop';b.textContent='STOP';b.dataset.slot=k;b.disabled=k!==0;b.onclick=()=>stopSlot(k);cell.append(e,b);box.appendChild(cell);slotEls.push(e)}else{cell.className='charCell';let e=document.createElement('span');e.className='char';e.textContent=c;cell.appendChild(e);box.appendChild(cell)}});updateStopButtons();tick()}
+function updateStopButtons(){document.querySelectorAll('.miniStop').forEach((b,i)=>{b.disabled=!running||i!==activeSlot;b.classList.toggle('ready',running&&i===activeSlot)})}
+function tick(){if(!running)return;slotEls[activeSlot].textContent=NUMS[numIndex];numIndex++;if(numIndex>=NUMS.length){numIndex=0;rounds++;delay=Math.max(70,delay*.90);$('#rounds').textContent=rounds;$('#speedText').textContent=`スピード ×${(420/delay).toFixed(2)}`;}timer=setTimeout(tick,delay)}
+function stopSlot(which){
+ if(!running||which!==activeSlot)return;
+ clearTimeout(timer);timer=null;running=false;
+ const el=slotEls[activeSlot];
+ // 押した数字は正誤に関係なくその場で固定し、複数スロットは必ず次へ進む
+ el.classList.add('stopped');
+ activeSlot++;
+ if(activeSlot<slotEls.length){
+   $('#hint').textContent=`次の数字を止めよう（${activeSlot+1}/${slotEls.length}）`;
+   numIndex=Math.floor(Math.random()*NUMS.length);
+   slotEls[activeSlot].textContent=NUMS[numIndex];
+   running=true;
+   updateStopButtons();
+   // 遷移用の待ち時間を置かず、次のスロットだけを直ちに回転開始
+   tick();
+   return;
+ }
+ // 全スロットを止めてからまとめて正誤判定する
+ const ok=slotEls.every((e,i)=>e.textContent===current.a[i]);
+ finish(ok);
+}
+function finish(ok){running=false;updateStopButtons();if(ok){let gain=Math.max(100,500-rounds*25)+streak*30;score+=gain;streak++;$('#hint').innerHTML=`<b>正解！ ${current.w}</b><br>${current.m}　+${gain}点`;}else{streak=0;slotEls.forEach((e,i)=>{e.textContent=current.a[i];e.classList.add('stopped')});$('#hint').innerHTML=`<b>おしい！ 正解は「${current.w}」</b><br>${current.m}`;}$('#score').textContent=score;$('#streak').textContent=streak;$('#speedText').textContent='';$('#nextBtn').classList.remove('hidden')}
+function next(){qIndex++;if(qIndex>=10){$('#finalScore').textContent=`${score} 点`;let t=score>=4500?'熟語スロット名人！':score>=3200?'すばらしい成績！':score>=2000?'いい調子！':'もう一度挑戦してみよう！';$('#finalText').textContent=`10問終了！ ${t}`;$('#endOverlay').classList.remove('hidden')}else showQuestion()}
+$('#startBtn').onclick=()=>{$('#startOverlay').classList.add('hidden');resetGame()};$('#nextBtn').onclick=next;$('#restartBtn').onclick=()=>{$('#endOverlay').classList.add('hidden');resetGame()};
+document.addEventListener('touchmove',e=>{if(e.target.closest('#app'))e.preventDefault()},{passive:false});
+</script>
+</body></html>
