@@ -16,9 +16,45 @@ header{display:flex;align-items:center;justify-content:space-between;gap:8px}.ti
 .controls{display:flex;gap:7px}.controls button{flex:1;border:0;border-radius:10px;padding:9px 8px;font-weight:900;font-size:14px;background:#3c342c;color:white}.controls button.secondary{background:#817362}.message{min-height:20px;text-align:center;font-weight:800;font-size:13px;color:#674e34}
 .overlay{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.overlay.show{display:flex}.panel{width:min(94vw,500px);background:#fffaf0;border-radius:16px;padding:14px;box-shadow:0 15px 40px #0007}.profile{display:grid;grid-template-columns:42% 1fr;gap:12px}.profile img{width:100%;height:190px;object-fit:cover;object-position:50% 25%;border-radius:10px;background:#ddd}.profile h2{margin:0 0 4px;font-size:22px}.reading{font-size:13px;color:#755f4b;font-weight:700;margin-bottom:12px}.desc{font-size:14px;line-height:1.6}.panel button{width:100%;margin-top:12px;border:0;border-radius:10px;padding:11px;background:var(--accent);color:#fff;font-weight:900}.result{text-align:center}.result h2{font-size:26px;margin:4px}.result .big{font-size:42px;font-weight:900;color:var(--accent)}
 @media(max-height:720px){.app{gap:4px;padding-top:5px}.help{font-size:10.5px;padding:4px}.board{gap:4px}.row{gap:4px}.inner{min-height:86px}.controls button{padding:6px}.message{font-size:11px;min-height:15px}.title{font-size:17px}.name-card{padding:3px 1px;font-size:11px}}
+
+/* まなびゲームズへ戻る */
+.home-back-btn {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #263238;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: manipulation;
+}
+.home-back-btn:hover { background: #fff; }
+.home-back-btn:active { transform: scale(0.96); }
+@media (max-width: 600px) {
+  .home-back-btn {
+    top: max(8px, env(safe-area-inset-top));
+    left: 8px;
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+}
+
 </style>
 </head>
-<body><main class="app">
+<body><a href="/" class="home-back-btn" aria-label="まなびゲームズのトップへ戻る">← まなびゲームズ</a><main class="app">
 <header><div class="title">歴史人物 神経衰弱</div><div class="stats"><div class="pill">獲得 <span id="score">0</span>/5</div><div class="pill">ミス <span id="miss">0</span></div></div></header>
 <div class="help">下のカードを<strong>長押し</strong>して2枚めくろう。同じ人物なら、上の名前を<strong>長押し</strong>！</div>
 <section class="board"><div class="row" id="names"></div><div class="row" id="row1"></div><div class="row" id="row2"></div></section>

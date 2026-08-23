@@ -1,6 +1,42 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>スズムシメモリーズ</title><style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;background:#f3f0df;color:#24301f;font-family:"Noto Sans JP","Yu Gothic",sans-serif;user-select:none;-webkit-user-select:none;touch-action:manipulation}body{min-height:100vh}.app{max-width:760px;margin:auto;padding:10px 10px 30px}.head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.title{font-weight:900;font-size:clamp(20px,5.6vw,32px);letter-spacing:.03em}.stats{white-space:nowrap;font-weight:800;background:#fff;border:2px solid #6d7f49;border-radius:12px;padding:7px 10px}.guide{background:#fff;border-radius:12px;padding:8px 10px;margin-bottom:10px;font-size:13px;line-height:1.45;box-shadow:0 2px 8px #0001}.sectionTitle{font-size:12px;font-weight:900;margin:8px 2px 5px;color:#53623b}.row5{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.pick{min-width:0;height:64px;border:2px solid #8a956d;border-radius:10px;background:#fff;padding:4px 2px;font-weight:800;font-size:clamp(10px,2.7vw,14px);display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.15;position:relative;overflow:hidden}.pick.sound{height:58px;font-size:clamp(9px,2.5vw,13px)}.pick.done{opacity:.28}.pick.target{outline:3px solid #d49b28;animation:pulse 1s infinite}@keyframes pulse{50%{transform:translateY(-2px)}}.board{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:6px;perspective:1000px}.card{aspect-ratio:.78;position:relative;transform-style:preserve-3d;transition:transform .42s cubic-bezier(.2,.8,.2,1);border-radius:10px}.card.flipped,.card.matched{transform:rotateY(180deg)}.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px #0003}.back{background:repeating-linear-gradient(45deg,#405d37 0 9px,#527548 9px 18px);border:3px solid #f5e7a8;display:flex;align-items:center;justify-content:center}.back:after{content:"♪";font-size:clamp(22px,7vw,40px);font-weight:900;color:#f5e7a8}.front{transform:rotateY(180deg);background:#fff;border:2px solid #697e54}.front img{width:100%;height:100%;object-fit:cover}.front img.fit-contain{object-fit:contain;background:#fff;padding:3px}.card.matched{opacity:.22;pointer-events:none}.result{display:none;background:#fff;border:3px solid #738452;border-radius:15px;margin-top:12px;padding:9px;gap:10px;align-items:stretch;box-shadow:0 4px 14px #0002}.result.show{display:flex;animation:pop .3s}@keyframes pop{from{transform:scale(.94);opacity:0}}.result img{width:38%;max-width:190px;object-fit:contain;background:#f7f5e9;border-radius:10px}.bio{flex:1;min-width:0}.bio h2{font-size:clamp(17px,4.5vw,25px);margin:2px 0 3px}.reading{font-size:12px;font-weight:600}.cry{font-size:clamp(16px,4vw,22px);font-weight:900;color:#7b4e14;margin:6px 0}.desc{font-size:13px;line-height:1.45}.next{width:100%;border:0;border-radius:10px;padding:10px;background:#637a45;color:white;font-weight:900;font-size:15px;margin-top:7px}.overlay{position:fixed;inset:0;background:#17200ed9;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}.overlay.show{display:flex}.finish{background:#fff;border-radius:20px;padding:22px;max-width:390px;width:100%;text-align:center}.finish h2{font-size:28px;margin:0 0 8px}.finish .big{font-size:22px;font-weight:900}.finish button{border:0;background:#637a45;color:#fff;border-radius:12px;padding:12px 22px;font-size:17px;font-weight:900;margin-top:12px}.holdbar{position:absolute;left:0;bottom:0;height:4px;width:0;background:#f2bd43}.holding .holdbar{animation:hold .55s linear forwards}@keyframes hold{to{width:100%}}@media(max-width:430px){.app{padding:7px}.guide{font-size:11px;padding:6px 8px}.pick{height:56px}.pick.sound{height:50px}.board{gap:4px}.sectionTitle{margin-top:6px}.result{margin-top:8px}}
-</style></head><body><main class="app"><div class="head"><div class="title">スズムシメモリーズ</div><div class="stats">獲得 <span id="got">0</span>/5　ミス <span id="miss">0</span></div></div><div class="guide" id="guide">伏せた写真を<strong>長押し</strong>して、同じ虫を2枚そろえよう。</div><div class="sectionTitle">① 虫の名前</div><div id="names" class="row5"></div><div class="sectionTitle">② 鳴き声</div><div id="sounds" class="row5"></div><div class="sectionTitle">③ 写真カード</div><div id="board" class="board"></div><div id="result" class="result"></div></main><div id="overlay" class="overlay"><div class="finish"><h2>クリア！</h2><div id="score" class="big"></div><div id="rank"></div><button onclick="newGame()">もう一度あそぶ</button></div></div><script>
+
+/* まなびゲームズへ戻る */
+.home-back-btn {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #263238;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: manipulation;
+}
+.home-back-btn:hover { background: #fff; }
+.home-back-btn:active { transform: scale(0.96); }
+@media (max-width: 600px) {
+  .home-back-btn {
+    top: max(8px, env(safe-area-inset-top));
+    left: 8px;
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+}
+
+</style></head><body><a href="/" class="home-back-btn" aria-label="まなびゲームズのトップへ戻る">← まなびゲームズ</a><main class="app"><div class="head"><div class="title">スズムシメモリーズ</div><div class="stats">獲得 <span id="got">0</span>/5　ミス <span id="miss">0</span></div></div><div class="guide" id="guide">伏せた写真を<strong>長押し</strong>して、同じ虫を2枚そろえよう。</div><div class="sectionTitle">① 虫の名前</div><div id="names" class="row5"></div><div class="sectionTitle">② 鳴き声</div><div id="sounds" class="row5"></div><div class="sectionTitle">③ 写真カード</div><div id="board" class="board"></div><div id="result" class="result"></div></main><div id="overlay" class="overlay"><div class="finish"><h2>クリア！</h2><div id="score" class="big"></div><div id="rank"></div><button onclick="newGame()">もう一度あそぶ</button></div></div><script>
 const DATA=[
 {id:'suzumushi',name:'スズムシ',read:'すずむし',cry:'リーン、リーン',img:'images/suzumushi.jpg',desc:'秋を代表する鳴く虫。オスが羽をこすり合わせて、すんだ音を出します。'},
 {id:'matsumushi',name:'マツムシ',read:'まつむし',cry:'チンチロリン',img:'images/matsumushi.jpg',desc:'草地などにすむ秋の虫。夜になると、かろやかな声で鳴きます。'},
