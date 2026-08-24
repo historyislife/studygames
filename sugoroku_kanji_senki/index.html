@@ -84,7 +84,101 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
 .cell.start[data-faction="green"]{box-shadow:inset 0 0 0 4px rgba(55,145,85,.55)}
 .cell.start[data-faction="purple"]{box-shadow:inset 0 0 0 4px rgba(125,75,160,.55)}
 
+
+.idiom.acquired{
+  opacity:.58;
+  background:rgba(225,225,225,.75);
+  border-color:#9a9a9a;
+  filter:saturate(.45);
+}
+.idiom.acquired b{
+  text-decoration:line-through;
+  text-decoration-thickness:2px;
+}
+.idiom-owned{
+  display:inline-block;
+  margin-left:6px;
+  padding:2px 7px;
+  border-radius:999px;
+  background:#4f6b50;
+  color:#fff;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.04em;
+}
+.idiom.acquired .idiom-progress{
+  color:#666;
+}
+
+
+.manual-btn{position:fixed;top:10px;right:170px;z-index:10000;min-height:38px;padding:7px 11px;border-radius:999px;border:1px solid rgba(0,0,0,.18);background:rgba(255,255,255,.93);color:#263238;font-weight:900;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.13)}
+.manual-overlay{position:fixed;inset:0;z-index:30000;display:none;align-items:flex-start;justify-content:center;padding:18px;background:rgba(0,0,0,.55);overflow:auto}
+.manual-overlay.show{display:flex}
+.manual-panel{width:min(760px,100%);margin:auto;background:#fffdf7;color:#2c241d;border-radius:20px;border:3px solid #8b5a2b;box-shadow:0 20px 70px rgba(0,0,0,.4);overflow:hidden}
+.manual-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:#f4e3b7;border-bottom:2px solid #c89d59}
+.manual-head h2{margin:0;font-size:22px}.manual-close{min-width:44px;min-height:44px;border:0;border-radius:12px;background:#fff;font-size:22px;font-weight:900;cursor:pointer}
+.manual-body{padding:16px 18px 24px;line-height:1.65}.manual-body h3{margin:22px 0 8px;padding-left:10px;border-left:5px solid #8b5a2b;font-size:18px}.manual-body h3:first-child{margin-top:0}.manual-body ul,.manual-body ol{padding-left:1.4em}.manual-body li{margin:5px 0}
+.manual-note{padding:10px 12px;border-radius:12px;background:#fff2c7;border:1px solid #e2c36d;font-weight:700}.manual-table{width:100%;border-collapse:collapse;font-size:14px}.manual-table th,.manual-table td{padding:8px;border-bottom:1px solid #ddd2c2;text-align:left;vertical-align:top}.manual-table th{background:#f6eee1}
+@media(max-width:600px){.manual-btn{right:auto;left:10px;top:54px}.manual-overlay{padding:8px}.manual-body{padding:14px}.manual-table{font-size:13px}}
+
 </style></head><body>
+<button id="manualBtn" class="manual-btn" type="button" aria-label="遊び方を開く">📖 遊び方</button>
+<div id="manualOverlay" class="manual-overlay" role="dialog" aria-modal="true" aria-labelledby="manualTitle">
+  <section class="manual-panel">
+    <div class="manual-head">
+      <h2 id="manualTitle">すごろく漢字戦記　遊び方</h2>
+      <button id="manualClose" class="manual-close" type="button" aria-label="マニュアルを閉じる">×</button>
+    </div>
+    <div class="manual-body">
+      <h3>ゲームの目的</h3>
+      <p>漢字を集めて四字熟語札を作り、天下統一を目指します。</p>
+      <ul><li><b>四字熟語札を3枚完成</b>すると勝利。</li><li>または、他の3勢力がすべて脱落して<b>最後の1勢力</b>になっても勝利。</li></ul>
+      <div class="manual-note">漢字は「熟語を作る」「城を建てる」「城を強化する」「市場で交換する」のすべてに使う大切な資源です。</div>
+
+      <h3>ゲーム開始</h3>
+      <ul><li>あなた（紅）＋CPU3勢力（蒼・翠・紫）の4人戦。</li><li>全員が四隅の本陣からスタート。</li><li>初期手札は<b>5字</b>。</li><li>開始時に四字熟語が<b>10種類</b>選ばれ、その10熟語に使われる漢字だけが登場します。</li></ul>
+
+      <h3>自分のターン</h3>
+      <ol><li>作れる四字熟語があれば、任意で<b>1枚だけ</b>作れます。</li><li>サイコロを振ります。</li><li>出た目だけ進みます。</li><li>止まったマスの効果を処理します。</li></ol>
+      <p>熟語を作ってもターンは終わらず、能力解決後にサイコロを振れます。</p>
+
+      <h3>本陣</h3>
+      <p>自分の本陣を<b>通過または停止</b>すると、漢字3字が提示され、その中から<b>2字</b>獲得します。</p>
+
+      <h3>おみくじ</h3>
+      <p>漢字5字が提示され、その中から<b>2字</b>獲得します。</p>
+      <p>「一心不乱」発動中は、次のおみくじが<b>7字から2字</b>になります。</p>
+
+      <h3>市場</h3>
+      <ol><li><b>無料獲得：</b>漢字2字から1字を選んで獲得。</li><li><b>交換：</b>手札2字を支払い、提示された5字から1字を選んで獲得。</li></ol>
+
+      <h3>築城</h3>
+      <p>空地に止まったとき、任意で手札の漢字1字を使って城を建てられます。例：「山」→<b>山城</b>。</p>
+      <p><b>最後の1字</b>は築城には使えません。</p>
+
+      <h3>城の強化</h3>
+      <p>自分の城に止まると、手札の漢字1字を追加して最大3文字まで強化できます。</p>
+      <table class="manual-table"><thead><tr><th>城</th><th>例</th><th>徴収</th></tr></thead><tbody><tr><td>1文字城</td><td>山城</td><td>1字</td></tr><tr><td>2文字城</td><td>山海城</td><td>2字</td></tr><tr><td>3文字城</td><td>山海風城</td><td>3字</td></tr></tbody></table>
+      <p>敵が止まると、城の文字数ぶん漢字を徴収します。</p>
+
+      <h3>四字熟語札</h3>
+      <ul><li>必要な4字がそろうと作成可能。</li><li>同じプレイヤーは<b>同じ熟語を2回取得できません</b>。</li><li>他プレイヤーが同じ熟語を取ることはできます。</li><li>作成後に手札が0字になる熟語は作れません。</li><li>取得済みは<b>「✓ 獲得済み」</b>と表示。</li></ul>
+      <p>完成時には<b>読み・意味・特殊能力</b>が表示されます。</p>
+
+      <h3>熟語札の能力</h3>
+      <ul><li><b>電光石火：</b>もう一度行動。</li><li><b>起死回生：</b>脱落寸前から復活。</li><li><b>画竜点睛：</b>あと1字で完成する熟語を助ける。</li><li><b>五里霧中：</b>相手の熟語進捗を隠し、熟語札作成を妨害。</li></ul>
+      <p>他にも多数あります。熟語の意味と能力のつながりにも注目してください。</p>
+
+      <h3>脱落</h3>
+      <p>手札の漢字が<b>0字</b>になると脱落します。</p>
+      <ul><li>コマは盤上から消えます。</li><li>所有していた城はすべて空地に戻ります。</li><li>以後その勢力のターンはありません。</li></ul>
+
+      <h3>勝つためのコツ</h3>
+      <ul><li>熟語完成に近い漢字は、むやみに城へ使わない。</li><li>不要な漢字は市場で整理する。</li><li>3文字城は強力なので、手札が少ないときは注意。</li><li>熟語3枚を狙うか、城で相手を削るかを状況で選ぶ。</li></ul>
+    </div>
+  </section>
+</div>
+
 <div id="idiomFlash" class="idiom-flash" aria-live="assertive" aria-atomic="true">
   <div class="idiom-flash-card">
     <div id="idiomFlashKicker" class="idiom-flash-kicker"></div>
@@ -92,7 +186,7 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
     <div id="idiomFlashEffect" class="idiom-flash-effect"></div>
   </div>
 </div>
-<a class="home" href="/">← ガクハコ</a><button class="sound-toggle" id="bgmToggle" type="button" aria-label="BGMのオンオフ">🎵 BGM</button><button class="sound-toggle" id="soundToggle" type="button" aria-label="効果音のオンオフ">🔊 SE</button><h1>すごろく漢字戦記</h1><div class="lead">漢字を集め、城を築き、四字熟語で天下統一！</div>
+<a class="home" href="/">← まなびゲームズ</a><button class="sound-toggle" id="bgmToggle" type="button" aria-label="BGMのオンオフ">🎵 BGM</button><button class="sound-toggle" id="soundToggle" type="button" aria-label="効果音のオンオフ">🔊 SE</button><h1>すごろく漢字戦記</h1><div class="lead">漢字を集め、城を築き、四字熟語で天下統一！</div>
 <div id="hud"></div><div id="wrap"><div class="board" id="board"><div class="center"><div id="msg">あなたの番です。サイコロを振ろう！</div>
 <div class="stage"><div class="die" id="die"><div class="face f1">1</div><div class="face f2">2</div><div class="face f3">3</div><div class="face f4">4</div><div class="face f5">5</div><div class="face f6">6</div></div></div>
 <button id="roll">🎲 サイコロを振る</button></div></div></div>
@@ -226,11 +320,18 @@ hud.innerHTML=ps.map((p,i)=>{
 hand.innerHTML=ps[0].h.map(x=>`<span class="k">${x}</span>`).join("")||"なし";
 idioms.innerHTML=words.map(w=>{
   let fog=ps[0].fogActive;
-  let prog=fog?"？？？？":progress(ps[0],w);
-  let make=!fog&&!wordMadeThisTurn&&can(ps[0],w)&&turn==0&&!busy&&!ps[0].w.includes(w);
-  return `<div class="idiom"><b>${w}</b>　${prog} ${make?`<button onclick="makeWord('${w}')">作る</button>`:""}<br>
-    <span style="opacity:.75">⚡ ${effects[w]}</span></div>`;
+  let owned=ps[0].w.includes(w);
+  let prog=fog&&!owned?"？？？？":progress(ps[0],w);
+  let make=!fog&&!wordMadeThisTurn&&!owned&&can(ps[0],w)&&turn==0&&!busy;
+  return `<div class="idiom ${owned?"acquired":""}">
+    <b>${w}</b>
+    <span class="idiom-progress">　${owned?"●●●●":prog}</span>
+    ${owned?`<span class="idiom-owned">✓ 獲得済み</span>`:""}
+    ${make?`<button onclick="makeWord('${w}')">作る</button>`:""}
+    <br><span style="opacity:.75">⚡ ${effects[w]}</span>
+  </div>`;
 }).join("");
+
 document.querySelectorAll(".token").forEach(x=>x.remove());
 ps.forEach((p,i)=>{
   if(!p.alive)return;
@@ -928,4 +1029,15 @@ async function cpu(){
 }
 function win(i){busy=true;roll.disabled=true;stopBGM();playSE("victory");show("天下統一！",`<h2>${ps[i].n}の勝利！</h2><p>四字熟語3枚完成、または最後まで生き残り、天下を統一しました。</p>`,[["再戦",()=>location.reload()]])}
 render();
+
+const manualBtn=document.getElementById("manualBtn");
+const manualOverlay=document.getElementById("manualOverlay");
+const manualClose=document.getElementById("manualClose");
+function openManual(){manualOverlay.classList.add("show");manualClose.focus()}
+function closeManual(){manualOverlay.classList.remove("show");manualBtn.focus()}
+manualBtn.addEventListener("click",openManual);
+manualClose.addEventListener("click",closeManual);
+manualOverlay.addEventListener("click",e=>{if(e.target===manualOverlay)closeManual()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&manualOverlay.classList.contains("show"))closeManual()});
+
 </script></body></html>
