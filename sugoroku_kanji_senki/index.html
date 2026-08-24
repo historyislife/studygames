@@ -1,0 +1,931 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>すごろく漢字戦記</title><style>
+*{box-sizing:border-box}body{margin:0;background:#d8c08c;color:#2b2118;font-family:"Noto Sans JP","Yu Gothic",sans-serif}
+.home{position:fixed;top:10px;left:10px;z-index:99;background:#fffddd;padding:7px 12px;border-radius:20px;text-decoration:none;color:#333;font-weight:bold}
+.sound-toggle{position:fixed;top:10px;right:10px;z-index:99;border:1px solid #7a572d;background:#fffddd;color:#332516;padding:7px 11px;border-radius:20px;font-weight:900;box-shadow:0 2px 7px #0002;cursor:pointer}.sound-toggle.off{opacity:.65;filter:grayscale(1)}#soundToggle{right:10px}#bgmToggle{right:82px}
+h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,48px)}.lead{text-align:center;font-weight:bold;margin:4px 0 10px}
+#hud{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;width:min(94vw,720px);margin:auto}.p{background:#fff9;padding:6px;border-radius:9px;font-size:12px}.p.on{outline:4px solid #f0bd32}
+#wrap{width:min(94vw,720px);aspect-ratio:1;margin:10px auto;position:relative}.board{position:absolute;inset:0;display:grid;grid-template:repeat(6,1fr)/repeat(6,1fr);gap:3px;background:#624526;border:7px ridge #b9853f;padding:4px;border-radius:15px}
+.cell{position:relative;background:#f4dfaa;border:2px solid #956b35;border-radius:8px;display:grid;place-items:center;text-align:center;font-size:clamp(9px,2vw,14px);font-weight:900;overflow:hidden}
+.omikuji{background:#ffd36e}.market{background:#c8e6c9;border-color:#4f7d4f}.special{background:#bfe0b8}.start{background:#ef9990}.castle{position:absolute;width:82%;height:76%;object-fit:cover;border-radius:6px}.clabel{position:absolute;top:2px;right:2px;background:#fff;border-radius:4px;padding:1px 3px;z-index:3}
+.token{position:absolute;width:45%;height:58%;object-fit:cover;border-radius:7px;z-index:5;filter:drop-shadow(0 3px 2px #0006);transition:transform .16s}
+.center{grid-area:2/2/6/6;background:#ead6a4;border:3px solid #916a39;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+#msg{background:#fffbdde8;border:2px solid #86602d;border-radius:9px;padding:6px 9px;font-weight:900;text-align:center;z-index:2;max-width:90%}
+.stage{height:130px;width:180px;perspective:600px;position:relative}.die{--s:62px;width:var(--s);height:var(--s);position:absolute;left:59px;top:32px;transform-style:preserve-3d}
+.face{position:absolute;width:var(--s);height:var(--s);display:grid;place-items:center;background:white;border:3px solid #222;border-radius:11px;font-size:34px;font-weight:900}
+.f1{transform:translateZ(31px)}.f6{transform:rotateY(180deg) translateZ(31px)}.f3{transform:rotateY(90deg) translateZ(31px)}.f4{transform:rotateY(-90deg) translateZ(31px)}.f2{transform:rotateX(90deg) translateZ(31px)}.f5{transform:rotateX(-90deg) translateZ(31px)}
+#roll{border:0;border-radius:25px;padding:9px 20px;background:#e6ad2d;box-shadow:0 4px #815918;font-weight:900}#roll:disabled{opacity:.5}
+#below{width:min(94vw,720px);margin:10px auto 30px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.panel{background:#fffbdcdd;border:2px solid #8d6632;border-radius:10px;padding:9px}.panel h2{font-size:15px;margin:0 0 5px}
+.k{display:inline-block;background:#fff;border:2px solid #74522b;border-radius:6px;padding:4px 7px;margin:2px;font:900 21px serif}.idiom{font-size:12px;padding:4px;border-bottom:1px solid #0002}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:100;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.dialog{background:#fff2c8;border:5px double #805820;border-radius:16px;padding:18px;text-align:center;max-width:520px}.choices{display:flex;flex-wrap:wrap;justify-content:center;gap:7px}.choice{font:900 28px serif;background:#fff;border:3px solid #a67a39;border-radius:10px;padding:8px 13px}
+@media(max-width:600px){h1{margin-top:50px}#hud{grid-template-columns:1fr 1fr}#below{grid-template-columns:1fr}.stage{transform:scale(.78);margin:-12px}#msg{font-size:11px}}
+
+/* 熟語札・能力発動の強調表示 */
+.idiom-flash{
+  position:fixed;
+  inset:0;
+  z-index:20000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .18s ease;
+  background:rgba(15,10,5,.20);
+}
+.idiom-flash.show{opacity:1}
+.idiom-flash-card{
+  width:min(86vw,520px);
+  padding:22px 24px;
+  border-radius:22px;
+  text-align:center;
+  background:rgba(255,250,235,.97);
+  border:4px solid #8b5a2b;
+  box-shadow:0 18px 60px rgba(0,0,0,.35), inset 0 0 0 3px rgba(255,255,255,.7);
+  transform:scale(.82) translateY(14px);
+  transition:transform .22s cubic-bezier(.2,.9,.2,1.2);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+}
+.idiom-flash.show .idiom-flash-card{transform:scale(1) translateY(0)}
+.idiom-flash-kicker{
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:.16em;
+  color:#7a4d1f;
+}
+.idiom-flash-word{
+  margin-top:6px;
+  font-size:clamp(34px,9vw,58px);
+  line-height:1.05;
+  font-weight:1000;
+  letter-spacing:.08em;
+  color:#2f2014;
+  text-shadow:0 2px 0 #fff;
+}
+.idiom-flash-effect{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:2px dashed rgba(122,77,31,.28);
+  font-size:clamp(15px,4vw,20px);
+  line-height:1.45;
+  font-weight:800;
+  color:#4a3827;
+}
+.idiom-flash.skill .idiom-flash-card{
+  background:rgba(246,250,255,.98);
+  border-color:#415f8f;
+}
+.idiom-flash.skill .idiom-flash-kicker{color:#415f8f}
+.idiom-flash.skill .idiom-flash-word{color:#1f3554}
+
+
+.cell.start[data-faction="red"]{box-shadow:inset 0 0 0 4px rgba(180,50,45,.55)}
+.cell.start[data-faction="blue"]{box-shadow:inset 0 0 0 4px rgba(55,100,180,.55)}
+.cell.start[data-faction="green"]{box-shadow:inset 0 0 0 4px rgba(55,145,85,.55)}
+.cell.start[data-faction="purple"]{box-shadow:inset 0 0 0 4px rgba(125,75,160,.55)}
+
+</style></head><body>
+<div id="idiomFlash" class="idiom-flash" aria-live="assertive" aria-atomic="true">
+  <div class="idiom-flash-card">
+    <div id="idiomFlashKicker" class="idiom-flash-kicker"></div>
+    <div id="idiomFlashWord" class="idiom-flash-word"></div>
+    <div id="idiomFlashEffect" class="idiom-flash-effect"></div>
+  </div>
+</div>
+<a class="home" href="/">← まなびゲームズ</a><button class="sound-toggle" id="bgmToggle" type="button" aria-label="BGMのオンオフ">🎵 BGM</button><button class="sound-toggle" id="soundToggle" type="button" aria-label="効果音のオンオフ">🔊 SE</button><h1>すごろく漢字戦記</h1><div class="lead">漢字を集め、城を築き、四字熟語で天下統一！</div>
+<div id="hud"></div><div id="wrap"><div class="board" id="board"><div class="center"><div id="msg">あなたの番です。サイコロを振ろう！</div>
+<div class="stage"><div class="die" id="die"><div class="face f1">1</div><div class="face f2">2</div><div class="face f3">3</div><div class="face f4">4</div><div class="face f5">5</div><div class="face f6">6</div></div></div>
+<button id="roll">🎲 サイコロを振る</button></div></div></div>
+<div id="below"><div class="panel"><h2>🀄 あなたの漢字</h2><div id="hand"></div><small>空地では1字を城に使います。熟語作成後に最低1字残る必要があります。</small></div><div class="panel"><h2>📜 四字熟語札</h2><div class="small">この対局で使う10熟語</div><div id="idioms"></div></div></div>
+<div class="modal" id="modal"><div class="dialog"><h2 id="mt"></h2><div id="mb"></div><div class="choices" id="choices"></div></div></div>
+<script>
+// ===== Background music (original synthesized loop) =====
+const BGM_SRC="assets/bgm/senki_loop.ogg";
+const bgm=new Audio(BGM_SRC);
+bgm.loop=true;
+bgm.preload="auto";
+bgm.volume=.16;
+let bgmEnabled=true;
+let bgmStarted=false;
+try{bgmEnabled=localStorage.getItem("kanjiSenkiBGM")!=="off"}catch(e){}
+function updateBGMButton(){
+  bgmToggle.textContent=bgmEnabled?"🎵 BGM":"🔇 BGM";
+  bgmToggle.classList.toggle("off",!bgmEnabled);
+  bgmToggle.setAttribute("aria-pressed",String(bgmEnabled));
+}
+function startBGM(){
+  if(!bgmEnabled||bgmStarted)return;
+  bgmStarted=true;
+  const pr=bgm.play();
+  if(pr&&pr.catch)pr.catch(()=>{bgmStarted=false});
+}
+function stopBGM(){
+  try{bgm.pause()}catch(e){}
+  bgmStarted=false;
+}
+bgmToggle.onclick=()=>{
+  bgmEnabled=!bgmEnabled;
+  try{localStorage.setItem("kanjiSenkiBGM",bgmEnabled?"on":"off")}catch(e){}
+  updateBGMButton();
+  if(bgmEnabled)startBGM();else stopBGM();
+};
+updateBGMButton();
+// Browsers block autoplay. Start after the player's first interaction.
+document.addEventListener("pointerdown",()=>{if(bgmEnabled)startBGM()},{once:true});
+
+// ===== Sound effects (self-contained generated WAV files) =====
+const SE={
+  diceRoll:"assets/se/se_dice_roll.wav",
+  diceLand:"assets/se/se_dice_land.wav",
+  pieceStep:"assets/se/se_piece_step.wav",
+  castleBuild:"assets/se/se_castle_build.wav",
+  omikuji:"assets/se/se_omikuji.wav",
+  kanjiGet:"assets/se/se_kanji_get.wav",
+  kanjiSteal:"assets/se/se_kanji_steal.wav",
+  idiomComplete:"assets/se/se_idiom_complete.wav",
+  skill:"assets/se/se_skill_activate.wav",
+  eliminated:"assets/se/se_player_eliminated.wav",
+  victory:"assets/se/se_victory.wav"
+};
+const SE_VOL={diceRoll:.55,diceLand:.48,pieceStep:.34,castleBuild:.62,omikuji:.48,kanjiGet:.48,kanjiSteal:.46,idiomComplete:.64,skill:.45,eliminated:.48,victory:.68};
+let seEnabled=true;
+try{seEnabled=localStorage.getItem("kanjiSenkiSE")!=="off"}catch(e){}
+const sePool={};
+function getSEPool(key){
+  if(!sePool[key]){
+    const count=key==="pieceStep"?6:3;
+    sePool[key]=Array.from({length:count},()=>{const a=new Audio(SE[key]);a.preload="auto";return a});
+    sePool[key]._cursor=0;
+  }
+  return sePool[key];
+}
+function playSE(key,rate=1){
+  if(!seEnabled||!SE[key])return;
+  const pool=getSEPool(key);
+  let a=pool.find(x=>x.paused||x.ended);
+  if(!a){a=pool[pool._cursor%pool.length];pool._cursor=(pool._cursor+1)%pool.length}
+  try{a.pause();a.currentTime=0;a.playbackRate=Math.max(.75,Math.min(1.3,rate));a.volume=SE_VOL[key]??.5;const pr=a.play();if(pr&&pr.catch)pr.catch(()=>{})}catch(e){}
+}
+function updateSoundButton(){
+  soundToggle.textContent=seEnabled?"🔊 SE":"🔇 SE";
+  soundToggle.classList.toggle("off",!seEnabled);
+  soundToggle.setAttribute("aria-pressed",String(seEnabled));
+}
+soundToggle.onclick=()=>{seEnabled=!seEnabled;try{localStorage.setItem("kanjiSenkiSE",seEnabled?"on":"off")}catch(e){}updateSoundButton();if(seEnabled)playSE("kanjiGet")};
+updateSoundButton();
+Object.keys(SE).forEach(getSEPool);
+
+const MASTER_WORDS=["一石二鳥", "電光石火", "起死回生", "七転八起", "四面楚歌", "一期一会", "一心不乱", "天下無双", "百発百中", "温故知新", "一日千秋", "一朝一夕", "一喜一憂", "一進一退", "一長一短", "以心伝心", "異口同音", "我田引水", "画竜点睛", "危機一髪", "起承転結", "疑心暗鬼", "空前絶後", "言行一致", "公明正大", "五里霧中", "三日坊主", "自画自賛", "自業自得", "十人十色", "心機一転", "森羅万象", "千差万別", "大器晩成", "単刀直入", "天真爛漫", "東奔西走", "日進月歩", "八方美人", "半信半疑", "百戦錬磨", "不言実行", "無我夢中", "有名無実", "臨機応変"];
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const words=shuffle([...new Set(MASTER_WORDS)]).slice(0,10);
+// The draw pool is made by concatenating the 10 selected idioms.
+// Therefore a kanji occurring multiple times is proportionally more likely to be drawn.
+const pool=words.flatMap(w=>[...w]);
+
+const idiomInfo={"一石二鳥": {"reading": "いっせきにちょう", "meaning": "一つのことをして、二つの利益を得ること。"}, "電光石火": {"reading": "でんこうせっか", "meaning": "行動が非常に素早いこと。"}, "起死回生": {"reading": "きしかいせい", "meaning": "絶望的な状態から立ち直ること。"}, "七転八起": {"reading": "しちてんはっき", "meaning": "何度失敗しても、くじけず立ち上がること。"}, "四面楚歌": {"reading": "しめんそか", "meaning": "周囲が敵や反対者ばかりで、孤立すること。"}, "一期一会": {"reading": "いちごいちえ", "meaning": "一生に一度の出会いと思って、その機会を大切にすること。"}, "一心不乱": {"reading": "いっしんふらん", "meaning": "一つのことに心を集中し、他に気を取られないこと。"}, "天下無双": {"reading": "てんかむそう", "meaning": "世の中に並ぶものがないほど優れていること。"}, "百発百中": {"reading": "ひゃっぱつひゃくちゅう", "meaning": "予想や計画などが、すべて思いどおりに当たること。"}, "温故知新": {"reading": "おんこちしん", "meaning": "昔のことを学び、そこから新しい知識や道理を得ること。"}, "一日千秋": {"reading": "いちじつせんしゅう", "meaning": "一日が千年のように長く感じるほど、待ち遠しいこと。"}, "一朝一夕": {"reading": "いっちょういっせき", "meaning": "ほんのわずかな期間のこと。"}, "一喜一憂": {"reading": "いっきいちゆう", "meaning": "状況が変わるたびに、喜んだり心配したりすること。"}, "一進一退": {"reading": "いっしんいったい", "meaning": "進んだり後退したりして、状況がなかなか決まらないこと。"}, "一長一短": {"reading": "いっちょういったん", "meaning": "長所もあれば短所もあること。"}, "以心伝心": {"reading": "いしんでんしん", "meaning": "言葉にしなくても、心や考えが通じ合うこと。"}, "異口同音": {"reading": "いくどうおん", "meaning": "多くの人が口をそろえて同じことを言うこと。"}, "我田引水": {"reading": "がでんいんすい", "meaning": "自分に都合がよいように、物事を考えたり行ったりすること。"}, "画竜点睛": {"reading": "がりょうてんせい", "meaning": "最後の大切な仕上げをして、物事を完成させること。"}, "危機一髪": {"reading": "ききいっぱつ", "meaning": "わずかな差で大きな危険が迫っていること。"}, "起承転結": {"reading": "きしょうてんけつ", "meaning": "文章や物語を、始まり・展開・変化・結びの四段階で組み立てること。"}, "疑心暗鬼": {"reading": "ぎしんあんき", "meaning": "疑う心があると、何でも恐ろしく怪しく見えること。"}, "空前絶後": {"reading": "くうぜんぜつご", "meaning": "それ以前にも以後にも例がないほど珍しいこと。"}, "言行一致": {"reading": "げんこういっち", "meaning": "言っていることと、実際の行動が一致していること。"}, "公明正大": {"reading": "こうめいせいだい", "meaning": "公平で隠し事がなく、正しく堂々としていること。"}, "五里霧中": {"reading": "ごりむちゅう", "meaning": "どうしたらよいか分からず、方針を見失っていること。"}, "三日坊主": {"reading": "みっかぼうず", "meaning": "物事を始めても長続きせず、すぐやめてしまうこと。"}, "自画自賛": {"reading": "じがじさん", "meaning": "自分で自分のことをほめること。"}, "自業自得": {"reading": "じごうじとく", "meaning": "自分の行いの結果を、自分自身が受けること。"}, "十人十色": {"reading": "じゅうにんといろ", "meaning": "人それぞれ、好みや考え方が違うこと。"}, "心機一転": {"reading": "しんきいってん", "meaning": "あるきっかけで気持ちを入れ替え、新しくやり直すこと。"}, "森羅万象": {"reading": "しんらばんしょう", "meaning": "宇宙に存在する、すべてのものや現象。"}, "千差万別": {"reading": "せんさばんべつ", "meaning": "さまざまな違いがあり、一つ一つ異なっていること。"}, "大器晩成": {"reading": "たいきばんせい", "meaning": "大人物は、才能が現れるまでに時間がかかること。"}, "単刀直入": {"reading": "たんとうちょくにゅう", "meaning": "前置きをせず、すぐ本題に入ること。"}, "天真爛漫": {"reading": "てんしんらんまん", "meaning": "飾り気がなく、明るく自然なままであること。"}, "東奔西走": {"reading": "とうほんせいそう", "meaning": "あちこち忙しく走り回ること。"}, "日進月歩": {"reading": "にっしんげっぽ", "meaning": "日ごと月ごとに、絶えず進歩すること。"}, "八方美人": {"reading": "はっぽうびじん", "meaning": "誰に対しても悪く思われないように振る舞うこと。"}, "半信半疑": {"reading": "はんしんはんぎ", "meaning": "半分は信じ、半分は疑っていること。"}, "百戦錬磨": {"reading": "ひゃくせんれんま", "meaning": "多くの経験を積み、十分に鍛えられていること。"}, "不言実行": {"reading": "ふげんじっこう", "meaning": "あれこれ言わず、黙って実行すること。"}, "無我夢中": {"reading": "むがむちゅう", "meaning": "我を忘れるほど、一つのことに熱中すること。"}, "有名無実": {"reading": "ゆうめいむじつ", "meaning": "名目だけ立派で、実際の内容が伴っていないこと。"}, "臨機応変": {"reading": "りんきおうへん", "meaning": "その場の状況に応じて、適切に対応すること。"}};
+let idiomFlashTimer=null;
+function showIdiomFlash(type,word,effectText){
+  const box=document.getElementById("idiomFlash");
+  const kicker=document.getElementById("idiomFlashKicker");
+  const wordEl=document.getElementById("idiomFlashWord");
+  const effectEl=document.getElementById("idiomFlashEffect");
+  if(!box)return;
+  box.classList.toggle("skill",type==="skill");
+  kicker.textContent=type==="skill"?"能力発動！":"四字熟語札 獲得！";
+  wordEl.textContent=word;
+  const info=idiomInfo[word];
+  if(type==="gain"&&info){
+    effectEl.innerHTML=`<div style="font-size:.88em;font-weight:900">（${info.reading}）</div>
+      <div style="margin-top:5px">${info.meaning}</div>
+      <div style="margin-top:10px;color:#7a4d1f">⚡ ${effects[word]||effectText||""}</div>`;
+  }else{
+    effectEl.textContent=effectText||"";
+  }
+  clearTimeout(idiomFlashTimer);
+  box.classList.remove("show");
+  void box.offsetWidth;
+  box.classList.add("show");
+  idiomFlashTimer=setTimeout(()=>box.classList.remove("show"), type==="skill"?1800:2600);
+}
+
+const effects={"一石二鳥": "漢字を2字獲得", "電光石火": "このターン終了後、もう一度自分のターン", "起死回生": "次に漢字0字になったとき、3字獲得して脱落を1回回避", "七転八起": "次に受ける城からの徴収を1回無効化", "四面楚歌": "他の生存者全員からランダムに1字ずつ奪う", "一期一会": "漢字を2字獲得", "一心不乱": "次のおみくじで7字から2字獲得", "天下無双": "漢字を3字獲得", "百発百中": "次回のサイコロの出目を1～6から選ぶ", "温故知新": "この熟語に使った4字からランダムに2字を手札へ戻す", "一日千秋": "次に自陣を通過・停止したとき、漢字を3字獲得", "一朝一夕": "このターン終了後、もう一度自分のターン", "一喜一憂": "1～6を判定。偶数なら3字獲得、奇数なら1字失う", "一進一退": "次の移動前に、進む／戻るを選択", "一長一短": "漢字を3字獲得した後、ランダムに1字失う", "以心伝心": "ランダムな相手1人の手札から1字をコピーして獲得", "異口同音": "手札に同じ漢字があればその字を1字追加。なければ1字獲得", "我田引水": "ランダムな相手1人から最大2字を奪う", "画竜点睛": "あと1字で完成する未完成熟語があれば不足字を獲得。なければ1字獲得", "危機一髪": "次に漢字0字になったとき、1字獲得して脱落を1回回避", "起承転結": "ランダム4字を提示し、その中から1字選んで獲得", "疑心暗鬼": "ランダムな相手1人から1字をランダムに奪う", "空前絶後": "次に受ける城からの徴収を1回無効化", "言行一致": "次の築城・城強化で使った漢字を1字手札へ戻す", "公明正大": "漢字を2字獲得", "五里霧中": "他プレイヤーは次の自分の1ターン、熟語進捗が霧に隠れ熟語札を作れない", "三日坊主": "漢字を3字獲得。次の自分の1ターンは築城・城強化不可", "自画自賛": "自分の城数と同じだけ、最大3字まで獲得", "自業自得": "ランダムな相手1人から、その相手の城数と同じだけ最大3字奪う", "十人十色": "ランダム5字を提示し、その中から1字選んで獲得", "心機一転": "手札をすべて捨て、同じ枚数の漢字を引き直す", "森羅万象": "漢字を3字獲得", "千差万別": "異なるランダム5字を提示し、その中から2字選んで獲得", "大器晩成": "この札が2枚目以降なら漢字を3字獲得。1枚目なら効果なし", "単刀直入": "ランダムな相手1人から1字をランダムに奪う", "天真爛漫": "1～6を判定。4～6なら3字、1～3なら2字獲得", "東奔西走": "次の移動前に、進む／戻るを選択", "日進月歩": "次の自分のターン開始時に1字獲得。2回発動", "八方美人": "他の生存者それぞれの手札からランダムに1字をコピー", "半信半疑": "ランダム3字を提示し、その中から1字選んで獲得", "百戦錬磨": "次に自分の城で徴収するとき、さらに1字奪う", "不言実行": "次の築城は手札の漢字を消費しない", "無我夢中": "このターン終了後、もう一度自分のターン", "有名無実": "敵の城をランダムに1つ空地へ戻す", "臨機応変": "次に受ける城からの徴収を1回無効化"};
+const cols=["red","blue","green","purple"],names=["あなた（紅）","CPU蒼","CPU翠","CPU紫"];
+const starts=[0,5,10,15];const ps=cols.map((c,i)=>({c,n:names[i],pos:starts[i],h:[],w:[],shield:false,alive:true,revives:[],omikuji2:false,hqBonus:false,aim:false,reverse:false,chooseDirection:false,noBuild:false,buildLock:0,freeBuild:false,buildRefund:false,doubleTax:false,growth:0,fogTurns:0,fogActive:false}));ps.forEach(p=>{for(let i=0;i<5;i++)p.h.push(rk())});
+let turn=0,busy=false,extra=false,wordMadeThisTurn=false,cells=[];function rk(){return pool[Math.floor(Math.random()*pool.length)]}
+function rc(i){if(i<6)return[1,i+1];if(i<11)return[i-4,6];if(i<16)return[6,16-i];return[21-i,1]}
+const sp={0:["start","紅軍本陣"],3:["omikuji","おみくじ"],5:["start","蒼軍本陣"],6:["market","市場"],8:["omikuji","おみくじ"],10:["start","翠軍本陣"],13:["omikuji","おみくじ"],15:["start","紫軍本陣"],16:["market","市場"],18:["omikuji","おみくじ"]};
+const B=document.getElementById("board");for(let i=0;i<20;i++){let [r,c]=rc(i),d=document.createElement("div"),s=sp[i];d.className="cell "+(s?s[0]:"");d.style.gridRow=r;d.style.gridColumn=c;d.innerHTML=s?s[1]:"空地";if([0,5,10,15].includes(i))d.dataset.faction=cols[[0,5,10,15].indexOf(i)];B.appendChild(d);cells.push({el:d,own:null,ch:null})}
+function render(){
+hud.innerHTML=ps.map((p,i)=>{
+  let shownHand=p.h.join(" ");
+  return `<div class="p ${i==turn&&p.alive?"on":""}" style="${p.alive?"":"opacity:.42;filter:grayscale(1)"}">
+    <b>${p.n}${p.alive?"":"（脱落）"}${p.fogActive?" 🌫️":""}</b><br>
+    漢字 ${p.h.length}　🏯 ${cells.filter(x=>x.own==i).length}　📜 ${p.w.length}/3<br>${shownHand}
+  </div>`;
+}).join("");
+hand.innerHTML=ps[0].h.map(x=>`<span class="k">${x}</span>`).join("")||"なし";
+idioms.innerHTML=words.map(w=>{
+  let fog=ps[0].fogActive;
+  let prog=fog?"？？？？":progress(ps[0],w);
+  let make=!fog&&!wordMadeThisTurn&&can(ps[0],w)&&turn==0&&!busy&&!ps[0].w.includes(w);
+  return `<div class="idiom"><b>${w}</b>　${prog} ${make?`<button onclick="makeWord('${w}')">作る</button>`:""}<br>
+    <span style="opacity:.75">⚡ ${effects[w]}</span></div>`;
+}).join("");
+document.querySelectorAll(".token").forEach(x=>x.remove());
+ps.forEach((p,i)=>{
+  if(!p.alive)return;
+  let im=document.createElement("img");im.className="token";im.src=`assets/samurai_${p.c}.png`;
+  let o=[[2,40],[52,40],[2,3],[52,3]][i];im.style.left=o[0]+"%";im.style.top=o[1]+"%";
+  cells[p.pos].el.appendChild(im)
+});
+}
+function progress(p,w){let h=[...p.h];return [...w].map(x=>{let i=h.indexOf(x);if(i<0)return"○";h.splice(i,1);return"●"}).join("")}
+function can(p,w){return p.h.length>4&&!progress(p,w).includes("○")}function consume(p,w){for(let x of w)p.h.splice(p.h.indexOf(x),1)}
+function show(t,b,opts){mt.textContent=t;mb.innerHTML=b;choices.innerHTML="";opts.forEach(o=>{let q=document.createElement("button");q.className="choice";q.innerHTML=o[0];q.onclick=()=>{modal.classList.remove("show");o[1]()};choices.appendChild(q)});modal.classList.add("show")}
+const rot={1:[0,0],2:[-90,0],3:[0,-90],4:[0,90],5:[90,0],6:[0,180]};
+async function dice(n){playSE("diceRoll");let st=performance.now(),rx=0,ry=0;return new Promise(done=>{function f(t){let q=Math.min(1,(t-st)/1200),v=(1-q)*(1-q);rx+=30*v+2;ry+=37*v+3;let bounce=Math.abs(Math.sin(q*16))*(1-q)*38;die.style.top=(32-bounce)+"px";die.style.left=(59+Math.sin(q*20)*25*(1-q))+"px";die.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rx/3}deg)`;if(q<1)requestAnimationFrame(f);else{playSE("diceLand");let a=rot[n];die.style.transition="transform .3s,left .2s,top .2s";die.style.left="59px";die.style.top="32px";die.style.transform=`rotateX(${a[0]}deg) rotateY(${a[1]}deg)`;setTimeout(()=>{die.style.transition="none";done()},350)}}requestAnimationFrame(f)})}
+async function chooseHQKanji(i){
+  let p=ps[i];
+  if(p.hqBonus){
+    p.hqBonus=false;
+    for(let z=0;z<3;z++)p.h.push(rk());
+    playSE("kanjiGet");
+    message(`${p.n}が一日千秋の効果で本陣から漢字3字を獲得！`);
+    render();
+    await wait(350);
+    return;
+  }
+  let offers=[rk(),rk(),rk()];
+  if(i===0){
+    await new Promise(resolve=>{
+      let chosen=[];
+      const chooseStep=()=>{
+        if(chosen.length>=2){
+          playSE("kanjiGet");
+          message(`本陣で「${chosen.join("・")}」を獲得`);
+          render();
+          resolve();
+          return;
+        }
+        show("本陣",`3字から受け取る漢字を2字選ぼう<br>あと${2-chosen.length}字`,
+          offers.map((ch,idx)=>[ch,()=>{
+            p.h.push(ch);
+            chosen.push(ch);
+            offers.splice(idx,1);
+            chooseStep();
+          }])
+        );
+      };
+      chooseStep();
+    });
+  }else{
+    let picks=cpuBestOffer(p,offers,2);
+    picks.forEach(ch=>p.h.push(ch));
+    playSE("kanjiGet");
+    message(`${p.n}が本陣で「${picks.join("・")}」を獲得`);
+    render();
+    await wait(220);
+  }
+}
+async function move(i,n){
+  for(let z=0;z<n;z++){
+    ps[i].pos=(ps[i].pos+(ps[i].reverse?-1:1)+20)%20;
+    if(ps[i].pos===starts[i])await chooseHQKanji(i);
+    render();
+    playSE("pieceStep",.96+Math.random()*.08);
+    let ts=cells[ps[i].pos].el.querySelectorAll(".token");
+    ts.forEach(t=>t.style.transform="translateY(-10px) scale(1.08)");
+    await wait(240);
+    ts.forEach(t=>t.style.transform="");
+    await wait(70);
+  }
+}
+function wait(n){return new Promise(r=>setTimeout(r,n))}function message(x){msg.textContent=x}
+roll.onclick=async()=>{if(busy||turn)return;busy=true;roll.disabled=true;await doRoll()}
+async function executeRoll(n){
+  message(`${ps[turn].n}、${n}！`);
+  await dice(n);
+  await move(turn,n);
+  await land();
+}
+async function doRoll(){
+  let p=ps[turn];
+  const afterDirection=async()=>{
+    if(p.aim){
+      p.aim=false;
+      if(turn===0){
+        show("百発百中","出目を選ぼう",[1,2,3,4,5,6].map(v=>[v,async()=>{
+          busy=true;await executeRoll(v);
+        }]));
+        return;
+      }else{
+        await executeRoll(6);
+        return;
+      }
+    }
+    await executeRoll(1+Math.floor(Math.random()*6));
+  };
+  if(p.chooseDirection){
+    p.chooseDirection=false;
+    if(turn===0){
+      show("進行方向","次の移動方向を選ぼう",[
+        ["前へ進む",async()=>{p.reverse=false;busy=true;await afterDirection()}],
+        ["後ろへ戻る",async()=>{p.reverse=true;busy=true;await afterDirection()}]
+      ]);
+      return;
+    }else{
+      p.reverse=Math.random()<.5;
+    }
+  }
+  await afterDirection();
+}
+
+function castleStrength(c){return c&&c.ch?[...c.ch].length:0}
+function refreshCastleCell(c){
+  if(!c||c.own===null)return;
+  let p=ps[c.own];
+  c.el.innerHTML=`<img class="castle" src="assets/castle_${p.c}.png"><span class="clabel">${c.ch}城</span>`;
+}
+function canBuildCastle(p){return p.freeBuild?p.h.length>=1:p.h.length>=2}
+function upgradeCastle(handIndex){
+  let p=ps[turn],c=cells[p.pos];
+  if(c.own!==turn||castleStrength(c)>=3||p.h.length<=1||handIndex<0||handIndex>=p.h.length)return false;
+  let ch=p.h.splice(handIndex,1)[0];
+  c.ch+=ch;
+  if(p.buildRefund){p.buildRefund=false;p.h.push(ch)}
+  refreshCastleCell(c);
+  playSE("castleBuild");
+  message(`${p.n}が城を強化！ ${c.ch}城になった（徴収${castleStrength(c)}字）`);
+  render();
+  return true;
+}
+function cpuBestOffer(p,offers,count=1){
+  let remain=[...offers],chosen=[];
+  while(chosen.length<count&&remain.length){
+    let bestIndex=0,bestValue=-1;
+    for(let i=0;i<remain.length;i++){
+      let v=cpuKanjiValue(p,remain[i]);
+      if(v>bestValue){bestValue=v;bestIndex=i}
+    }
+    let ch=remain.splice(bestIndex,1)[0];
+    chosen.push(ch);
+    p.h.push(ch);
+  }
+  for(let i=0;i<chosen.length;i++)p.h.pop();
+  return chosen;
+}
+function cpuKanjiValue(p,ch){
+  let best=0;
+  for(const w of words){
+    if(p.w.includes(w))continue;
+    if(!w.includes(ch))continue;
+    let h=[...p.h],have=0;
+    for(const x of w){let j=h.indexOf(x);if(j>=0){h.splice(j,1);have++}}
+    best=Math.max(best,have);
+  }
+  return best;
+}
+function cpuMarketTrade(p){
+  if(p.h.length<2)return false;
+  // 手札が少ない時は純増を優先。余裕があれば不要字2枚を交換する。
+  if(p.h.length<=4||Math.random()<0.45)return false;
+  let ranked=p.h.map((ch,i)=>({ch,i,v:cpuKanjiValue(p,ch)})).sort((a,b)=>a.v-b.v);
+  let inds=[ranked[0].i,ranked[1].i].sort((a,b)=>b-a);
+  inds.forEach(i=>p.h.splice(i,1));
+  let offers=Array.from({length:5},()=>rk());
+  let best=offers[0],bestV=-1;
+  for(const ch of offers){
+    let v=cpuKanjiValue(p,ch);
+    if(v>bestV){bestV=v;best=ch}
+  }
+  p.h.push(best);
+  playSE("kanjiGet");
+  return best;
+}
+function humanMarketExchange(p){
+  let firstIndex=-1;
+  const chooseFirst=()=>{
+    show("市場：交換","交換に出す漢字を1枚選ぼう",p.h.map((x,i)=>[x,()=>{
+      firstIndex=i;
+      const secondOpts=p.h.map((y,j)=>({y,j})).filter(o=>o.j!==firstIndex);
+      show("市場：交換","交換に出す2枚目を選ぼう",secondOpts.map(o=>[o.y,()=>{
+        let inds=[firstIndex,o.j].sort((a,b)=>b-a);
+        let paid=inds.map(i=>p.h[i]).reverse();
+        inds.forEach(i=>p.h.splice(i,1));
+        let offers=Array.from({length:5},()=>rk());
+        show("市場：交換",`「${paid.join("・")}」を渡した。<br>市場の5枚から1枚選ぼう`,offers.map(ch=>[ch,()=>{
+          p.h.push(ch);
+          playSE("kanjiGet");
+          message(`市場で2枚を「${ch}」1枚と交換した`);
+          end();
+        }]));
+      }]));
+    }]));
+  };
+  chooseFirst();
+}
+function humanStealMany(victimIndex,lordIndex,count,done){
+  let victim=ps[victimIndex],lord=ps[lordIndex],taken=0;
+  const step=()=>{
+    if(taken>=count||victim.h.length===0){done();return}
+    let c=cells[victim.pos];
+    show(`${c.ch}城`,`${victim.n}から徴収：あと${Math.min(count-taken,victim.h.length)}字選べます`,
+      victim.h.map((x,i)=>[x,()=>{
+        lord.h.push(victim.h.splice(i,1)[0]);
+        taken++;
+        playSE("kanjiSteal");
+        step();
+      }])
+    );
+  };
+  step();
+}
+
+async function land(){
+  let p=ps[turn],c=cells[p.pos],s=sp[p.pos];
+
+  // おみくじ
+  if(s&&s[0]=="omikuji"){
+    playSE("omikuji");
+    let a=Array.from({length:p.omikuji2?7:5},()=>rk());
+    if(turn==0){
+      let chosen=[];
+      const chooseStep=()=>{
+        if(chosen.length>=2){
+          playSE("kanjiGet");
+          message(`おみくじで「${chosen.join("・")}」を獲得`);
+          p.omikuji2=false;
+          end();
+          return;
+        }
+        show("おみくじ",`${p.omikuji2?7:5}字から2字選ぼう<br>あと${2-chosen.length}字`,
+          a.map((x,ix)=>[x,()=>{
+            p.h.push(x);
+            chosen.push(x);
+            a.splice(ix,1);
+            chooseStep();
+          }])
+        );
+      };
+      chooseStep();
+      return;
+    }else{
+      let picks=cpuBestOffer(p,a,2);
+      picks.forEach(ch=>p.h.push(ch));
+      p.omikuji2=false;
+      playSE("kanjiGet");
+      message(`${p.n}がおみくじで「${picks.join("・")}」を獲得`);
+      await wait(600);
+    }
+  }
+
+  // 市場：1字獲得 or 2字→5択から1字交換
+  else if(s&&s[0]=="market"){
+    playSE("omikuji");
+    if(turn==0){
+      let opts=[
+        ["漢字を1字獲得",()=>{
+          let offers=[rk(),rk()];
+          show("市場：無料獲得","2字から1字選ぼう",offers.map(ch=>[ch,()=>{
+            p.h.push(ch);playSE("kanjiGet");
+            message(`市場で「${ch}」を獲得`);
+            end();
+          }]));
+        }]
+      ];
+      if(p.h.length>=2){
+        opts.push(["漢字2字を交換",()=>humanMarketExchange(p)]);
+      }
+      show("市場","どちらを利用しますか？<br><small>交換：手札2字を渡し、ランダム5字から1字を選択</small>",opts);
+      return;
+    }else{
+      let got=cpuMarketTrade(p);
+      if(got){
+        message(`${p.n}が市場で漢字2字を「${got}」1字と交換`);
+      }else{
+        let offers=[rk(),rk()];
+        let ch=cpuBestOffer(p,offers,1)[0];
+        p.h.push(ch);playSE("kanjiGet");
+        message(`${p.n}が市場で「${ch}」を獲得`);
+      }
+      await wait(650);
+    }
+  }
+
+  // 空地：任意で築城
+  else if(!s&&c.own===null&&canBuildCastle(p)&&!p.noBuild){
+    if(turn==0){
+      show("空地に到着","このマスに城を築きますか？",[
+        ["築城する",()=>{show("築城","城にする漢字を選ぼう",p.h.map((x,i)=>[x,()=>{build(i);end()}]));}],
+        ["何もしない",()=>end()]
+      ]);
+      return;
+    }else{
+      let idx=cpuBuildChoice(p);
+      if(idx>=0){
+        build(idx);
+        message(`${p.n}が${c.ch}城を築城！`);
+        await wait(600);
+      }else{
+        message(`${p.n}は築城を見送った`);
+        await wait(450);
+      }
+    }
+  }
+
+  else if(!s&&c.own===null&&p.h.length===1&&!p.freeBuild){
+    message("最後の1字は築城には使用できません");
+    await wait(550);
+  }
+
+  // 自分の城：最大3文字まで強化
+  else if(c.own===turn){
+    let lv=castleStrength(c);
+    if(lv>=3){
+      message(`${c.ch}城は最大強化済み（徴収3字）`);
+      await wait(500);
+    }else if(p.h.length<=1||p.noBuild){
+      message(p.h.length===1?`${c.ch}城に到着。最後の1字は城強化には使えません`:`${c.ch}城に到着`);
+      await wait(400);
+    }else if(turn==0){
+      show(`${c.ch}城`,`城を強化しますか？<br>現在：${lv}文字／徴収${lv}字<br>最大：3文字／徴収3字`,[
+        ["城を強化する",()=>{
+          show("城の強化","追加する漢字を選ぼう",p.h.map((x,i)=>[x,()=>{upgradeCastle(i);end()}]));
+        }],
+        ["何もしない",()=>end()]
+      ]);
+      return;
+    }else{
+      let idx=cpuBuildChoice(p);
+      if(idx>=0&&p.h.length>3){
+        upgradeCastle(idx);
+        await wait(600);
+      }else{
+        message(`${p.n}は${c.ch}城の強化を見送った`);
+        await wait(450);
+      }
+    }
+  }
+
+  // 敵城：城の文字数ぶん徴収（1～3字）
+  else if(c.own!==null&&c.own!==turn&&p.h.length){
+    let lord=ps[c.own];
+    let amount=castleStrength(c);
+    if(lord.doubleTax){amount++;lord.doubleTax=false}
+    amount=Math.min(amount,p.h.length);
+
+    if(p.shield){
+      p.shield=false;
+      playSE("skill");
+      message("七転八起！ 徴収を防いだ");
+      await wait(600);
+    }
+    else if(c.own==0){
+      humanStealMany(turn,c.own,amount,()=>end());
+      return;
+    }
+    else{
+      stealRandom(turn,c.own,amount);
+      message(`${lord.n}の${c.ch}城が漢字を${amount}字徴収！`);
+      await wait(650);
+    }
+  }
+
+  end();
+}
+function cpuBuildChoice(p){
+  if(!p.h.length)return -1;
+  const useful=p.h.map((ch,idx)=>{
+    let best=99;
+    for(const w of words){
+      let h=[...p.h],missing=0;
+      for(const x of w){let j=h.indexOf(x);if(j>=0)h.splice(j,1);else missing++}
+      if(w.includes(ch))best=Math.min(best,missing);
+    }
+    return {idx,ch,best};
+  });
+  const expendable=useful.filter(x=>x.best>=2);
+  if(p.freeBuild){
+    if(expendable.length)return expendable[Math.floor(Math.random()*expendable.length)].idx;
+    return Math.floor(Math.random()*p.h.length);
+  }
+  if(p.h.length<=3 || (expendable.length===0 && Math.random()<0.7)) return -1;
+  if(expendable.length) return expendable[Math.floor(Math.random()*expendable.length)].idx;
+  return Math.random()<0.45 ? Math.floor(Math.random()*p.h.length) : -1;
+}
+function build(i){
+  let p=ps[turn],c=cells[p.pos];
+  if(i<0||i>=p.h.length)return false;
+  if(!p.freeBuild&&p.h.length<=1){
+    message("最後の1字は築城には使用できません");
+    return false;
+  }
+  let usedChar=p.h[i];
+  if(p.freeBuild){p.freeBuild=false;c.ch=usedChar}
+  else{c.ch=p.h.splice(i,1)[0]}
+  c.own=turn;
+  if(p.buildRefund){p.buildRefund=false;p.h.push(usedChar)}
+  refreshCastleCell(c);
+  playSE("castleBuild");
+  render();
+  return true;
+}
+function randomOpponent(i){
+  let a=ps.map((p,j)=>p.alive&&j!==i?j:-1).filter(j=>j>=0);
+  return a.length?a[Math.floor(Math.random()*a.length)]:-1;
+}
+function uniqueRandomKanji(n){
+  let u=shuffle([...new Set(pool)]);
+  while(u.length<n)u.push(rk());
+  return u.slice(0,n);
+}
+function chooseKanjiOffer(i,title,offers,count=1){
+  return new Promise(resolve=>{
+    if(i!==0){
+      let p=ps[i];
+      let chosen=[...offers].sort((a,b)=>cpuKanjiValue(p,b)-cpuKanjiValue(p,a)).slice(0,count);
+      chosen.forEach(ch=>p.h.push(ch));
+      if(chosen.length)playSE("kanjiGet");
+      message(`${p.n}が「${chosen.join("・")}」を獲得`);
+      resolve(chosen);
+      return;
+    }
+    let remain=[...offers],chosen=[];
+    const step=()=>{
+      if(chosen.length>=count||!remain.length){
+        if(chosen.length)playSE("kanjiGet");
+        resolve(chosen);return;
+      }
+      show(title,`候補：${remain.join("　")}<br>${count===1?"1字":"あと"+(count-chosen.length)+"字"}選ぼう`,
+        remain.map((ch,idx)=>[ch,()=>{
+          ps[i].h.push(ch);chosen.push(ch);remain.splice(idx,1);step();
+        }])
+      );
+    };
+    step();
+  });
+}
+function stealRandom(from,to,n){
+  let moved=0;
+  for(let z=0;z<n&&ps[from].h.length;z++){
+    ps[to].h.push(ps[from].h.splice(Math.floor(Math.random()*ps[from].h.length),1)[0]);moved++
+  }
+  if(moved)playSE("kanjiSteal");
+}
+async function effect(i,w,usedChars){
+  showIdiomFlash("skill",w,effects[w]||"能力発動");
+  playSE("skill");
+  message(`【${w}】能力発動：${effects[w]||""}`);
+  let p=ps[i],others=ps.map((q,j)=>q.alive&&j!==i?j:-1).filter(j=>j>=0);
+  const gain=n=>{for(let z=0;z<n;z++)p.h.push(rk());if(n>0)playSE("kanjiGet")};
+
+  if(["一石二鳥","一期一会","公明正大"].includes(w))gain(2);
+  else if(["森羅万象","天下無双"].includes(w))gain(3);
+  else if(w==="電光石火"||w==="一朝一夕"||w==="無我夢中")extra=true;
+  else if(w==="起死回生")p.revives.push(3);
+  else if(w==="危機一髪")p.revives.push(1);
+  else if(w==="七転八起"||w==="空前絶後"||w==="臨機応変")p.shield=true;
+  else if(w==="四面楚歌")others.forEach(j=>stealRandom(j,i,1));
+  else if(w==="一心不乱")p.omikuji2=true;
+  else if(w==="百発百中")p.aim=true;
+  else if(w==="温故知新"){
+    let src=shuffle([...usedChars]).slice(0,2);
+    src.forEach(ch=>p.h.push(ch));
+    if(src.length)playSE("kanjiGet");
+  }
+  else if(w==="一日千秋")p.hqBonus=true;
+  else if(w==="一喜一憂"){
+    let d=1+Math.floor(Math.random()*6);
+    message(`一喜一憂の判定は${d}。${d%2===0?"漢字3字獲得！":"漢字1字を失う…"}`);
+    if(d%2===0)gain(3);else if(p.h.length)p.h.splice(Math.floor(Math.random()*p.h.length),1);
+  }
+  else if(w==="一進一退"||w==="東奔西走")p.chooseDirection=true;
+  else if(w==="一長一短"){
+    gain(3);
+    if(p.h.length){p.h.splice(Math.floor(Math.random()*p.h.length),1)}
+  }
+  else if(w==="以心伝心"){
+    let j=randomOpponent(i);
+    if(j>=0&&ps[j].h.length){p.h.push(ps[j].h[Math.floor(Math.random()*ps[j].h.length)]);playSE("kanjiGet")}
+  }
+  else if(w==="異口同音"){
+    let counts={};p.h.forEach(ch=>counts[ch]=(counts[ch]||0)+1);
+    let dup=Object.keys(counts).find(ch=>counts[ch]>=2);
+    if(dup){p.h.push(dup);playSE("kanjiGet")}else gain(1);
+  }
+  else if(w==="我田引水"){
+    let j=randomOpponent(i);if(j>=0)stealRandom(j,i,2);
+  }
+  else if(w==="画竜点睛"){
+    let target=words.find(x=>!p.w.includes(x)&&(()=>{
+      let h=[...p.h],miss=[];
+      for(let c of x){let j=h.indexOf(c);if(j>=0)h.splice(j,1);else miss.push(c)}
+      return miss.length===1;
+    })());
+    if(target){
+      let h=[...p.h],miss=[];
+      for(let c of target){let j=h.indexOf(c);if(j>=0)h.splice(j,1);else miss.push(c)}
+      p.h.push(miss[0]);playSE("kanjiGet");message(`画竜点睛！「${target}」に必要な「${miss[0]}」を獲得`);
+    }else gain(1);
+  }
+  else if(w==="起承転結")await chooseKanjiOffer(i,"起承転結：4字から選択",[rk(),rk(),rk(),rk()],1);
+  else if(w==="疑心暗鬼"||w==="単刀直入"){
+    let j=randomOpponent(i);if(j>=0)stealRandom(j,i,1);
+  }
+  else if(w==="言行一致")p.buildRefund=true;
+  else if(w==="五里霧中")others.forEach(j=>ps[j].fogTurns=Math.max(ps[j].fogTurns,1));
+  else if(w==="三日坊主"){gain(3);p.buildLock=Math.max(p.buildLock,1)}
+  else if(w==="自画自賛")gain(Math.min(3,cells.filter(c=>c.own===i).length));
+  else if(w==="自業自得"){
+    let j=randomOpponent(i);
+    if(j>=0)stealRandom(j,i,Math.min(3,cells.filter(c=>c.own===j).length));
+  }
+  else if(w==="十人十色")await chooseKanjiOffer(i,"十人十色：5字から選択",[rk(),rk(),rk(),rk(),rk()],1);
+  else if(w==="心機一転"){let n=p.h.length;p.h=[];gain(n)}
+  else if(w==="千差万別")await chooseKanjiOffer(i,"千差万別：5字から2字",uniqueRandomKanji(5),2);
+  else if(w==="大器晩成"){if(p.w.length>=2)gain(3)}
+  else if(w==="天真爛漫"){
+    let d=1+Math.floor(Math.random()*6),n=d>=4?3:2;
+    gain(n);message(`天真爛漫の判定は${d}。漢字${n}字獲得！`);
+  }
+  else if(w==="日進月歩")p.growth=2;
+  else if(w==="八方美人")others.forEach(j=>{
+    let q=ps[j];if(q.h.length){p.h.push(q.h[Math.floor(Math.random()*q.h.length)]);playSE("kanjiGet")}
+  });
+  else if(w==="半信半疑")await chooseKanjiOffer(i,"半信半疑：3字から選択",[rk(),rk(),rk()],1);
+  else if(w==="百戦錬磨")p.doubleTax=true;
+  else if(w==="不言実行")p.freeBuild=true;
+  else if(w==="有名無実"){
+    let enemy=cells.map((c,k)=>c.own!==null&&c.own!==i?k:-1).filter(k=>k>=0);
+    if(enemy.length){
+      let k=enemy[Math.floor(Math.random()*enemy.length)];
+      let old=cells[k].ch;
+      cells[k].own=null;cells[k].ch=null;cells[k].el.innerHTML=sp[k]?sp[k][1]:"空地";
+      message(`有名無実！ ${old}城が空地に戻った`);
+    }
+  }
+}
+async function resolveWord(i,w){
+  let p=ps[i];
+  if(!p.alive||p.w.includes(w)||!can(p,w))return false;
+  let used=[...w];
+  consume(p,w);p.w.push(w);wordMadeThisTurn=true;
+  playSE("idiomComplete");
+  showIdiomFlash("gain",w,effects[w]||"");
+  render();
+  await wait(850);
+  await effect(i,w,used);
+  render();
+
+  // 3枚完成は能力による自滅判定より先に勝利とする
+  if(p.w.length>=3){win(i);return false}
+
+  checkEliminations();
+  if(!p.alive)return false;
+  let survivor=soleSurvivor();
+  if(survivor>=0){win(survivor);return false}
+  return true;
+}
+async function makeWord(w){
+  if(turn!==0||busy||wordMadeThisTurn||ps[0].fogActive||!can(ps[0],w)||ps[0].w.includes(w))return;
+  busy=true;roll.disabled=true;
+  let ok=await resolveWord(0,w);
+  if(!ok)return;
+  let info=idiomInfo[w];
+  show("四字熟語 完成！",
+    `<div style="font:900 38px serif">${w}</div>
+     <div style="font-weight:900">（${info.reading}）</div>
+     <p style="font-weight:700">${info.meaning}</p>
+     <p>⚡ <b>能力：</b>${effects[w]}</p>`,
+    [["サイコロへ",()=>{
+      busy=false;roll.disabled=false;
+      message("熟語札の能力を解決しました。サイコロを振ろう！");
+      render();
+    }]]
+  );
+}
+function clearCastles(i){
+  cells.forEach((c,idx)=>{
+    if(c.own===i){
+      c.own=null;c.ch=null;
+      let s=sp[idx];
+      c.el.innerHTML=s?s[1]:"空地";
+    }
+  });
+}
+function eliminate(i){
+  let p=ps[i];
+  if(!p.alive)return;
+  p.alive=false;p.h=[];
+  playSE("eliminated");
+  clearCastles(i);
+  message(`${p.n}は漢字を失い、戦線から脱落！ 城はすべて空白地に戻った。`);
+  render();
+}
+function checkEliminations(){
+  ps.forEach((p,i)=>{
+    if(p.alive&&p.h.length===0){
+      if(p.revives&&p.revives.length){
+        let amount=Math.max(...p.revives);
+        p.revives.splice(p.revives.indexOf(amount),1);
+        for(let z=0;z<amount;z++)p.h.push(rk());
+        playSE("skill");playSE("kanjiGet");
+        message(`${p.n}、${amount===3?"起死回生":"危機一髪"}！ 漢字${amount}字を得て脱落回避！`);
+      }else eliminate(i);
+    }
+  });
+}
+function nextAlive(from){
+  for(let k=1;k<=ps.length;k++){
+    let j=(from+k)%ps.length;
+    if(ps[j].alive)return j;
+  }
+  return -1;
+}
+function soleSurvivor(){
+  let a=ps.map((p,i)=>p.alive?i:-1).filter(i=>i>=0);
+  return a.length===1?a[0]:-1;
+}
+function startTurn(i){
+  wordMadeThisTurn=false;
+  let p=ps[i];
+  p.noBuild=p.buildLock>0;
+  if(p.buildLock>0)p.buildLock--;
+  p.fogActive=p.fogTurns>0;
+  if(p.fogTurns>0)p.fogTurns--;
+  if(p.growth>0){
+    p.growth--;p.h.push(rk());playSE("kanjiGet");
+    message(`${p.n}、日進月歩で漢字1字獲得！`);
+  }
+}
+function end(){
+  checkEliminations();
+  render();
+  let survivor=soleSurvivor();
+  if(survivor>=0){win(survivor);return}
+  if(ps[turn].alive&&ps[turn].w.length>=3){win(turn);return}
+  if(extra&&ps[turn].alive){
+    extra=false;wordMadeThisTurn=false;
+    ps[turn].reverse=false;
+    busy=false;render();
+    message(`${ps[turn].n}は熟語能力でもう一度！`);
+    if(turn==0)roll.disabled=false;else setTimeout(cpu,600);
+    return
+  }
+  let old=turn,nxt=nextAlive(turn);
+  if(nxt<0)return;
+  if(ps[old]){ps[old].noBuild=false;ps[old].reverse=false;ps[old].fogActive=false}
+  turn=nxt;
+  startTurn(turn);
+  busy=false;render();
+  if(turn==0){
+    roll.disabled=false;
+    message(ps[turn].fogActive?"五里霧中！ このターンは熟語進捗が霧に隠れ、熟語札を作れません。":"あなたの番です。熟語を作るか、サイコロを振ろう！");
+  }else{
+    roll.disabled=true;setTimeout(cpu,650)
+  }
+}
+
+function cpuWordAbilityScore(p,w){
+  const s={
+    "天下無双":9,"森羅万象":9,"電光石火":9,"一朝一夕":8,"無我夢中":8,
+    "温故知新":8,"画竜点睛":8,"四面楚歌":8,
+    "一石二鳥":7,"一期一会":7,"公明正大":7,"一心不乱":7,"一日千秋":7,
+    "日進月歩":7,"我田引水":7,"起死回生":7,
+    "百発百中":6,"千差万別":6,"八方美人":6,"自業自得":6,
+    "危機一髪":5,"七転八起":5,"空前絶後":5,"臨機応変":5,
+    "言行一致":5,"不言実行":5,"百戦錬磨":5,"十人十色":5,
+    "起承転結":5,"半信半疑":5,"以心伝心":5,"天真爛漫":5,"有名無実":5,
+    "異口同音":4,"自画自賛":4,"心機一転":4,"一進一退":4,"東奔西走":4,
+    "五里霧中":4,"疑心暗鬼":4,"単刀直入":4,
+    "一喜一憂":3,"一長一短":3,"三日坊主":3,
+    "大器晩成":p.w.length>=1?7:1
+  };
+  let v=s[w]??4;
+  if(p.w.length===2)v+=100;
+  if(p.h.length<=2&&["起死回生","危機一髪","七転八起","空前絶後","臨機応変"].includes(w))v+=4;
+  if(p.h.length>=7&&["電光石火","一朝一夕","無我夢中","百発百中"].includes(w))v+=2;
+  return v;
+}
+function cpuChooseWord(p){
+  const candidates=words.filter(w=>!p.w.includes(w)&&can(p,w));
+  if(!candidates.length)return null;
+  candidates.sort((a,b)=>cpuWordAbilityScore(p,b)-cpuWordAbilityScore(p,a));
+  return candidates[0];
+}
+
+async function cpu(){
+  if(busy)return;
+  busy=true;
+  let p=ps[turn],w=null;
+  if(!p.fogActive&&!wordMadeThisTurn)w=cpuChooseWord(p);
+  if(w){
+    let ok=await resolveWord(turn,w);
+    if(!ok)return;
+    await wait(450);
+  }
+  await doRoll();
+}
+function win(i){busy=true;roll.disabled=true;stopBGM();playSE("victory");show("天下統一！",`<h2>${ps[i].n}の勝利！</h2><p>四字熟語3枚完成、または最後まで生き残り、天下を統一しました。</p>`,[["再戦",()=>location.reload()]])}
+render();
+</script></body></html>
