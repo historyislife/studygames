@@ -38,6 +38,15 @@ h1{font-size:clamp(2rem,7vw,3.6rem);line-height:1.15;margin:.25em 0}
 .play{margin-top:auto;display:block;text-align:center;text-decoration:none;font-weight:900;background:#263238;color:#fff;padding:12px;border-radius:12px}
 .coming{margin-top:auto;text-align:center;font-weight:900;padding:12px;border:1px dashed #aab5bb;border-radius:12px;color:#687981;background:#f7f9fa}
 .notice{margin-top:44px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}
+
+.game-info{margin:0 0 14px;border:1px solid var(--line);border-radius:12px;background:#f8fafb;overflow:hidden}
+.game-info summary{cursor:pointer;font-weight:800;padding:10px 12px;list-style:none;position:relative;padding-right:34px}
+.game-info summary::-webkit-details-marker{display:none}
+.game-info summary::after{content:"＋";position:absolute;right:12px;top:50%;transform:translateY(-50%);font-weight:900;color:#65747d}
+.game-info[open] summary::after{content:"−"}
+.game-info .info-body{padding:0 12px 11px}
+.game-info .info-body p{margin:7px 0 0;font-size:.9rem;line-height:1.7;color:var(--muted)}
+
 .notice h2{font-size:1.2rem;margin:0 0 7px}
 .notice p{margin:0;color:var(--muted)}
 footer{text-align:center;color:#718087;font-size:.85rem;padding:30px 18px 45px}
@@ -100,18 +109,36 @@ footer{text-align:center;color:#718087;font-size:.85rem;padding:30px 18px 45px}
     <div class="badges"><span class="badge">国語</span><span class="badge">漢字</span></div>
     <h3>ことばすくい</h3>
     <p>漢字のボールをすくって、お題に合うことばを集めるゲームです。</p>
+    <details class="game-info">
+      <summary>このゲームで学べること・遊び方</summary>
+      <div class="info-body">
+       <p>漢字を組み合わせてことばを作ることで、語彙や漢字の読み方・使い方を楽しく確認できます。お題に合う漢字のボールを選んですくい、正しいことばを完成させましょう。国語の復習や、ことば遊びが好きな人におすすめです。</p>
+      </div>
+     </details>
     <a class="play" href="./kotoba_sukui/">あそぶ</a>
    </article>
   <article class="card">
   <div class="badges"><span class="badge">国語</span><span class="badge">四字熟語</span></div>
   <h3>熟語スロット</h3>
   <p>数字を含む四字熟語のスロットを止めて、正しい熟語を完成させるゲームです。</p>
-  <a class="play" href="./jukugo_slot/">あそぶ</a>
+  <details class="game-info">
+      <summary>このゲームで学べること・遊び方</summary>
+      <div class="info-body">
+       <p>数字を含む四字熟語を、スロットを止めながら完成させるゲームです。正しい漢字の並びを考えることで、四字熟語の形や意味に親しめます。国語の語彙力を増やしたい人や、四字熟語を楽しく復習したい人におすすめです。</p>
+      </div>
+     </details>
+    <a class="play" href="./jukugo_slot/">あそぶ</a>
 </article>
    <article class="card">
     <div class="badges"><span class="badge">国語</span><span class="badge">漢字・四字熟語</span><span class="badge">すごろく</span></div>
     <h3>すごろく漢字戦記</h3>
     <p>漢字を集めて熟語を完成させ、城を築きながら天下統一をめざすすごろくゲームです。</p>
+    <details class="game-info">
+      <summary>このゲームで学べること・遊び方</summary>
+      <div class="info-body">
+       <p>漢字を集めて熟語を完成させながら進む、すごろく型の国語ゲームです。熟語づくりだけでなく、集めた漢字の使い方や組み合わせを考える力も養えます。城を築きながら進むゲーム性を通して、漢字学習をくり返し楽しめます。</p>
+      </div>
+     </details>
     <a class="play" href="./sugoroku_kanji_senki/">あそぶ</a>
    </article>
   </div>
@@ -124,12 +151,24 @@ footer{text-align:center;color:#718087;font-size:.85rem;padding:30px 18px 45px}
     <div class="badges"><span class="badge">算数</span><span class="badge">計算</span></div>
     <h3>4つの数字 計算パズル</h3>
     <p>4つの数字の間に＋・−・×・÷を入れて、目標の数字を作る計算パズルです。</p>
+    <details class="game-info">
+      <summary>このゲームで学べること・遊び方</summary>
+      <div class="info-body">
+       <p>4つの数字と＋・−・×・÷を組み合わせ、目標の数を作る計算パズルです。四則計算の練習だけでなく、どの順番で計算するかを考える力や数の感覚も鍛えられます。暗算や計算の工夫を楽しみたい人におすすめです。</p>
+      </div>
+     </details>
     <a class="play" href="./four_numbers/">あそぶ</a>
    </article>
    <article class="card">
     <div class="badges"><span class="badge">算数</span><span class="badge">面積・図形</span></div>
     <h3>ぴったり面積</h3>
     <p>形のちがう図形を動かして、同じ面積を作る図形学習ゲームです。</p>
+    <details class="game-info">
+      <summary>このゲームで学べること・遊び方</summary>
+      <div class="info-body">
+       <p>形の異なる図形を同じ面積にすることで、面積の考え方を学ぶゲームです。三角形・正方形・長方形・円・扇形などの大きさを比べながら、辺の長さや角度を調整します。面積の公式を使って考える練習や図形学習の復習に役立ちます。</p>
+      </div>
+     </details>
     <a class="play" href="./pittari_menseki/">あそぶ</a>
    </article>
   </div>
@@ -142,6 +181,12 @@ footer{text-align:center;color:#718087;font-size:.85rem;padding:30px 18px 45px}
     <div class="badges"><span class="badge">理科</span><span class="badge">生き物・昆虫</span></div>
     <h3>スズムシメモリーズ</h3>
     <p>秋に鳴く虫の写真・名前・鳴き声を組み合わせて覚える神経衰弱ゲームです。</p>
+    <details class="game-info">
+      <summary>このゲームで学べること・遊び方</summary>
+      <div class="info-body">
+       <p>秋に鳴く虫の写真・名前・鳴き声を組み合わせて覚える神経衰弱ゲームです。見た目だけでなく鳴き声にも触れることで、生き物の特徴を楽しく学べます。身近な昆虫や秋の自然について興味を広げたい人におすすめです。</p>
+      </div>
+     </details>
     <a class="play" href="./suzumushi_memories/mushi_src/">あそぶ</a>
    </article>
   </div>
@@ -154,18 +199,36 @@ footer{text-align:center;color:#718087;font-size:.85rem;padding:30px 18px 45px}
     <div class="badges"><span class="badge">社会</span><span class="badge">都道府県</span></div>
     <h3>都道府県クイズ</h3>
     <p>人口・面積・位置・農林水産物などから、条件に合う都道府県を考えるクイズです。</p>
+    <details class="game-info">
+      <summary>このゲームで学べること・遊び方</summary>
+      <div class="info-body">
+       <p>人口・面積・位置・農林水産物などのヒントから、条件に合う都道府県を考えるクイズです。都道府県名を覚えるだけでなく、それぞれの地域の特徴や違いにも触れられます。小学校社会の地理学習や復習におすすめです。</p>
+      </div>
+     </details>
     <a class="play" href="./todofuken_quiz/">あそぶ</a>
    </article>
    <article class="card">
     <div class="badges"><span class="badge">社会</span><span class="badge">地理</span></div>
     <h3>日本列島ジグソーパズル</h3>
     <p>都道府県の形を見ながら、日本地図の正しい場所にはめていくパズルです。</p>
+    <details class="game-info">
+      <summary>このゲームで学べること・遊び方</summary>
+      <div class="info-body">
+       <p>都道府県の形を見ながら、日本地図の正しい場所にはめていくパズルです。位置関係や県の形をくり返し確認できるので、日本地理を視覚的に覚えられます。都道府県の場所を楽しく身につけたい人におすすめです。</p>
+      </div>
+     </details>
     <a class="play" href="./japan_jigsaw/">あそぶ</a>
    </article>
    <article class="card">
     <div class="badges"><span class="badge">社会</span><span class="badge">歴史</span><span class="badge">小学6年生</span></div>
     <h3>歴史人物 神経衰弱</h3>
     <p>同じ人物の肖像画を2枚見つけて、正しい歴史人物の名前と組み合わせる神経衰弱ゲームです。</p>
+    <details class="game-info">
+      <summary>このゲームで学べること・遊び方</summary>
+      <div class="info-body">
+       <p>歴史人物の肖像画と名前を組み合わせる神経衰弱ゲームです。人物の顔や名前をくり返し見ることで、日本史に登場する代表的な人物を覚えやすくなります。小学校6年生の歴史学習や、人物名の復習におすすめです。</p>
+      </div>
+     </details>
     <a class="play" href="./history_memory/">あそぶ</a>
    </article>
   </div>
