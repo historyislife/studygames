@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>四字熟語キューブ</title>
+<style>
+  :root{
+    --bg1:#eef5ff;
+    --bg2:#f9fbff;
+    --ink:#1f2937;
+    --muted:#64748b;
+    --panel:rgba(255,255,255,.86);
+    --line:rgba(15,23,42,.12);
+    --accent:#2563eb;
+    --ok:#059669;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--bg1),var(--bg2));}
+  body{touch-action:none;user-select:none;-webkit-user-select:none}
+  .home-back-btn{
+    position:fixed;top:10px;left:10px;z-index:20;display:inline-flex;align-items:center;justify-content:center;
+    padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.9);color:#263238;
+    border:1px solid rgba(0,0,0,.12);font-size:13px;font-weight:700;text-decoration:none;backdrop-filter:blur(8px)
+  }
+  #app{width:100%;height:100%;display:grid;grid-template-rows:auto 1fr auto;position:relative}
+  header{text-align:center;padding:12px 120px 2px;z-index:5;pointer-events:none}
+  h1{margin:0;font-size:clamp(20px,4vw,32px);letter-spacing:.04em}
+  .sub{margin-top:3px;color:var(--muted);font-size:13px}
+  #stage{position:relative;min-height:0}
+  #canvasWrap{position:absolute;inset:0}
+  canvas{display:block;width:100%;height:100%;touch-action:none}
+  .hud{
+    position:absolute;right:12px;top:10px;width:min(290px,35vw);max-height:calc(100% - 20px);overflow:auto;
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 12px 30px rgba(15,23,42,.10);backdrop-filter:blur(10px);z-index:6
+  }
+  .progress{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .progress strong{font-size:18px}.progress span{font-size:13px;color:var(--muted)}
+  .idioms{display:grid;gap:6px}
+  .idiom{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;border-radius:10px;background:rgba(248,250,252,.9);font-weight:700;letter-spacing:.08em;border:1px solid rgba(15,23,42,.06)}
+  .idiom.done{background:rgba(236,253,245,.95);color:#047857;border-color:rgba(5,150,105,.18)}
+  .mark{font-size:12px;letter-spacing:0;color:var(--muted)}
+  .idiom.done .mark{color:#059669}
+  .idiom.learned{cursor:pointer}
+  .idiom.learned:hover{border-color:rgba(37,99,235,.28);box-shadow:0 3px 10px rgba(37,99,235,.08)}
+  .idiom.learned .mark{color:#2563eb}
+  .idiom.done .mark{color:#059669}
+  .meaning-card{
+    position:absolute;left:50%;bottom:18px;transform:translateX(-50%) translateY(12px);z-index:18;
+    width:min(520px,calc(100% - 28px));padding:14px 42px 14px 16px;border-radius:16px;
+    background:rgba(255,255,255,.97);border:1px solid rgba(37,99,235,.20);box-shadow:0 16px 42px rgba(15,23,42,.16);
+    opacity:0;pointer-events:none;transition:.2s ease;backdrop-filter:blur(10px)
+  }
+  .meaning-card.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+  .meaning-title{font-size:19px;font-weight:900;letter-spacing:.10em;color:#1d4ed8;margin-bottom:5px}
+  .meaning-label{font-size:11px;font-weight:900;color:#64748b;letter-spacing:.08em;margin-bottom:2px}
+  .meaning-text{font-size:14px;line-height:1.65;font-weight:700;color:#334155}
+  .meaning-close{position:absolute;right:9px;top:9px;width:30px;height:30px;padding:0;border-radius:999px;box-shadow:none;font-size:18px;line-height:1}
+  .gesture{
+    position:absolute;left:12px;bottom:10px;width:min(320px,42vw);background:rgba(255,255,255,.82);border:1px solid var(--line);
+    border-radius:14px;padding:10px 12px;font-size:12px;line-height:1.6;color:#475569;backdrop-filter:blur(9px);z-index:6;pointer-events:none
+  }
+  .gesture b{color:#0f172a}
+  footer{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;padding:8px 10px 12px;z-index:8}
+  .difficulty{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:12px;padding:5px 8px;font-size:12px;font-weight:800;color:#475569}
+  select{border:0;background:transparent;color:#1e293b;font:inherit;font-weight:900;outline:none;cursor:pointer}
+  button.solve{background:#0f766e;color:white;border-color:#0f766e}
+  button:disabled, select:disabled{opacity:.5;cursor:not-allowed}
+  button{appearance:none;border:1px solid rgba(15,23,42,.13);background:white;color:#1e293b;border-radius:12px;padding:10px 14px;font-weight:800;font-size:14px;box-shadow:0 4px 12px rgba(15,23,42,.06);cursor:pointer}
+  button:active{transform:translateY(1px)}
+  button.primary{background:#2563eb;color:white;border-color:#2563eb}
+  #toast{position:absolute;left:50%;top:16%;transform:translateX(-50%) translateY(-8px);z-index:30;padding:10px 16px;border-radius:999px;background:rgba(15,23,42,.88);color:white;font-weight:800;opacity:0;pointer-events:none;transition:.2s ease;white-space:nowrap}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  #overlayMsg{position:absolute;inset:0;display:grid;place-items:center;z-index:4;pointer-events:none}
+  #overlayMsg .pill{opacity:0;transform:scale(.95);transition:.2s ease;background:rgba(255,255,255,.92);border:1px solid rgba(37,99,235,.18);box-shadow:0 14px 40px rgba(37,99,235,.15);padding:14px 18px;border-radius:16px;font-weight:900;color:#1d4ed8}
+  #overlayMsg .pill.show{opacity:1;transform:scale(1)}
+  @media(max-width:800px){
+    header{padding:52px 12px 0}
+    .hud{left:10px;right:10px;top:auto;bottom:8px;width:auto;max-height:150px;padding:9px 10px}
+    .idioms{grid-template-columns:repeat(3,1fr);gap:4px}
+    .idiom{padding:6px 7px;font-size:11px;letter-spacing:.02em}.mark{display:none}
+    .gesture{left:10px;top:8px;bottom:auto;width:min(270px,72vw);font-size:11px;padding:8px 10px}
+    .meaning-card{bottom:164px;width:calc(100% - 20px);padding:12px 40px 12px 13px}
+    .meaning-title{font-size:17px}.meaning-text{font-size:13px}
+    footer{padding-bottom:max(10px,env(safe-area-inset-bottom));}
+    button{padding:9px 11px;font-size:13px}
+  }
+</style>
+</head>
+<body>
+<a href="/" class="home-back-btn" aria-label="ガクハコのトップへ戻る">← ガクハコ</a>
+<div id="app">
+  <header>
+    <h1>四字熟語キューブ</h1>
+    <div class="sub">回して、6面すべての四字熟語を完成させよう</div>
+  </header>
+  <main id="stage">
+    <div id="canvasWrap"></div>
+    <div class="gesture">
+      <b>見る：</b>左右スワイプで横回転／上下スワイプで縦回転／ピンチで拡大縮小<br>
+      <b>動かす：</b>文字を長押し → そのままスライド
+    </div>
+    <aside class="hud">
+      <div class="progress"><strong id="progressText">完成 0 / 6</strong><span id="moveText">0手</span></div>
+      <div class="idioms" id="idiomList"></div>
+    </aside>
+    <div id="toast"></div>
+    <div class="meaning-card" id="meaningCard" role="dialog" aria-live="polite" aria-label="四字熟語の意味">
+      <button class="meaning-close" id="meaningClose" aria-label="閉じる">×</button>
+      <div class="meaning-label">四字熟語の意味</div>
+      <div class="meaning-title" id="meaningTitle"></div>
+      <div class="meaning-text" id="meaningText"></div>
+    </div>
+    <div id="overlayMsg"><div class="pill" id="clearPill">6面完成！</div></div>
+  </main>
+  <footer>
+    <label class="difficulty">難易度
+      <select id="difficultySelect" aria-label="スクランブル難易度">
+        <option value="1">練習（1手）</option>
+        <option value="3" selected>かんたん（3手）</option>
+        <option value="4">むずかしい（4手）</option>
+        <option value="5">おに（5手）</option>
+      </select>
+    </label>
+    <button id="hintBtn">ヒント（1手進める）</button>
+    <button id="solveBtn" class="solve">自動で解く</button>
+    <button id="resetBtn">最初から</button>
+    <button id="newBtn" class="primary">新しい問題</button>
+  </footer>
+</div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
+
+const canvasWrap = document.getElementById('canvasWrap');
+const idiomList = document.getElementById('idiomList');
+const progressText = document.getElementById('progressText');
+const moveText = document.getElementById('moveText');
+const toast = document.getElementById('toast');
+const clearPill = document.getElementById('clearPill');
+const meaningCard = document.getElementById('meaningCard');
+const meaningTitle = document.getElementById('meaningTitle');
+const meaningText = document.getElementById('meaningText');
+const meaningClose = document.getElementById('meaningClose');
+
+const IDIOM_POOL = [
+  ['一石二鳥','温故知新','起死回生','電光石火','七転八起','一期一会'],
+  ['以心伝心','試行錯誤','切磋琢磨','臥薪嘗胆','百発百中','日進月歩'],
+  ['有言実行','大器晩成','十人十色','一進一退','千載一遇','前代未聞'],
+  ['悪戦苦闘','一心不乱','公明正大','自画自賛','単刀直入','無我夢中']
+];
+
+const IDIOM_MEANINGS = {
+  '一石二鳥':'一つのことをして、同時に二つの利益を得ること。',
+  '温故知新':'昔のことを学び、そこから新しい知識や道理を見いだすこと。',
+  '起死回生':'ほとんどだめな状態から、一気に立て直すこと。',
+  '電光石火':'行動や動きが、非常に素早いこと。',
+  '七転八起':'何度失敗してもくじけず、立ち上がって努力すること。',
+  '一期一会':'一生に一度かもしれない出会いを、大切にすること。',
+  '以心伝心':'言葉にしなくても、気持ちや考えが相手に伝わること。',
+  '試行錯誤':'いろいろな方法を試し、失敗しながら解決法を見つけること。',
+  '切磋琢磨':'仲間同士で励まし合い、競い合って成長すること。',
+  '臥薪嘗胆':'目的を達成するため、苦労に耐えて努力を続けること。',
+  '百発百中':'ねらったものに必ず当たること。転じて、予想や計画がすべて当たること。',
+  '日進月歩':'日に日に、絶えず進歩していくこと。',
+  '有言実行':'口にしたことを、責任をもって実際に行うこと。',
+  '大器晩成':'大きな才能をもつ人は、時間をかけて立派に成長するということ。',
+  '十人十色':'人それぞれ、考え方や好みが違うこと。',
+  '一進一退':'進んだり退いたりして、状況がなかなか大きく進展しないこと。',
+  '千載一遇':'めったにない、とても貴重な機会。',
+  '前代未聞':'これまで一度も聞いたことがないほど、珍しいこと。',
+  '悪戦苦闘':'難しい状況の中で、苦しみながら懸命に努力すること。',
+  '一心不乱':'ほかのことに心を奪われず、一つのことに集中すること。',
+  '公明正大':'隠し事がなく、公平で正しく堂々としていること。',
+  '自画自賛':'自分で自分のしたことや作品をほめること。',
+  '単刀直入':'前置きをせず、すぐに本題や要点に入ること。',
+  '無我夢中':'我を忘れるほど、一つのことに熱中すること。'
+};
+
+const FACE_DEFS = [
+  {key:'px', normal:new THREE.Vector3( 1, 0, 0), axis:'x', sign: 1, up:new THREE.Vector3(0,1,0), right:new THREE.Vector3(0,0,-1)},
+  {key:'nx', normal:new THREE.Vector3(-1, 0, 0), axis:'x', sign:-1, up:new THREE.Vector3(0,1,0), right:new THREE.Vector3(0,0, 1)},
+  {key:'py', normal:new THREE.Vector3( 0, 1, 0), axis:'y', sign: 1, up:new THREE.Vector3(0,0,-1), right:new THREE.Vector3(1,0,0)},
+  {key:'ny', normal:new THREE.Vector3( 0,-1, 0), axis:'y', sign:-1, up:new THREE.Vector3(0,0, 1), right:new THREE.Vector3(1,0,0)},
+  {key:'pz', normal:new THREE.Vector3( 0, 0, 1), axis:'z', sign: 1, up:new THREE.Vector3(0,1,0), right:new THREE.Vector3(1,0,0)},
+  {key:'nz', normal:new THREE.Vector3( 0, 0,-1), axis:'z', sign:-1, up:new THREE.Vector3(0,1,0), right:new THREE.Vector3(-1,0,0)}
+];
+const FACE_INDEX = Object.fromEntries(FACE_DEFS.map((f,i)=>[f.key,i]));
+const SPACING = 1.03;
+const CUBIE_SIZE = .96;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, 1, .1, 100);
+camera.position.set(5.1,4.5,6.3);
+camera.lookAt(0,0,0);
+
+const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+canvasWrap.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff,0x667085,2.2));
+const dir = new THREE.DirectionalLight(0xffffff,2.4); dir.position.set(4,7,6); scene.add(dir);
+const dir2 = new THREE.DirectionalLight(0xffffff,1.1); dir2.position.set(-5,-2,-4); scene.add(dir2);
+
+const viewGroup = new THREE.Group();
+scene.add(viewGroup);
+let puzzleGroup = new THREE.Group();
+viewGroup.add(puzzleGroup);
+
+const raycaster = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+let cubies = [];
+let currentIdioms = [];
+let faceStatus = Array(6).fill(false);
+let learnedIdioms = new Set();
+let meaningTimer = null;
+let moveCount = 0;
+let scrambleMoves = [];
+let moveHistory = []; // scramble + player moves; reversing this always returns to the solved state
+let solving = false;
+let busy = false;
+let selectedCubie = null;
+let selectedFaceNormalLocal = null;
+let activePointer = null;
+let pressTimer = null;
+let longPressed = false;
+let dragStart = null;
+let currentMovePreview = null;
+let lastPinchDistance = 0;
+const pointers = new Map();
+
+function faceKeyFromVec(v){
+  const a = [Math.abs(v.x),Math.abs(v.y),Math.abs(v.z)];
+  const m = Math.max(...a);
+  if(m===a[0]) return v.x>=0?'px':'nx';
+  if(m===a[1]) return v.y>=0?'py':'ny';
+  return v.z>=0?'pz':'nz';
+}
+function axisVec(axis){ return axis==='x'?new THREE.Vector3(1,0,0):axis==='y'?new THREE.Vector3(0,1,0):new THREE.Vector3(0,0,1); }
+function snapAxis(v){
+  const av={x:Math.abs(v.x),y:Math.abs(v.y),z:Math.abs(v.z)};
+  let axis='x'; if(av.y>av.x && av.y>=av.z) axis='y'; else if(av.z>av.x && av.z>av.y) axis='z';
+  const s = Math.sign(v[axis]) || 1;
+  return {axis,sign:s};
+}
+function roundQuarterQuaternion(q){
+  // Numerical cleanup only; cube rotations are exact quarter turns in intent.
+  q.normalize();
+  ['x','y','z','w'].forEach(k=>{ if(Math.abs(q[k])<1e-8) q[k]=0; });
+}
+
+function makeStickerTexture(char, completed=false){
+  const c=document.createElement('canvas'); c.width=256; c.height=256;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle=completed?'#ecfdf5':'#fffdf7'; ctx.fillRect(0,0,256,256);
+  ctx.strokeStyle=completed?'#10b981':'#d5d9df'; ctx.lineWidth=12; ctx.strokeRect(8,8,240,240);
+  ctx.fillStyle='#111827'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font='900 132px "Noto Sans JP", "Yu Gothic", sans-serif';
+  ctx.fillText(char,128,133);
+  const tex=new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace; tex.anisotropy=8; return tex;
+}
+function makeBlankMaterial(){ return new THREE.MeshStandardMaterial({color:0x2b3038,roughness:.72,metalness:.02}); }
+function makeStickerMaterial(char){ return new THREE.MeshStandardMaterial({map:makeStickerTexture(char),roughness:.48,metalness:.0,emissive:0x000000,emissiveIntensity:0}); }
+
+function faceCellIndex(faceDef, pos){
+  const u = Math.round(pos.dot(faceDef.right));
+  const v = Math.round(pos.dot(faceDef.up));
+  const col = u>0 ? 1 : 0;
+  const row = v>0 ? 0 : 1;
+  return row*2+col;
+}
+
+function chooseIdioms(){
+  const set = IDIOM_POOL[Math.floor(Math.random()*IDIOM_POOL.length)].slice();
+  // Assign randomly to six world faces.
+  for(let i=set.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [set[i],set[j]]=[set[j],set[i]]; }
+  return set;
+}
+
+function buildPuzzle(){
+  while(puzzleGroup.children.length) puzzleGroup.remove(puzzleGroup.children[0]);
+  cubies=[]; moveCount=0; scrambleMoves=[]; moveHistory=[]; learnedIdioms.clear(); moveText.textContent='0手'; clearPill.classList.remove('show'); hideMeaning();
+  currentIdioms=chooseIdioms();
+  const geom=new THREE.BoxGeometry(CUBIE_SIZE,CUBIE_SIZE,CUBIE_SIZE);
+  for(const x of [-1,1]) for(const y of [-1,1]) for(const z of [-1,1]){
+    const pos=new THREE.Vector3(x,y,z);
+    const mats=Array.from({length:6},()=>makeBlankMaterial());
+    const stickers={};
+    FACE_DEFS.forEach((fd,fi)=>{
+      if(pos[fd.axis]===fd.sign){
+        const idx=faceCellIndex(fd,pos);
+        const ch=currentIdioms[fi][idx];
+        mats[FACE_INDEX[fd.key]]=makeStickerMaterial(ch);
+        stickers[fd.key]={faceId:fi,char:ch,localNormal:fd.normal.clone()};
+      }
+    });
+    const mesh=new THREE.Mesh(geom,mats);
+    mesh.position.copy(pos).multiplyScalar(SPACING/2);
+    mesh.userData={coord:{x,y,z},home:{x,y,z},stickers,baseScale:1};
+    puzzleGroup.add(mesh); cubies.push(mesh);
+  }
+  updateIdiomUI();
+  const n=Number(document.getElementById('difficultySelect')?.value || 3);
+  scramble(n);
+}
+
+function updateIdiomUI(){
+  idiomList.innerHTML='';
+  currentIdioms.forEach((idiom,i)=>{
+    const learned=learnedIdioms.has(idiom);
+    const d=document.createElement('div');
+    d.className='idiom'+(faceStatus[i]?' done':'')+(learned?' learned':'');
+    const mark=faceStatus[i]?'完成 ✓':(learned?'意味を見る':'未完成');
+    d.innerHTML=`<span>${idiom}</span><span class="mark">${mark}</span>`;
+    if(learned){
+      d.setAttribute('role','button');
+      d.setAttribute('tabindex','0');
+      d.setAttribute('aria-label',`${idiom}の意味を見る`);
+      const open=()=>showMeaning(idiom,false);
+      d.addEventListener('click',open);
+      d.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } });
+    }
+    idiomList.appendChild(d);
+  });
+}
+
+function showMeaning(idiom,autoHide=true){
+  const meaning=IDIOM_MEANINGS[idiom] || '意味を準備中です。';
+  clearTimeout(meaningTimer);
+  meaningTitle.textContent=idiom;
+  meaningText.textContent=meaning;
+  meaningCard.classList.add('show');
+  if(autoHide){ meaningTimer=setTimeout(hideMeaning,5200); }
+}
+function hideMeaning(){
+  clearTimeout(meaningTimer);
+  meaningCard.classList.remove('show');
+}
+meaningClose.addEventListener('click',hideMeaning);
+
+function rotateCoord(coord,axis,dir){
+  let {x,y,z}=coord;
+  if(axis==='x') return dir>0?{x,y:-z,z:y}:{x,y:z,z:-y};
+  if(axis==='y') return dir>0?{x:z,y,z:-x}:{x:-z,y,z:x};
+  return dir>0?{x:-y,y:x,z}:{x:y,y:-x,z};
+}
+
+function applyMoveInstant(axis,layer,dir){
+  const q=new THREE.Quaternion().setFromAxisAngle(axisVec(axis),dir*Math.PI/2);
+  cubies.filter(c=>c.userData.coord[axis]===layer).forEach(c=>{
+    c.userData.coord=rotateCoord(c.userData.coord,axis,dir);
+    c.position.set(c.userData.coord.x*SPACING/2,c.userData.coord.y*SPACING/2,c.userData.coord.z*SPACING/2);
+    c.quaternion.premultiply(q); roundQuarterQuaternion(c.quaternion);
+  });
+}
+
+function scramble(n=3){
+  const axes=['x','y','z']; let lastAxis='';
+  for(let i=0;i<n;i++){
+    let axis=axes[Math.floor(Math.random()*3)];
+    if(axis===lastAxis) axis=axes[(axes.indexOf(axis)+1+Math.floor(Math.random()*2))%3];
+    const layer=Math.random()<.5?-1:1; const dir=Math.random()<.5?-1:1;
+    applyMoveInstant(axis,layer,dir);
+    const m={axis,layer,dir}; scrambleMoves.push(m); moveHistory.push({...m}); lastAxis=axis;
+  }
+  detectFaces();
+}
+
+function setHighlight(list, on){
+  list.forEach(c=>{
+    const s=on?1.045:1; c.scale.setScalar(s);
+    c.traverse(o=>{ if(o.material && 'emissive' in o.material){ o.material.emissive.setHex(on?0x143a6b:0x000000); o.material.emissiveIntensity=on?.18:0; } });
+  });
+}
+function clearHighlight(){ setHighlight(cubies,false); }
+
+function rotatedWordLayouts(word){
+  // 2×2 の読み順（左上→右上→左下→右下）を、面そのものを
+  // 0/90/180/270° 回した場合の4通りに展開する。
+  // 2×2キューブには中心ピースがないため、「どの世界方向にどの熟語があるか」や
+  // 「面が何度回転しているか」は完成条件に含めない。
+  const a=[...word];
+  return [
+    [a[0],a[1],a[2],a[3]],
+    [a[2],a[0],a[3],a[1]],
+    [a[3],a[2],a[1],a[0]],
+    [a[1],a[3],a[0],a[2]]
+  ].map(x=>x.join(''));
+}
+
+function readWorldFace(fd){
+  const chars=Array(4).fill(null);
+  const faceCubies=cubies.filter(c=>c.userData.coord[fd.axis]===fd.sign);
+  if(faceCubies.length!==4) return null;
+
+  for(const c of faceCubies){
+    const pos=new THREE.Vector3(c.userData.coord.x,c.userData.coord.y,c.userData.coord.z);
+    const idx=faceCellIndex(fd,pos);
+    let found=null;
+    for(const st of Object.values(c.userData.stickers)){
+      const n=st.localNormal.clone().applyQuaternion(c.quaternion);
+      n.set(Math.round(n.x),Math.round(n.y),Math.round(n.z));
+      if(n.equals(fd.normal)){ found=st; break; }
+    }
+    if(!found) return null;
+    chars[idx]=found.char;
+  }
+  return chars.every(Boolean)?chars.join(''):null;
+}
+
+function setCompletedFaceGlow(completedWorldFaceIndexes){
+  const completed = new Set(completedWorldFaceIndexes);
+
+  // いったん全ステッカーの発光を解除し、現在完成している「世界面」だけを光らせる。
+  for(const c of cubies){
+    for(const [localKey, st] of Object.entries(c.userData.stickers)){
+      const mat = c.material[FACE_INDEX[localKey]];
+      if(!mat || !mat.emissive) continue;
+      mat.emissive.setHex(0x000000);
+      mat.emissiveIntensity = 0;
+
+      const n=st.localNormal.clone().applyQuaternion(c.quaternion);
+      n.set(Math.round(n.x),Math.round(n.y),Math.round(n.z));
+      const worldFaceIndex=FACE_INDEX[faceKeyFromVec(n)];
+      if(completed.has(worldFaceIndex)){
+        mat.emissive.setHex(0x34d399);
+        mat.emissiveIntensity = 0.58;
+      }
+    }
+  }
+}
+
+function detectFaces(){
+  // 「この熟語は必ず上面」ではなく、6面のどこにあってもよい。
+  // さらに面の90°単位の回転も許容する。これによりキューブ全体を
+  // どの向きに持ち替えても、同じ完成状態は同じように判定される。
+  const worldFaces=FACE_DEFS.map(readWorldFace);
+  const idiomLayouts=currentIdioms.map(idiom=>new Set(rotatedWordLayouts(idiom)));
+
+  // 各世界面について、どの四字熟語が完成しているかを調べる。
+  const worldFaceMatches=worldFaces.map(faceText=>{
+    if(!faceText) return -1;
+    return idiomLayouts.findIndex(layouts=>layouts.has(faceText));
+  });
+  const status=currentIdioms.map((_,idiomIndex)=>worldFaceMatches.includes(idiomIndex));
+
+  // 完成した「面」そのものを4マスまとめて発光。崩れれば次の判定で即消灯する。
+  const completedWorldFaceIndexes=worldFaceMatches
+    .map((idiomIndex,worldFaceIndex)=>idiomIndex>=0?worldFaceIndex:-1)
+    .filter(i=>i>=0);
+  setCompletedFaceGlow(completedWorldFaceIndexes);
+
+  const newly=status.map((v,i)=>v&&!faceStatus[i]?i:-1).filter(i=>i>=0);
+  const newlyIdioms=newly.map(i=>currentIdioms[i]);
+  newlyIdioms.forEach(idiom=>learnedIdioms.add(idiom));
+  faceStatus=status;
+  const count=status.filter(Boolean).length;
+  progressText.textContent=`完成 ${count} / 6`;
+  updateIdiomUI();
+  if(newly.length && moveCount>0){
+    showToast(`${currentIdioms[newly[0]]} 完成！`);
+    showMeaning(currentIdioms[newly[0]],true);
+  }
+  if(count===6){ clearPill.classList.add('show'); showToast('6面すべて完成！'); }
+  else clearPill.classList.remove('show');
+}
+
+function showToast(text){
+  toast.textContent=text; toast.classList.add('show');
+  clearTimeout(showToast.t); showToast.t=setTimeout(()=>toast.classList.remove('show'),1100);
+}
+
+function resize(){
+  const r=canvasWrap.getBoundingClientRect();
+  renderer.setSize(r.width,r.height,false); camera.aspect=r.width/r.height; camera.updateProjectionMatrix();
+}
+window.addEventListener('resize',resize); resize();
+
+function raycastAt(clientX,clientY){
+  const r=renderer.domElement.getBoundingClientRect();
+  ndc.x=((clientX-r.left)/r.width)*2-1; ndc.y=-((clientY-r.top)/r.height)*2+1;
+  raycaster.setFromCamera(ndc,camera);
+  const hits=raycaster.intersectObjects(cubies,false);
+  return hits[0]||null;
+}
+
+function startLongPress(e){
+  if(busy || solving || pointers.size>1) return;
+  clearTimeout(pressTimer);
+  pressTimer=setTimeout(()=>{
+    const hit=raycastAt(e.clientX,e.clientY); if(!hit) return;
+    selectedCubie=hit.object; longPressed=true; dragStart={x:e.clientX,y:e.clientY};
+    const n=hit.face.normal.clone().transformDirection(hit.object.matrixWorld);
+    // Convert world normal into puzzle local coordinates (remove view rotation).
+    const invViewQ=viewGroup.getWorldQuaternion(new THREE.Quaternion()).invert();
+    selectedFaceNormalLocal=n.applyQuaternion(invViewQ).normalize();
+    selectedFaceNormalLocal.set(Math.round(selectedFaceNormalLocal.x),Math.round(selectedFaceNormalLocal.y),Math.round(selectedFaceNormalLocal.z));
+    clearHighlight(); setHighlight([selectedCubie],true); showToast('そのままスライド');
+  },340);
+}
+
+function previewMoveFromDrag(dx,dy){
+  if(!selectedCubie || !selectedFaceNormalLocal) return null;
+  const r=renderer.domElement.getBoundingClientRect();
+  // Approximate screen drag as a world direction using camera basis.
+  const camRight=new THREE.Vector3(1,0,0).applyQuaternion(camera.quaternion);
+  const camUp=new THREE.Vector3(0,1,0).applyQuaternion(camera.quaternion);
+  const dWorld=camRight.multiplyScalar(dx/r.width).add(camUp.multiplyScalar(-dy/r.height)).normalize();
+  const invViewQ=viewGroup.getWorldQuaternion(new THREE.Quaternion()).invert();
+  const dLocal=dWorld.applyQuaternion(invViewQ);
+  dLocal.addScaledVector(selectedFaceNormalLocal,-dLocal.dot(selectedFaceNormalLocal));
+  if(dLocal.lengthSq()<1e-6) return null; dLocal.normalize();
+  const axisGuess=selectedFaceNormalLocal.clone().cross(dLocal);
+  const snapped=snapAxis(axisGuess);
+  const axis=snapped.axis;
+  if(Math.abs(selectedFaceNormalLocal[axis])>.5) return null;
+  const layer=selectedCubie.userData.coord[axis];
+  return {axis,layer,dir:snapped.sign};
+}
+
+async function rotateLayer(axis,layer,dir,duration=210,countMove=true,recordHistory=true){
+  if(busy) return; busy=true; clearHighlight();
+  const chosen=cubies.filter(c=>c.userData.coord[axis]===layer);
+  const g=new THREE.Group(); puzzleGroup.add(g);
+  chosen.forEach(c=>g.attach(c));
+  const start=performance.now(); const target=dir*Math.PI/2;
+  await new Promise(resolve=>{
+    function tick(t){
+      const p=duration===0?1:Math.min(1,(t-start)/duration);
+      const eased=1-Math.pow(1-p,3);
+      g.rotation[axis]=target*eased;
+      if(p<1) requestAnimationFrame(tick); else resolve();
+    }
+    requestAnimationFrame(tick);
+  });
+  chosen.forEach(c=>puzzleGroup.attach(c));
+  puzzleGroup.remove(g);
+  chosen.forEach(c=>{
+    c.userData.coord=rotateCoord(c.userData.coord,axis,dir);
+    c.position.set(c.userData.coord.x*SPACING/2,c.userData.coord.y*SPACING/2,c.userData.coord.z*SPACING/2);
+    // Snap tiny floating errors in quaternion components.
+    roundQuarterQuaternion(c.quaternion);
+  });
+  if(countMove){ moveCount++; moveText.textContent=`${moveCount}手`; }
+  if(recordHistory) moveHistory.push({axis,layer,dir});
+  busy=false; detectFaces();
+}
+
+function cancelPress(){ clearTimeout(pressTimer); pressTimer=null; }
+function clearGesture(){
+  cancelPress(); longPressed=false; selectedCubie=null; selectedFaceNormalLocal=null; currentMovePreview=null; dragStart=null; clearHighlight();
+}
+
+renderer.domElement.addEventListener('pointerdown',e=>{
+  if(solving) return;
+  renderer.domElement.setPointerCapture(e.pointerId); pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pointers.size===1){ activePointer={id:e.pointerId,x:e.clientX,y:e.clientY}; startLongPress(e); }
+  else { cancelPress(); longPressed=false; const ps=[...pointers.values()]; lastPinchDistance=Math.hypot(ps[0].x-ps[1].x,ps[0].y-ps[1].y); }
+});
+renderer.domElement.addEventListener('pointermove',e=>{
+  if(!pointers.has(e.pointerId)) return;
+  const prev=pointers.get(e.pointerId); pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pointers.size>=2){
+    cancelPress();
+    const ps=[...pointers.values()]; const d=Math.hypot(ps[0].x-ps[1].x,ps[0].y-ps[1].y);
+    if(lastPinchDistance>0){ const factor=d/lastPinchDistance; camera.position.multiplyScalar(1/factor); const len=camera.position.length(); camera.position.setLength(THREE.MathUtils.clamp(len,4.3,10)); }
+    lastPinchDistance=d; return;
+  }
+  if(!activePointer || activePointer.id!==e.pointerId) return;
+  const dx=e.clientX-activePointer.x, dy=e.clientY-activePointer.y;
+  if(!longPressed){
+    if(Math.hypot(e.clientX-activePointer.x,e.clientY-activePointer.y)>6) cancelPress();
+    // View rotation follows the drag in both directions.
+    // Horizontal drag = yaw around the screen/world vertical axis.
+    // Vertical drag = pitch around the camera's screen-right axis.
+    const incX=e.clientX-prev.x, incY=e.clientY-prev.y;
+    const yawAxis=new THREE.Vector3(0,1,0);
+    const pitchAxis=new THREE.Vector3(1,0,0).applyQuaternion(camera.quaternion).normalize();
+    const qYaw=new THREE.Quaternion().setFromAxisAngle(yawAxis,incX*0.008);
+    const qPitch=new THREE.Quaternion().setFromAxisAngle(pitchAxis,incY*0.008);
+    viewGroup.quaternion.premultiply(qYaw);
+    viewGroup.quaternion.premultiply(qPitch);
+    viewGroup.quaternion.normalize();
+  }else if(dragStart){
+    const ddx=e.clientX-dragStart.x, ddy=e.clientY-dragStart.y;
+    if(Math.hypot(ddx,ddy)>18){
+      currentMovePreview=previewMoveFromDrag(ddx,ddy);
+      clearHighlight();
+      if(currentMovePreview){ setHighlight(cubies.filter(c=>c.userData.coord[currentMovePreview.axis]===currentMovePreview.layer),true); }
+      else if(selectedCubie) setHighlight([selectedCubie],true);
+    }
+  }
+});
+function endPointer(e){
+  if(pointers.has(e.pointerId)) pointers.delete(e.pointerId);
+  cancelPress();
+  if(longPressed && currentMovePreview && !busy){
+    const m=currentMovePreview; clearGesture(); rotateLayer(m.axis,m.layer,m.dir);
+  }else clearGesture();
+  activePointer=null; lastPinchDistance=0;
+}
+renderer.domElement.addEventListener('pointerup',endPointer);
+renderer.domElement.addEventListener('pointercancel',endPointer);
+renderer.domElement.addEventListener('wheel',e=>{
+  if(solving) return;
+  e.preventDefault(); camera.position.multiplyScalar(e.deltaY>0?1.08:.92); camera.position.setLength(THREE.MathUtils.clamp(camera.position.length(),4.3,10));
+},{passive:false});
+
+// Buttons
+const initialSnapshot=()=>scrambleMoves.map(m=>({...m}));
+const difficultySelect=document.getElementById('difficultySelect');
+const hintBtn=document.getElementById('hintBtn');
+const solveBtn=document.getElementById('solveBtn');
+const resetBtn=document.getElementById('resetBtn');
+const newBtn=document.getElementById('newBtn');
+
+function setControlsDisabled(disabled){
+  [difficultySelect,hintBtn,solveBtn,resetBtn,newBtn].forEach(el=>el.disabled=disabled);
+}
+function moveLabel(m){
+  const axisName={x:'左右',y:'上下',z:'前後'}[m.axis];
+  const layerName=m.layer>0?'＋側':'－側';
+  const dirName=m.dir>0?'正方向':'反対方向';
+  return `${axisName}の${layerName}の層を${dirName}へ90°`;
+}
+
+newBtn.addEventListener('click',()=>{ if(busy||solving)return; faceStatus=Array(6).fill(false); buildPuzzle(); });
+difficultySelect.addEventListener('change',()=>{ if(busy||solving)return; faceStatus=Array(6).fill(false); buildPuzzle(); });
+
+resetBtn.addEventListener('click',()=>{
+  if(busy||solving)return;
+  // Rebuild the same word set, then reapply the original scramble.
+  const words=currentIdioms.slice(); const moves=initialSnapshot();
+  while(puzzleGroup.children.length) puzzleGroup.remove(puzzleGroup.children[0]);
+  cubies=[]; moveCount=0; moveHistory=[]; moveText.textContent='0手'; faceStatus=Array(6).fill(false); clearPill.classList.remove('show'); hideMeaning();
+  const geom=new THREE.BoxGeometry(CUBIE_SIZE,CUBIE_SIZE,CUBIE_SIZE);
+  for(const x of [-1,1]) for(const y of [-1,1]) for(const z of [-1,1]){
+    const pos=new THREE.Vector3(x,y,z), mats=Array.from({length:6},()=>makeBlankMaterial()), stickers={};
+    FACE_DEFS.forEach((fd,fi)=>{ if(pos[fd.axis]===fd.sign){ const idx=faceCellIndex(fd,pos), ch=words[fi][idx]; mats[fi]=makeStickerMaterial(ch); stickers[fd.key]={faceId:fi,char:ch,localNormal:fd.normal.clone()}; } });
+    const mesh=new THREE.Mesh(geom,mats); mesh.position.copy(pos).multiplyScalar(SPACING/2); mesh.userData={coord:{x,y,z},home:{x,y,z},stickers}; puzzleGroup.add(mesh); cubies.push(mesh);
+  }
+  moves.forEach(m=>{ applyMoveInstant(m.axis,m.layer,m.dir); moveHistory.push({...m}); });
+  detectFaces(); showToast('最初の配置に戻しました');
+});
+
+hintBtn.addEventListener('click',async()=>{
+  if(busy||solving)return;
+  if(!moveHistory.length){ showToast('もう完成状態です'); return; }
+
+  // A hint now performs exactly one guaranteed-correct move instead of
+  // describing the move with cube notation/directions. This keeps the hint
+  // understandable even when the whole cube has been rotated for viewing.
+  const last=moveHistory.pop();
+  const inverse={axis:last.axis,layer:last.layer,dir:-last.dir};
+
+  solving=true;
+  setControlsDisabled(true);
+  clearGesture();
+
+  const chosen=cubies.filter(c=>c.userData.coord[inverse.axis]===inverse.layer);
+  clearHighlight();
+  setHighlight(chosen,true);
+  showToast('ヒント：この層を1手だけ戻します');
+  await new Promise(r=>setTimeout(r,320));
+  clearHighlight();
+
+  await rotateLayer(inverse.axis,inverse.layer,inverse.dir,320,false,false);
+
+  solving=false;
+  setControlsDisabled(false);
+  detectFaces();
+  if(moveHistory.length){
+    showToast('1手進みました');
+  }else{
+    showToast('ヒントで6面完成！');
+  }
+});
+
+solveBtn.addEventListener('click',async()=>{
+  if(busy||solving)return;
+  if(!moveHistory.length){ showToast('すでに完成しています'); return; }
+  solving=true; setControlsDisabled(true); clearGesture();
+  showToast('自動解答を開始');
+  // Every legal player move is recorded, so reversing the complete history
+  // (player moves first, then the original scramble) always solves the cube.
+  while(moveHistory.length){
+    const last=moveHistory.pop();
+    await rotateLayer(last.axis,last.layer,-last.dir,300,false,false);
+    await new Promise(r=>setTimeout(r,90));
+  }
+  solving=false; setControlsDisabled(false);
+  moveCount=0; moveText.textContent='0手';
+  detectFaces(); showToast('自動解答：6面完成！');
+});
+
+function animate(){ requestAnimationFrame(animate); renderer.render(scene,camera); }
+buildPuzzle(); animate();
+</script>
+</body>
+</html>
