@@ -61,6 +61,7 @@
     border-radius:14px;padding:10px 12px;font-size:12px;line-height:1.6;color:#475569;backdrop-filter:blur(9px);z-index:6;pointer-events:none
   }
   .gesture b{color:#0f172a}
+  .gesture-mobile{display:none}
   footer{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;padding:8px 10px 12px;z-index:8}
   .difficulty{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:12px;padding:5px 8px;font-size:12px;font-weight:800;color:#475569}
   select{border:0;background:transparent;color:#1e293b;font:inherit;font-weight:900;outline:none;cursor:pointer}
@@ -76,24 +77,49 @@
   #overlayMsg .pill.show{opacity:1;transform:scale(1)}
   @media(max-width:800px){
     html,body{height:100%;overflow:hidden}
-    #app{grid-template-rows:auto minmax(0,1fr) auto}
+    #app{
+      height:100%;
+      grid-template-rows:auto minmax(0,1fr) auto;
+    }
 
-    header{padding:52px 12px 4px}
+    /* ヘッダーを詰め、ゲーム領域へ高さを返す */
+    header{padding:48px 10px 2px}
+    h1{font-size:22px;line-height:1.15}
+    .sub{font-size:11px;margin-top:2px}
 
-    /* スマホでは「キューブ → 熟語一覧」を別々の段にして重なりを防ぐ */
+    /* 操作説明 / キューブ / 熟語一覧の3段。中央のキューブを最大化 */
     #stage{
       display:grid;
-      grid-template-rows:auto minmax(250px,1fr) auto;
+      grid-template-rows:auto minmax(0,1fr) auto;
       min-height:0;
       overflow:hidden;
     }
     #canvasWrap{
       position:relative;
       inset:auto;
-      min-height:250px;
       grid-row:2;
+      min-height:0;
+      overflow:hidden;
     }
 
+    /* 操作説明は1行だけ */
+    .gesture{
+      position:relative;
+      left:auto;top:auto;bottom:auto;
+      grid-row:1;
+      width:auto;
+      margin:3px 8px 1px;
+      padding:5px 7px;
+      border-radius:10px;
+      font-size:9.5px;
+      line-height:1.2;
+      text-align:center;
+      white-space:nowrap;
+    }
+    .gesture-desktop{display:none}
+    .gesture-mobile{display:inline}
+
+    /* 熟語一覧は薄い帯にする。6個を1段表示 */
     .hud{
       position:relative;
       left:auto;right:auto;top:auto;bottom:auto;
@@ -101,64 +127,113 @@
       width:auto;
       max-height:none;
       overflow:visible;
-      margin:4px 10px 8px;
-      padding:9px 10px;
-      border-radius:14px;
+      margin:2px 8px 4px;
+      padding:5px 6px 6px;
+      border-radius:11px;
+      flex-shrink:0;
     }
-    .progress{margin-bottom:6px}
-    .idioms{grid-template-columns:repeat(3,1fr);gap:4px}
+    .progress{
+      margin:0 2px 4px;
+      min-height:16px;
+    }
+    .progress strong{font-size:13px}
+    .progress span{font-size:10px}
+    .idioms{
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      gap:2px;
+    }
     .idiom{
       min-width:0;
-      padding:6px 5px;
-      font-size:11px;
-      letter-spacing:.01em;
+      padding:5px 1px;
+      font-size:9.5px;
+      line-height:1;
+      letter-spacing:0;
       justify-content:center;
       text-align:center;
+      border-radius:7px;
     }
-    .idiom > span:first-child{white-space:nowrap}
+    .idiom > span:first-child{
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:clip;
+    }
     .mark{display:none}
 
-    /* スマホでは操作説明も独立した段にして、キューブに重ねない */
-    .gesture{
+    /* フッターは常に独立領域。熟語一覧の上へ重ならない */
+    footer{
       position:relative;
-      left:auto;
-      top:auto;
-      bottom:auto;
-      width:auto;
-      margin:4px 10px 2px;
-      font-size:11px;
-      padding:8px 10px;
-      grid-row:1;
-      border-radius:12px;
+      z-index:12;
+      display:grid;
+      grid-template-columns:minmax(0,.9fr) minmax(0,1.35fr) minmax(0,1fr);
+      gap:4px;
+      padding:5px 7px max(7px,env(safe-area-inset-bottom));
+      background:rgba(249,251,255,.97);
+      border-top:1px solid var(--line);
+      box-shadow:0 -4px 14px rgba(15,23,42,.05);
     }
+    .difficulty{
+      min-width:0;
+      padding:4px 5px;
+      font-size:10px;
+      justify-content:center;
+      border-radius:9px;
+    }
+    select{
+      min-width:0;
+      max-width:100%;
+      font-size:10px;
+    }
+    button{
+      min-width:0;
+      padding:7px 5px;
+      font-size:10.5px;
+      line-height:1.15;
+      border-radius:9px;
+      white-space:nowrap;
+    }
+    #hintBtn{grid-column:2}
+    #solveBtn{grid-column:3}
+    #resetBtn{grid-column:1 / 2}
+    #newBtn{grid-column:2 / 4}
 
-    /* 意味カードは熟語一覧の配置に左右されないよう画面固定 */
+    /* 意味カードはフッターの上に表示 */
     .meaning-card{
       position:fixed;
-      bottom:calc(86px + env(safe-area-inset-bottom));
-      width:calc(100% - 20px);
-      padding:12px 40px 12px 13px;
+      bottom:calc(82px + env(safe-area-inset-bottom));
+      width:calc(100% - 16px);
+      padding:11px 38px 11px 12px;
     }
-    .meaning-title{font-size:17px}
-    .meaning-text{font-size:13px}
-
-    footer{
-      padding:6px 8px max(10px,env(safe-area-inset-bottom));
-      gap:6px;
-    }
-    .difficulty{padding:4px 7px}
-    button{padding:8px 9px;font-size:12px}
+    .meaning-title{font-size:16px}
+    .meaning-text{font-size:12px}
   }
 
-  @media(max-width:430px) and (max-height:720px){
-    header{padding-top:48px}
-    #stage{grid-template-rows:auto minmax(220px,1fr) auto}
-    #canvasWrap{min-height:220px}
-    .gesture{font-size:10px;line-height:1.45;width:auto;margin:2px 10px}
-    .hud{margin-top:2px;margin-bottom:4px}
-    .idiom{font-size:10px;padding:5px 3px}
+  @media(max-width:360px){
+    header{padding-top:46px}
+    h1{font-size:20px}
+    .sub{font-size:10px}
+    .gesture{
+      margin-left:5px;
+      margin-right:5px;
+      padding-left:3px;
+      padding-right:3px;
+      font-size:8.5px;
+    }
+    .hud{margin-left:5px;margin-right:5px}
+    .idiom{font-size:8.5px}
+    footer{padding-left:5px;padding-right:5px;gap:3px}
+    .difficulty,select{font-size:9px}
+    button{font-size:9.5px;padding:6px 3px}
+  }
+
+  @media(max-height:680px) and (max-width:800px){
+    header{padding-top:44px}
+    .sub{display:none}
+    .gesture{margin-top:1px;padding-top:4px;padding-bottom:4px}
+    .hud{margin-top:1px;margin-bottom:2px;padding-top:4px;padding-bottom:4px}
+    .progress{margin-bottom:3px}
+    .idiom{padding-top:4px;padding-bottom:4px}
     footer{padding-top:4px}
-    button{padding:7px 8px;font-size:11px}
+    button{padding-top:6px;padding-bottom:6px}
   }
 </style>
 </head>
@@ -172,8 +247,13 @@
   <main id="stage">
     <div id="canvasWrap"></div>
     <div class="gesture">
-      <b>見る：</b>左右スワイプで横回転／上下スワイプで縦回転／ピンチで拡大縮小<br>
-      <b>動かす：</b>文字を長押し → そのままスライド
+      <span class="gesture-desktop">
+        <b>見る：</b>左右スワイプで横回転／上下スワイプで縦回転／ピンチで拡大縮小<br>
+        <b>動かす：</b>文字を長押し → そのままスライド
+      </span>
+      <span class="gesture-mobile">
+        <b>回転</b> スワイプ　<b>動かす</b> 長押し→スライド　<b>拡縮</b> ピンチ
+      </span>
     </div>
     <aside class="hud">
       <div class="progress"><strong id="progressText">完成 0 / 6</strong><span id="moveText">0手</span></div>
