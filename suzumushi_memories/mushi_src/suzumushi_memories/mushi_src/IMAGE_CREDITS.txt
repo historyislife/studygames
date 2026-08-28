@@ -1,0 +1,16 @@
+IMAGE CREDITS
+
+本版の昆虫画像10点は、本プロジェクト用に生成した図鑑風イラストです。
+外部写真素材はゲーム本編では使用していません。
+
+ファイル対応:
+suzumushi.webp        スズムシ
+matsumushi.webp        マツムシ
+enma_koorogi.webp      エンマコオロギ
+kanetataki.webp         カネタタキ
+kantan.webp             カンタン
+aomatsumushi.webp       アオマツムシ
+kutsuwamushi.webp       クツワムシ
+hayashi_umaoi.webp      ハヤシノウマオイ
+nishi_kirigirisu.webp   キリギリス（ニシキリギリス参考）
+tsuyumushi.webp         ツユムシ
