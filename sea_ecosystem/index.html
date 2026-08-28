@@ -1,0 +1,1389 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>海の生態系カードゲーム イラスト版</title>
+<style>
+  :root{
+    --bg:#eaf6f7;--panel:#ffffff;--ink:#17343a;--muted:#5e7479;--line:#bfd7da;
+    --p:#6957a5;--c:#d16b36;--b:#8b6b48;--f:#2f72b7;--i:#3f8b72;--w:#c79b20;
+    --danger:#b84747;--ok:#337a55;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg);color:var(--ink)}
+  button{font:inherit;cursor:pointer}
+  .home-back-btn{position:fixed;top:10px;left:10px;z-index:1000;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.92);color:#263238;border:1px solid rgba(0,0,0,.12);text-decoration:none;font-size:13px;font-weight:700}
+  header{padding:14px 16px 10px;text-align:center;background:#d7eff0;border-bottom:1px solid var(--line)}
+  h1{font-size:22px;margin:0 0 4px}
+  .subtitle{font-size:12px;color:var(--muted)}
+  main{max-width:1500px;margin:auto;padding:12px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;margin-bottom:10px}
+  .toolbar button,.actionbar button,.smallbtn{border:1px solid #91b5b8;background:#fff;border-radius:9px;padding:8px 11px;color:var(--ink);font-weight:700}
+  .toolbar button:hover,.actionbar button:hover,.smallbtn:hover{background:#f3fbfb}
+  .statusline{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:14px}
+  .statusline strong{color:#154f59}
+  .section{background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}
+  .section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}
+  .section-title h2{font-size:16px;margin:0}
+  .token-pool{
+    display:grid;grid-template-columns:repeat(6,minmax(72px,1fr));
+    gap:10px;align-items:end;margin-bottom:14px
+  }
+  .token{
+    position:relative;border:none;background:transparent;padding:0;
+    width:100%;height:76px;min-width:72px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .token-stack{position:relative;width:62px;height:62px}
+  .token-disc{
+    position:absolute;left:7px;width:48px;height:48px;border-radius:50%;
+    border:3px solid rgba(255,255,255,.9);
+    background:var(--chip-bg,#777);
+    box-shadow:0 3px 0 rgba(0,0,0,.22),0 6px 10px rgba(0,0,0,.2);
+  }
+  .token-disc.d1{bottom:0}.token-disc.d2{bottom:5px}.token-disc.d3{bottom:10px}.token-disc.d4{bottom:15px}
+  .token-icon{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    z-index:8;font-size:24px;line-height:1;filter:drop-shadow(0 1px 0 rgba(255,255,255,.6))
+  }
+  .token-count{
+    position:absolute;right:-2px;top:-3px;z-index:10;
+    min-width:24px;height:24px;padding:0 5px;border-radius:999px;
+    display:flex;align-items:center;justify-content:center;
+    background:#17343a;color:#fff;border:2px solid #fff;
+    font-size:12px;font-weight:950;box-shadow:0 2px 5px rgba(0,0,0,.24)
+  }
+  .token-label{
+    position:absolute;left:50%;bottom:-4px;transform:translate(-50%,100%);
+    font-size:9px;white-space:nowrap;color:var(--ink);font-weight:800
+  }
+  .token.selected .token-disc{box-shadow:0 0 0 4px rgba(23,52,58,.22),0 4px 0 rgba(0,0,0,.2),0 8px 14px rgba(0,0,0,.24)}
+  .token.selected{transform:translateY(-3px)}
+  .token:disabled{opacity:.28;cursor:not-allowed}
+  .token.P{--chip-bg:#6c4ccf}.token.C{--chip-bg:#e06b2d}.token.B{--chip-bg:#8b5a2b}
+  .token.F{--chip-bg:#2878c8}.token.I{--chip-bg:#2f9b72}.token.W{--chip-bg:#d7ad24}
+  .token-chip-flyer{
+    position:fixed;z-index:5200;width:48px;height:48px;border-radius:50%;
+    border:3px solid rgba(255,255,255,.92);background:var(--chip-bg,#777);
+    pointer-events:none;box-shadow:0 8px 18px rgba(0,0,0,.3);
+    will-change:transform,opacity;
+  }
+  .token-chip-flyer::after{
+    content:attr(data-icon);position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;font-size:23px
+  }
+  @keyframes chipFly{
+    0%{transform:translate(0,0) scale(1);opacity:1}
+    22%{transform:translate(0,-12px) scale(1.13);opacity:1}
+    100%{transform:translate(var(--chip-x),var(--chip-y)) scale(.62);opacity:0}
+  }
+  .token-chip-flyer.flying{animation:chipFly .48s cubic-bezier(.2,.8,.2,1) forwards}
+  .P{border-color:var(--p)} .C{border-color:var(--c)} .B{border-color:var(--b)} .F{border-color:var(--f)} .I{border-color:var(--i)} .W{border-color:var(--w)}
+  .legend{display:flex;gap:7px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:24px;padding:0 6px;border:2px solid;border-radius:999px;background:#fff;font-weight:800;font-size:12px;color:var(--ink)}
+  .supply-wrap{display:grid;gap:10px}
+  .rowbox{background:#f9fdfd;border:1px solid #d3e5e7;border-radius:10px;padding:8px}
+  .row-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px;font-weight:800}
+  .cards{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:7px}
+  .card{background:#fff;border:2px solid #aac7ca;border-radius:10px;padding:5px;min-height:118px;display:flex;flex-direction:column;gap:3px;position:relative;overflow:hidden}
+  .card.bonus-P{border-top:6px solid var(--p)} .card.bonus-C{border-top:6px solid var(--c)} .card.bonus-B{border-top:6px solid var(--b)} .card.bonus-F{border-top:6px solid var(--f)} .card.bonus-I{border-top:6px solid var(--i)}
+  .card.objective{border-top:6px solid #234b55;background:#f6fbf9}
+  .cardname{font-weight:900;font-size:14px;line-height:1.25}
+  .cardmeta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:5px}
+  .cost{display:flex;flex-wrap:wrap;gap:3px;margin-top:auto}
+  .cardactions{display:flex;gap:4px;margin-top:3px}
+  .cardactions button{border:1px solid #a9c3c5;background:#f8ffff;border-radius:6px;padding:4px 6px;font-size:11px;font-weight:800;flex:1}
+  .cardactions .predate{border-color:#d49c9c;background:#fff7f7;color:#8b2929}
+  .prey{font-size:10px;color:#8b2929}
+  .cardart-wrap{position:relative;width:calc(100% + 10px);margin:-5px -5px 1px;aspect-ratio:4/3;overflow:hidden;background:#123f4a;border-bottom:1px solid #d2e1e3}
+  .cardart{width:100%;height:100%;display:block;object-fit:cover;object-position:center}
+  .art-tags{position:absolute;left:4px;right:4px;top:4px;display:flex;justify-content:space-between;gap:3px;pointer-events:none}
+  .art-tag{background:rgba(10,34,39,.83);color:white;border-radius:999px;padding:2px 5px;font-size:10px;font-weight:900;line-height:1.25;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .art-cost{position:absolute;left:4px;right:4px;bottom:4px;z-index:4;display:flex;flex-wrap:nowrap;white-space:nowrap;overflow:hidden;align-items:center;gap:3px;min-height:27px;padding:3px 5px;border-radius:7px;background:rgba(7,28,34,.62);border:1px solid rgba(255,255,255,.26);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);box-shadow:0 2px 6px rgba(0,0,0,.18);pointer-events:none}
+  .art-cost-label{font-size:9px;color:#fff;font-weight:900;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+  .art-cost .badge{min-width:24px;height:21px;padding:0 4px;border-width:1px;background:rgba(255,255,255,.9);font-size:10px;flex:0 1 auto}.art-cost.cost-4{gap:1px;padding-left:3px;padding-right:3px}.art-cost.cost-4 .art-cost-label{font-size:7px}.art-cost.cost-4 .badge{min-width:19px;height:18px;padding:0 2px;font-size:8px}
+
+  .objective{padding:0!important;min-height:0!important}.objective .cardart-wrap{width:100%;margin:0;aspect-ratio:4/3;border:0;border-radius:0}.objective .cardname,.objective .cost,.objective>div:last-child{margin-left:5px;margin-right:5px}.objective>div:last-child{margin-bottom:5px}
+  .objective .cardmeta{display:block}
+  .owned-chip{display:inline-flex!important;align-items:center;gap:4px}
+  .owned-thumb{width:30px;height:30px;object-fit:cover;object-position:center;border-radius:5px;flex:0 0 auto;border:1px solid #c6dadd;background:#dcebed}
+
+  .owned-thumb.inspect-thumb{
+    cursor:zoom-in;touch-action:pan-y;-webkit-touch-callout:none;
+    transition:transform .15s ease,box-shadow .15s ease;
+  }
+  .owned-thumb.inspect-thumb:active{transform:scale(1.08);box-shadow:0 0 0 3px rgba(28,101,113,.18)}
+
+  /* BOTの手番を見せる演出 */
+  #botActionBanner{
+    position:fixed;z-index:6100;left:50%;top:54px;
+    transform:translate(-50%,-12px);opacity:0;pointer-events:none;
+    display:flex;align-items:center;gap:8px;
+    width:max-content;max-width:min(92vw,520px);
+    padding:7px 11px;border-radius:11px;
+    background:rgba(16,47,53,.92);color:#fff;
+    border:1px solid rgba(255,255,255,.25);
+    -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+    box-shadow:0 8px 24px rgba(0,0,0,.28);
+    transition:opacity .16s ease,transform .16s ease;
+    font-size:12px;font-weight:850;
+  }
+  #botActionBanner.show{opacity:1;transform:translate(-50%,0)}
+  .bot-action-thumb{
+    width:38px;height:38px;object-fit:cover;border-radius:6px;
+    border:1px solid rgba(255,255,255,.6);background:#dcebed;flex:0 0 auto
+  }
+  .bot-action-text{line-height:1.35}
+  .bot-action-text strong{color:#fff4a8}
+  .bot-target-flash{animation:botTargetFlash .56s ease}
+  @keyframes botTargetFlash{
+    0%{box-shadow:0 0 0 0 rgba(255,198,61,0)}
+    35%{transform:scale(1.045);box-shadow:0 0 0 5px rgba(255,198,61,.58),0 8px 20px rgba(0,0,0,.24)}
+    100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,198,61,0)}
+  }
+  .bot-card-flyer{
+    position:fixed;z-index:6050;pointer-events:none;overflow:hidden;
+    border:2px solid rgba(255,255,255,.92);border-radius:8px;
+    background:#123f4a;box-shadow:0 10px 28px rgba(0,0,0,.38);
+    transform-origin:center center;will-change:transform,opacity;
+  }
+  .bot-card-flyer img{width:100%;height:100%;display:block;object-fit:cover}
+  @keyframes botCardFly{
+    0%{transform:translate(0,0) scale(1);opacity:1}
+    18%{transform:translate(0,-10px) scale(1.08);opacity:1}
+    100%{transform:translate(var(--bot-x),var(--bot-y)) scale(.34);opacity:0}
+  }
+  .bot-card-flyer.flying{animation:botCardFly .64s cubic-bezier(.2,.8,.2,1) forwards}
+  @media(max-width:520px){
+    #botActionBanner{top:38px;padding:5px 8px;font-size:10px;border-radius:8px;gap:6px}
+    .bot-action-thumb{width:31px;height:31px;border-radius:5px}
+  }
+
+  .reserved-card{display:inline-flex;align-items:center;gap:4px}
+  .objective.achieved{opacity:.35}
+  .actionbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;align-items:center}
+  .actionbar .primary{background:#1c6571;color:white;border-color:#1c6571}
+  .actionbar .danger{color:#9a3030}
+  #tokenConfirm{display:none}
+  .player-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .player-panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+  .player-panel h2{margin:0 0 8px;font-size:17px}
+  .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+  .summary-item{background:#f4fafa;border-radius:8px;padding:7px;text-align:center}
+  .summary-item b{display:block;font-size:18px}
+  .bonus-line,.token-line{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0}
+  .owned-list{max-height:230px;overflow:auto;border-top:1px solid #d8e7e8;padding-top:6px;margin-top:6px}
+  .owned-chip{display:inline-block;margin:2px;padding:4px 6px;border-radius:6px;background:#edf6f7;font-size:11px;border:1px solid #d0e3e5}
+  .reserved{background:#fff9e9}
+  .log{background:#102f35;color:#d8f0f2;border-radius:10px;padding:8px;max-height:180px;overflow:auto;font-size:12px;line-height:1.5}
+  .log div+div{border-top:1px solid rgba(255,255,255,.08);padding-top:3px;margin-top:3px}
+  .sym{color:#17664c;font-weight:800}
+  .cardart{touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+
+  /* 手持ちトークン／永久ボーナス 常時表示HUD */
+  #playerHud{
+    position:fixed;right:8px;top:78px;z-index:4500;width:190px;
+    border:1px solid rgba(57,92,99,.42);border-radius:12px;
+    background:rgba(244,252,252,.82);
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+    box-shadow:0 7px 24px rgba(15,48,55,.22);
+    color:var(--ink);overflow:hidden;touch-action:none;
+  }
+  .hud-head{
+    min-height:30px;padding:6px 8px;display:flex;align-items:center;
+    justify-content:space-between;gap:6px;
+    background:rgba(28,101,113,.88);color:#fff;
+    cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;
+  }
+  .hud-head:active{cursor:grabbing}
+  .hud-title{font-size:11px;font-weight:950;white-space:nowrap}
+  .hud-mini{
+    border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.18);
+    color:#fff;border-radius:6px;padding:1px 6px;font-size:12px;font-weight:900;
+    line-height:18px;min-width:24px;
+  }
+  .hud-body{padding:7px 7px 8px}
+  .hud-section+.hud-section{margin-top:7px;padding-top:7px;border-top:1px solid rgba(62,102,109,.18)}
+  .hud-label{display:flex;align-items:center;justify-content:space-between;font-size:9px;font-weight:900;margin-bottom:4px;color:#35545a}
+  .hud-label b{font-size:9px;color:#17343a}
+  .hud-values{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+  .hud-values.bonus{grid-template-columns:repeat(5,1fr)}
+  .hud-chip{
+    min-width:0;height:27px;border-radius:7px;border:1px solid rgba(0,0,0,.14);
+    display:flex;align-items:center;justify-content:center;gap:2px;
+    background:rgba(255,255,255,.78);font-size:10px;font-weight:950;
+    box-shadow:0 1px 2px rgba(0,0,0,.07)
+  }
+  .hud-chip .hud-num{font-size:11px}
+  .hud-chip.P{box-shadow:inset 0 -3px 0 var(--p)}
+  .hud-chip.C{box-shadow:inset 0 -3px 0 var(--c)}
+  .hud-chip.B{box-shadow:inset 0 -3px 0 var(--b)}
+  .hud-chip.F{box-shadow:inset 0 -3px 0 var(--f)}
+  .hud-chip.I{box-shadow:inset 0 -3px 0 var(--i)}
+  .hud-chip.W{box-shadow:inset 0 -3px 0 var(--w)}
+  #playerHud.compact{width:178px}
+  #playerHud.compact .hud-body{padding:5px 6px 6px}
+  #playerHud.compact .hud-section{margin:0;padding:0;border:0}
+  #playerHud.compact .hud-section+.hud-section{margin-top:4px}
+  #playerHud.compact .hud-label{display:none}
+  #playerHud.compact .hud-values{grid-template-columns:repeat(6,1fr);gap:2px}
+  #playerHud.compact .hud-values.bonus{grid-template-columns:repeat(5,1fr)}
+  #playerHud.compact .hud-chip{height:22px;border-radius:5px;font-size:8px;gap:1px}
+  #playerHud.compact .hud-chip .hud-num{font-size:9px}
+  @media(max-width:520px){
+    #playerHud{width:166px;right:4px;top:58px;border-radius:9px}
+    .hud-head{min-height:25px;padding:4px 6px}
+    .hud-title{font-size:9px}
+    .hud-mini{font-size:10px;line-height:16px;padding:0 5px}
+    .hud-body{padding:5px}
+    .hud-section+.hud-section{margin-top:5px;padding-top:5px}
+    .hud-label{font-size:8px;margin-bottom:3px}
+    .hud-label b{font-size:8px}
+    .hud-values{gap:2px}
+    .hud-chip{height:23px;border-radius:5px;font-size:8px}
+    .hud-chip .hud-num{font-size:9px}
+    #playerHud.compact{width:158px}
+    #playerHud.compact .hud-chip{height:20px;font-size:7px}
+  }
+
+  #detailDialog{max-width:620px;width:min(94vw,620px);background:#f8ffff}
+  .detail-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(220px,.9fr);gap:12px;align-items:start}
+  .detail-image-wrap{background:linear-gradient(180deg,#f7fbfc,#e8f2f4);border:1px solid #d4e5e7;border-radius:12px;overflow:hidden;min-height:260px;display:flex;align-items:center;justify-content:center;padding:10px}
+  .detail-image{display:block;width:100%;max-height:58vh;object-fit:contain;background:#ffffff;border-radius:10px;image-rendering:auto;filter:none;mix-blend-mode:normal;box-shadow:0 8px 22px rgba(0,0,0,.08)}
+  .detail-name{font-size:22px;font-weight:950;margin:0 0 8px}
+  .detail-stats{display:flex;flex-wrap:wrap;gap:6px;margin:7px 0 10px}
+  .detail-stat{padding:5px 8px;border-radius:999px;background:#e7f3f4;border:1px solid #c4dadd;font-size:12px;font-weight:800}
+  .detail-cost{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 11px}
+  .detail-cost .badge{height:28px;min-width:34px;font-size:13px}
+  .detail-info{font-size:13px;line-height:1.65;color:#29464c;background:white;border:1px solid #d4e5e7;border-radius:9px;padding:9px}
+  .detail-prey{margin-top:9px;color:#8b2929;font-size:12px;font-weight:800}
+  .longpress-hint{font-size:10px;color:#6b8084;text-align:center;margin-top:6px}
+  dialog{border:none;border-radius:14px;box-shadow:0 20px 70px rgba(0,0,0,.28);max-width:720px;width:min(92vw,720px);padding:0}
+  dialog::backdrop{background:rgba(10,28,31,.5)}
+  .modal-head{padding:12px 14px;background:#dff1f2;font-weight:900}
+  .modal-body{padding:12px}
+  .modal-footer{padding:10px 12px;text-align:right;border-top:1px solid #d7e6e7}
+  .win{font-size:20px;font-weight:900;text-align:center;padding:10px}
+  @media(max-width:900px){
+    .cards{grid-template-columns:repeat(2,minmax(140px,1fr))}
+    .player-grid{grid-template-columns:1fr}
+  }
+  @media(max-width:520px){
+    main{padding:4px}
+    header{padding:10px 6px 7px}
+    h1{font-size:16px;padding-left:84px;text-align:left}
+    .subtitle{font-size:10px;padding-left:84px;text-align:left}
+    .toolbar{gap:4px;margin-bottom:5px}
+    .toolbar button{padding:5px 7px;font-size:11px}
+    .statusline{padding:6px 7px;margin-bottom:5px;font-size:11px}
+    .section{padding:5px;margin-bottom:5px;border-radius:8px}
+    .section-title{margin-bottom:4px}
+    .section-title h2{font-size:12px}
+    .section-title span{display:none}
+    .supply-wrap{gap:4px}
+    .rowbox{padding:4px;border-radius:7px}
+    .row-head{font-size:10px;margin-bottom:3px}
+    .cards{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px}
+    .card{min-width:0;min-height:124px;padding:2px;border-radius:6px;border-width:1px;gap:2px}
+    .card.bonus-P,.card.bonus-C,.card.bonus-B,.card.bonus-F,.card.bonus-I,.card.objective{border-top-width:4px}
+    .cardart-wrap{width:calc(100% + 4px);margin:-2px -2px 1px;aspect-ratio:4/3;border-radius:4px 4px 0 0}
+    .art-tags{left:2px;right:2px;top:2px;gap:1px}
+    .art-tag{padding:1px 3px;font-size:7px}
+    .cardname{font-size:9px;line-height:1.12;overflow-wrap:anywhere;min-height:20px}
+    .cardmeta{font-size:8px;gap:2px}
+    .cost{gap:1px}
+    .badge{min-width:18px;height:17px;padding:0 3px;border-width:1px;font-size:8px}
+    .prey{font-size:7px;line-height:1.1}
+    .cardactions{gap:1px;margin-top:1px}
+    .cardactions button{padding:2px 1px;font-size:8px;border-radius:4px}
+    .objective .cardmeta{font-size:8px}
+    .objective .cardart-wrap{aspect-ratio:1/1}
+    .objective .cardname{font-size:9px;min-height:20px;padding:0 2px}
+    .objective .cost{padding:0 2px 3px}
+    .objective>div:last-child{display:none}
+    .objective div[style]{font-size:7px!important}
+    .token-pool{grid-template-columns:repeat(6,minmax(0,1fr));gap:2px;margin-bottom:16px}
+    .token{width:100%;min-width:0;height:58px}
+    .token-stack{width:44px;height:48px}
+    .token-disc{left:5px;width:34px;height:34px;border-width:2px}
+    .token-disc.d1{bottom:0}.token-disc.d2{bottom:4px}.token-disc.d3{bottom:8px}.token-disc.d4{bottom:12px}
+    .token-icon{font-size:18px}
+    .token-count{right:-1px;top:-2px;min-width:20px;height:20px;font-size:10px;border-width:1px}
+    .token-label{font-size:7px;bottom:-2px}
+    .actionbar{gap:4px;margin-top:8px;display:grid;grid-template-columns:1fr 1fr}
+    .actionbar button{padding:6px 5px;font-size:10px}
+    #tokenConfirm,#tokenCancel{grid-column:auto}
+
+    /* サプライ16枚を縦画面で一望しやすくする */
+    .home-back-btn{top:5px;left:5px;padding:4px 7px;font-size:10px}
+    header{min-height:32px;padding:5px 5px 4px}
+    h1{font-size:13px;padding-left:74px;margin:0}
+    .subtitle{display:none}
+    main{padding:3px}
+    .toolbar{margin-bottom:3px;gap:3px;flex-wrap:nowrap}
+    .toolbar button{padding:4px 5px;font-size:9px;white-space:nowrap}
+    .statusline{padding:4px 5px;margin-bottom:3px;font-size:9px;line-height:1.2;border-radius:6px}
+    .supply-section{padding:3px;margin-bottom:4px;border-radius:7px}
+    .supply-section>.section-title{display:none}
+    .supply-wrap{gap:3px}
+    .rowbox{padding:2px 3px 3px;border-radius:6px}
+    .row-head{height:12px;margin-bottom:2px;font-size:8px;line-height:12px}
+    .cards{gap:2px}
+    .card{min-height:103px;padding:2px;border-radius:5px;gap:1px}
+    .card.bonus-P,.card.bonus-C,.card.bonus-B,.card.bonus-F,.card.bonus-I,.card.objective{border-top-width:3px}
+    .cardart-wrap{width:calc(100% + 4px);margin:-2px -2px 0;aspect-ratio:4/3;border-radius:3px 3px 0 0}
+    .art-tags{left:2px;right:2px;top:2px}
+    .art-tag{padding:1px 2px;font-size:6px}
+    .art-cost{left:2px;right:2px;bottom:2px;gap:1px;min-height:19px;padding:2px 2px;border-radius:4px}
+    .art-cost-label{font-size:6px}
+    .art-cost .badge{min-width:15px;height:14px;padding:0 2px;font-size:6px;border-width:1px}
+    .art-cost.cost-4{gap:0;padding:1px}
+    .art-cost.cost-4 .art-cost-label{font-size:5px;margin-right:1px}
+    .art-cost.cost-4 .badge{min-width:12px;height:12px;padding:0 1px;font-size:5.5px}
+    .detail-layout{grid-template-columns:1fr;gap:8px}
+    .detail-image-wrap{min-height:0;padding:8px}
+    .detail-image{max-height:46vh}
+    .detail-name{font-size:18px}
+    .detail-stats{gap:4px;margin:5px 0 7px}
+    .detail-stat{font-size:10px;padding:4px 6px}
+    .detail-info{font-size:12px;line-height:1.55;padding:8px}
+    .detail-cost{gap:3px;margin:5px 0 8px}
+    .detail-cost .badge{height:23px;min-width:28px;font-size:11px}
+    .cardname{font-size:8px;line-height:1.05;min-height:17px;margin-top:1px}
+    .prey{font-size:6px;line-height:1.05;max-height:13px;overflow:hidden}
+    .cardactions{gap:1px;margin-top:auto}
+    .cardactions button{min-height:15px;padding:1px 0;font-size:7px;border-radius:3px}
+    .objective{padding:0!important;min-height:88px!important}
+    .objective .cardart-wrap{aspect-ratio:4/3}
+    .objective .cardname{font-size:8px;min-height:17px;padding:1px 2px;margin:0}
+    .objective>div:last-child{display:none}
+    .summary-grid{grid-template-columns:repeat(3,1fr)}
+  }
+  .card-flyer{
+    position:fixed;z-index:5000;pointer-events:none;margin:0;
+    box-shadow:0 16px 42px rgba(0,0,0,.36);
+    transform-origin:center center;
+    will-change:transform,opacity;
+  }
+  .card.acquire-pulse{animation:acquirePulse .28s ease}
+  @keyframes acquirePulse{
+    0%{transform:scale(1)}
+    45%{transform:scale(1.09);box-shadow:0 0 0 5px rgba(28,101,113,.22)}
+    100%{transform:scale(1)}
+  }
+  @keyframes cardFlyAcquire{
+    0%{transform:translate(0,0) scale(1);opacity:1}
+    18%{transform:translate(0,-16px) scale(1.12);opacity:1}
+    72%{transform:translate(var(--fly-x),var(--fly-y)) scale(.78);opacity:.95}
+    100%{transform:translate(var(--fly-x),var(--fly-y)) scale(.42);opacity:0}
+  }
+  .card-flyer.flying{animation:cardFlyAcquire .68s cubic-bezier(.2,.78,.2,1) forwards}
+</style>
+</head>
+<body>
+<a href="/" class="home-back-btn">← ガクハコ</a>
+<header>
+  <h1>海の生態系カードゲーム</h1>
+  <div class="subtitle">イラスト版 BOT対戦プロトタイプ / 共生・捕食・大型海洋生物</div>
+</header>
+<main>
+  <div class="toolbar">
+    <button id="newGameBtn">新しいゲーム</button>
+    <button id="botBtn">BOT状況</button>
+    <button id="rulesBtn">ルール</button>
+  </div>
+  <div id="statusline" class="statusline"></div>
+
+  <section class="section supply-section">
+    <div class="section-title"><h2>サプライ（大型/L3/L2/L1 各4枚）</h2><span style="font-size:12px;color:var(--muted)">L1/L2/L3は購入・予約可。大型海洋生物は条件達成で自動獲得。</span></div>
+    <div id="supply" class="supply-wrap"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">
+      <h2>トークンサプライ</h2>
+      <div class="legend">
+        <span>P=プランクトン</span><span>C=甲殻類</span><span>B=貝・底生</span><span>F=魚類</span><span>I=軟体・無脊椎</span><span>W=豊かな海域</span>
+      </div>
+    </div>
+    <div id="tokenPool" class="token-pool"></div>
+    <div class="actionbar">
+      <button id="take3Btn">3種を1枚ずつ</button>
+      <button id="take2Btn">1種を2枚</button>
+      <button id="tokenConfirm" class="primary">選択を確定</button>
+      <button id="tokenCancel">選択解除</button>
+    </div>
+  </section>
+
+  <div class="player-grid">
+    <section class="player-panel">
+      <h2>あなたの場</h2>
+      <div id="playerPanel"></div>
+    </section>
+    <section class="player-panel">
+      <h2>ゲームログ</h2>
+      <div id="log" class="log"></div>
+    </section>
+  </div>
+</main>
+
+<div id="botActionBanner" aria-live="polite"></div>
+
+<div id="playerHud" aria-label="手持ちトークンと永久ボーナス">
+  <div id="playerHudHandle" class="hud-head">
+    <span class="hud-title">所持状況</span>
+    <button id="playerHudMini" class="hud-mini" type="button" aria-label="表示を小さくする">−</button>
+  </div>
+  <div class="hud-body">
+    <div class="hud-section">
+      <div class="hud-label"><span>永久ボーナス</span><b id="hudBonusKinds">0/5系統</b></div>
+      <div id="hudBonuses" class="hud-values bonus"></div>
+    </div>
+    <div class="hud-section">
+      <div class="hud-label"><span>手持ちトークン</span><b id="hudTokenTotal">0/10</b></div>
+      <div id="hudTokens" class="hud-values"></div>
+    </div>
+  </div>
+</div>
+
+<dialog id="botDialog">
+  <div class="modal-head">BOTの状況</div>
+  <div class="modal-body" id="botPanel"></div>
+  <div class="modal-footer"><button class="smallbtn" onclick="document.getElementById('botDialog').close()">閉じる</button></div>
+</dialog>
+
+<dialog id="rulesDialog">
+  <div class="modal-head">試作ルール</div>
+  <div class="modal-body">
+    <ul>
+      <li>各通常トークンと万能トークン「豊かな海域」は各4枚。所持できるトークンは合計10枚まで。取得後に11枚以上になった場合は、10枚になるまで任意のトークンをサプライへ返す。</li>
+      <li>1手番に「異なる3種を1枚ずつ」「同じ1種を2枚」「カード予約＋万能1枚」「生き物カード獲得」のどれか1アクション。</li>
+      <li>カードのボーナスは以後その系統のコストを1軽減する。万能は不足分を補える。</li>
+      <li>予約上限は3枚。予約したカードは本人だけが獲得できる。</li>
+      <li>🤝 共生関係を初めて完成させると+1点。</li>
+      <li>捕食対象を自分の場に持っているカードは、獲物1枚を破棄して無償獲得できる。破棄したカードのボーナスも失う。</li>
+      <li>大型海洋生物は表示中4種のみ有効。永久ボーナス条件を満たすと1手番につき1種が自動加入し+3点。</li>
+      <li>勝利条件は20点以上かつ5系統中4系統以上を保有。あなたとBOTが1手ずつ行ったラウンド終了時に判定。</li>
+    </ul>
+  </div>
+  <div class="modal-footer"><button class="smallbtn" onclick="document.getElementById('rulesDialog').close()">閉じる</button></div>
+</dialog>
+
+<dialog id="endDialog">
+  <div class="modal-head">ゲーム終了</div>
+  <div class="modal-body" id="endBody"></div>
+  <div class="modal-footer"><button class="smallbtn" onclick="document.getElementById('endDialog').close()">閉じる</button></div>
+</dialog>
+
+<dialog id="detailDialog">
+  <div class="modal-head">生き物図鑑</div>
+  <div class="modal-body" id="detailBody"></div>
+  <div class="modal-footer"><button class="smallbtn" onclick="document.getElementById('detailDialog').close()">閉じる</button></div>
+</dialog>
+
+<script>
+const CARD_DATA = [{"id":"C1","name":"カイアシ類","level":1,"bonus":"P","cost":{"P":3},"points":0,"prey":[]},{"id":"C2","name":"ヤムシ","level":1,"bonus":"P","cost":{"P":2,"C":1},"points":0,"prey":[]},{"id":"C3","name":"サルパ","level":1,"bonus":"P","cost":{"P":4},"points":0,"prey":[]},{"id":"C4","name":"オタマボヤ","level":1,"bonus":"P","cost":{"P":4},"points":0,"prey":[]},{"id":"C5","name":"ミズクラゲ","level":1,"bonus":"P","cost":{"P":2,"C":2},"points":0,"prey":[]},{"id":"C6","name":"クシクラゲ","level":1,"bonus":"P","cost":{"P":2,"C":2,"F":1},"points":1,"prey":[]},{"id":"C7","name":"翼足類","level":1,"bonus":"P","cost":{"P":4},"points":0,"prey":[]},{"id":"C8","name":"クリオネ","level":1,"bonus":"P","cost":{"P":2,"I":3},"points":1,"prey":[]},{"id":"C9","name":"オキアミ","level":1,"bonus":"C","cost":{"P":3},"points":0,"prey":[]},{"id":"C10","name":"アミ","level":1,"bonus":"C","cost":{"P":2,"B":1},"points":0,"prey":[]},{"id":"C11","name":"ヨコエビ","level":1,"bonus":"C","cost":{"P":1,"B":2},"points":0,"prey":[]},{"id":"C12","name":"モエビ","level":1,"bonus":"C","cost":{"P":2,"B":2},"points":0,"prey":[]},{"id":"C13","name":"テッポウエビ","level":1,"bonus":"C","cost":{"P":1,"B":3},"points":0,"prey":[]},{"id":"C14","name":"オトヒメエビ","level":1,"bonus":"C","cost":{"B":2,"I":1},"points":0,"prey":[]},{"id":"C15","name":"ヤドカリ","level":1,"bonus":"C","cost":{"B":2,"I":2},"points":0,"prey":[]},{"id":"C16","name":"コメツキガニ","level":1,"bonus":"C","cost":{"P":2,"B":3},"points":1,"prey":[]},{"id":"C17","name":"アサリ","level":1,"bonus":"B","cost":{"P":3},"points":0,"prey":[]},{"id":"C18","name":"カキ","level":1,"bonus":"B","cost":{"P":4},"points":0,"prey":[]},{"id":"C19","name":"ホタテ","level":1,"bonus":"B","cost":{"P":5},"points":1,"prey":[]},{"id":"C20","name":"ゴカイ","level":1,"bonus":"B","cost":{"P":2,"B":1},"points":0,"prey":[]},{"id":"C21","name":"イソメ","level":1,"bonus":"B","cost":{"B":2,"I":2},"points":0,"prey":[]},{"id":"C22","name":"ケヤリムシ","level":1,"bonus":"B","cost":{"P":4},"points":0,"prey":[]},{"id":"C23","name":"クモヒトデ","level":1,"bonus":"B","cost":{"P":2,"B":2},"points":0,"prey":[]},{"id":"C24","name":"フジツボ","level":1,"bonus":"B","cost":{"P":3,"B":2},"points":1,"prey":[]},{"id":"C25","name":"イワシ","level":1,"bonus":"F","cost":{"P":3},"points":0,"prey":[]},{"id":"C26","name":"カタクチイワシ","level":1,"bonus":"F","cost":{"P":4},"points":0,"prey":[]},{"id":"C27","name":"キビナゴ","level":1,"bonus":"F","cost":{"P":2,"C":1},"points":0,"prey":[]},{"id":"C28","name":"イカナゴ","level":1,"bonus":"F","cost":{"P":2,"C":2},"points":0,"prey":[]},{"id":"C29","name":"ハゼ","level":1,"bonus":"F","cost":{"C":2,"B":1},"points":0,"prey":[]},{"id":"C30","name":"クマノミ","level":1,"bonus":"F","cost":{"P":2,"C":2},"points":0,"prey":[]},{"id":"C31","name":"コバンザメ","level":1,"bonus":"F","cost":{"P":2,"C":2},"points":0,"prey":[]},{"id":"C32","name":"アジ","level":1,"bonus":"F","cost":{"P":1,"C":2,"F":2},"points":1,"prey":[]},{"id":"C33","name":"ホタルイカ","level":1,"bonus":"I","cost":{"P":1,"C":2},"points":0,"prey":[]},{"id":"C34","name":"ミミイカ","level":1,"bonus":"I","cost":{"C":2,"B":1},"points":0,"prey":[]},{"id":"C35","name":"イイダコ","level":1,"bonus":"I","cost":{"C":2,"B":2},"points":0,"prey":[]},{"id":"C36","name":"ヒメイカ","level":1,"bonus":"I","cost":{"C":2,"F":2},"points":0,"prey":[]},{"id":"C37","name":"ヒトデ","level":1,"bonus":"I","cost":{"B":3},"points":0,"prey":[]},{"id":"C38","name":"イソギンチャク","level":1,"bonus":"I","cost":{"P":2,"C":2},"points":0,"prey":[]},{"id":"C39","name":"ウミウシ","level":1,"bonus":"I","cost":{"B":2,"I":2},"points":0,"prey":[]},{"id":"C40","name":"ナマコ","level":1,"bonus":"I","cost":{"P":2,"B":3},"points":1,"prey":[]},{"id":"C41","name":"アカクラゲ","level":2,"bonus":"P","cost":{"P":3,"C":2},"points":1,"prey":["カイアシ類"]},{"id":"C42","name":"タコクラゲ","level":2,"bonus":"P","cost":{"P":4,"C":1},"points":1,"prey":[]},{"id":"C43","name":"カツオノエボシ","level":2,"bonus":"P","cost":{"P":2,"C":2,"F":1},"points":1,"prey":["カイアシ類"]},{"id":"C44","name":"オキクラゲ","level":2,"bonus":"P","cost":{"P":2,"C":2,"F":2},"points":2,"prey":[]},{"id":"C45","name":"ユウレイクラゲ","level":2,"bonus":"P","cost":{"P":2,"C":3,"F":2},"points":2,"prey":[]},{"id":"C46","name":"アマクサクラゲ","level":2,"bonus":"P","cost":{"P":2,"C":3,"F":2,"I":1},"points":3,"prey":[]},{"id":"C47","name":"クルマエビ","level":2,"bonus":"C","cost":{"P":2,"B":2,"I":1},"points":1,"prey":[]},{"id":"C48","name":"シャコ","level":2,"bonus":"C","cost":{"C":1,"B":2,"I":2},"points":1,"prey":["アサリ"]},{"id":"C49","name":"ガザミ","level":2,"bonus":"C","cost":{"C":1,"B":2,"F":2},"points":1,"prey":["ゴカイ"]},{"id":"C50","name":"イセエビ","level":2,"bonus":"C","cost":{"C":1,"B":3,"I":2},"points":2,"prey":["ヤドカリ"]},{"id":"C51","name":"ケガニ","level":2,"bonus":"C","cost":{"B":2,"I":3,"F":2},"points":2,"prey":[]},{"id":"C52","name":"ズワイガニ","level":2,"bonus":"C","cost":{"C":1,"B":3,"I":2,"F":2},"points":3,"prey":[]},{"id":"C53","name":"サザエ","level":2,"bonus":"B","cost":{"P":2,"B":3},"points":1,"prey":[]},{"id":"C54","name":"アワビ","level":2,"bonus":"B","cost":{"P":2,"B":2,"I":1},"points":1,"prey":[]},{"id":"C55","name":"ムラサキウニ","level":2,"bonus":"B","cost":{"P":1,"B":3,"I":1},"points":1,"prey":[]},{"id":"C56","name":"マナマコ","level":2,"bonus":"B","cost":{"P":2,"B":3,"I":1},"points":2,"prey":[]},{"id":"C57","name":"ミルクイ","level":2,"bonus":"B","cost":{"P":4,"B":2,"I":1},"points":2,"prey":[]},{"id":"C58","name":"タイラギ","level":2,"bonus":"B","cost":{"P":3,"C":1,"B":3,"I":1},"points":3,"prey":[]},{"id":"C59","name":"マダイ","level":2,"bonus":"F","cost":{"C":2,"B":2,"F":1},"points":1,"prey":["ヤドカリ"]},{"id":"C60","name":"ウツボ","level":2,"bonus":"F","cost":{"C":1,"B":1,"F":2,"I":1},"points":1,"prey":["ハゼ"]},{"id":"C61","name":"ハタ","level":2,"bonus":"F","cost":{"C":2,"F":3},"points":1,"prey":["クマノミ"]},{"id":"C62","name":"カツオ","level":2,"bonus":"F","cost":{"C":2,"F":4},"points":2,"prey":["イワシ","カタクチイワシ"]},{"id":"C63","name":"サワラ","level":2,"bonus":"F","cost":{"C":1,"F":4,"I":2},"points":2,"prey":["イカナゴ","キビナゴ"]},{"id":"C64","name":"ブリ","level":2,"bonus":"F","cost":{"C":2,"F":4,"I":2},"points":3,"prey":["アジ"]},{"id":"C65","name":"ヤリイカ","level":2,"bonus":"I","cost":{"P":1,"C":3,"F":1},"points":1,"prey":["オキアミ"]},{"id":"C66","name":"ケンサキイカ","level":2,"bonus":"I","cost":{"C":3,"F":2},"points":1,"prey":[]},{"id":"C67","name":"アオリイカ","level":2,"bonus":"I","cost":{"C":2,"F":3},"points":1,"prey":["テッポウエビ","オトヒメエビ"]},{"id":"C68","name":"コウイカ","level":2,"bonus":"I","cost":{"C":2,"B":1,"F":3},"points":2,"prey":[]},{"id":"C69","name":"マダコ","level":2,"bonus":"I","cost":{"C":3,"B":3,"F":1},"points":2,"prey":["アサリ","サザエ"]},{"id":"C70","name":"オウムガイ","level":2,"bonus":"I","cost":{"C":2,"B":2,"F":2,"I":2},"points":3,"prey":[]},{"id":"C71","name":"エチゼンクラゲ","level":3,"bonus":"P","cost":{"P":4,"C":4},"points":3,"prey":[]},{"id":"C72","name":"キタユウレイクラゲ","level":3,"bonus":"P","cost":{"P":3,"C":3,"F":3},"points":4,"prey":[]},{"id":"C73","name":"ヒカリボヤ群体","level":3,"bonus":"P","cost":{"P":6,"C":4},"points":4,"prey":[]},{"id":"C74","name":"大型クダクラゲ類","level":3,"bonus":"P","cost":{"P":5,"C":3,"F":3},"points":5,"prey":[]},{"id":"C75","name":"タカアシガニ","level":3,"bonus":"C","cost":{"C":2,"B":4,"I":2},"points":3,"prey":["ヒトデ"]},{"id":"C76","name":"アメリカンロブスター","level":3,"bonus":"C","cost":{"C":3,"B":3,"I":3},"points":4,"prey":["サザエ","アワビ"]},{"id":"C77","name":"タラバガニ","level":3,"bonus":"C","cost":{"B":4,"I":3,"F":3},"points":4,"prey":["アワビ"]},{"id":"C78","name":"ダイオウグソクムシ","level":3,"bonus":"C","cost":{"B":4,"I":3,"F":4},"points":5,"prey":["マナマコ","ナマコ"]},{"id":"C79","name":"オオシャコガイ","level":3,"bonus":"B","cost":{"P":4,"B":4},"points":3,"prey":[]},{"id":"C80","name":"ホラガイ","level":3,"bonus":"B","cost":{"B":4,"I":3,"C":2},"points":4,"prey":["ヒトデ"]},{"id":"C81","name":"カブトガニ","level":3,"bonus":"B","cost":{"B":4,"I":3,"C":3},"points":4,"prey":[]},{"id":"C82","name":"オニヒトデ","level":3,"bonus":"B","cost":{"I":6,"B":5},"points":5,"prey":[]},{"id":"C83","name":"ロウニンアジ","level":3,"bonus":"F","cost":{"C":2,"F":6},"points":3,"prey":[]},{"id":"C84","name":"タマカイ","level":3,"bonus":"F","cost":{"C":2,"B":2,"F":5},"points":4,"prey":["ウツボ"]},{"id":"C85","name":"クロマグロ","level":3,"bonus":"F","cost":{"C":2,"F":7,"I":1},"points":4,"prey":["カツオ"]},{"id":"C86","name":"バショウカジキ","level":3,"bonus":"F","cost":{"C":1,"F":8,"I":2},"points":5,"prey":["アオリイカ","ヤリイカ"]},{"id":"C87","name":"アメリカオオアカイカ","level":3,"bonus":"I","cost":{"C":3,"F":5},"points":3,"prey":["サワラ"]},{"id":"C88","name":"ミズダコ","level":3,"bonus":"I","cost":{"C":3,"B":3,"F":3},"points":4,"prey":["イセエビ","ズワイガニ"]},{"id":"C89","name":"ダイオウイカ","level":3,"bonus":"I","cost":{"C":2,"F":7,"I":1},"points":4,"prey":["サワラ","ブリ"]},{"id":"C90","name":"ダイオウホウズキイカ","level":3,"bonus":"I","cost":{"C":2,"F":7,"I":2},"points":5,"prey":["ブリ","クロマグロ"]}];
+const OBJECTIVE_DATA = [{"id": "O1", "name": "ジンベエザメ", "req": {"P": 4, "F": 4}, "points": 3}, {"id": "O2", "name": "ザトウクジラ", "req": {"C": 4, "F": 4}, "points": 3}, {"id": "O3", "name": "ラッコ", "req": {"C": 4, "B": 4}, "points": 3}, {"id": "O4", "name": "セイウチ", "req": {"B": 4, "I": 4}, "points": 3}, {"id": "O5", "name": "オサガメ", "req": {"P": 4, "I": 4}, "points": 3}, {"id": "O6", "name": "コククジラ", "req": {"P": 3, "C": 3, "B": 3}, "points": 3}, {"id": "O7", "name": "ナガスクジラ", "req": {"P": 3, "C": 3, "F": 3}, "points": 3}, {"id": "O8", "name": "マンボウ", "req": {"P": 3, "F": 3, "I": 3}, "points": 3}, {"id": "O9", "name": "アカウミガメ", "req": {"C": 3, "B": 3, "I": 3}, "points": 3}, {"id": "O10", "name": "キタトックリクジラ", "req": {"B": 3, "F": 3, "I": 3}, "points": 3}];
+const CREATURE_INFO = {"カイアシ類":"海の動物プランクトンを代表する小型甲殻類。多くの魚やクラゲなどの餌となり、海の食物網を支える重要な存在。","ヤムシ":"透明で細長い体をもつ動物プランクトン。頭部の鉤状の毛で小さなプランクトンを捕らえる捕食者。","サルパ":"樽形で半透明の被嚢動物。海水を体内に通して微小な植物プランクトンなどを濾し取って食べる。","オタマボヤ":"尾を使って泳ぐ小型の被嚢動物。粘液で作る「ハウス」で海中の微粒子を集めて食べる。","ミズクラゲ":"日本沿岸でもよく見られるクラゲ。傘の中に見える四つ葉状の生殖腺が特徴。","クシクラゲ":"櫛板と呼ばれる繊毛の列を動かして泳ぐ。クラゲに似るが刺胞動物とは別の仲間。","翼足類":"翼のように変化した足で海中を泳ぐ巻貝の仲間。プランクトンとして外洋を漂う。","クリオネ":"殻を失った翼足類の一種。翼のような足で泳ぎ、他の翼足類を捕食する。","オキアミ":"エビに似た小型甲殻類。魚・海鳥・クジラなど多くの生物を支える重要な餌資源。","アミ":"小型のエビに似た甲殻類。沿岸や汽水域にも多く、魚類の重要な餌になる。","ヨコエビ":"左右に平たい体をもつ小型甲殻類。海藻や海底など多様な環境で暮らす。","モエビ":"浅い海の藻場や岩礁に多い小型のエビ類。小動物や有機物などを利用する。","テッポウエビ":"片方の大きなはさみを高速で閉じ、強い衝撃音を出す。ハゼと共生する種類も有名。","オトヒメエビ":"赤白の縞と長い触角が特徴。魚の体表の寄生生物などを食べるクリーナーとして知られる。","ヤドカリ":"巻貝の空き殻を背負って柔らかい腹部を守る甲殻類。成長するとより大きな殻へ引っ越す。","コメツキガニ":"干潟に暮らす小型のカニ。砂泥を口に運び、含まれる有機物などを食べる。","アサリ":"砂泥底に潜って暮らす二枚貝。水を濾過して植物プランクトンなどを食べる。","カキ":"岩などに付着して暮らす二枚貝。大量の海水を濾過し、微小なプランクトンを食べる。","ホタテ":"扇形の殻をもつ二枚貝。殻を素早く開閉して泳ぐこともできる。","ゴカイ":"海底の砂泥に多い環形動物。魚やカニなど多くの生物の餌になる。","イソメ":"海底の砂や岩の隙間に暮らす多毛類。小動物や有機物を食べる種類が多い。","ケヤリムシ":"管の中に暮らし、羽毛状の鰓冠を広げて海中の微粒子を集める多毛類。","クモヒトデ":"細長く柔軟な5本の腕をもつ棘皮動物。海底の有機物や小さな生物を利用する。","フジツボ":"岩や船底などに固着する甲殻類。殻の中から蔓脚を伸ばしてプランクトンを濾し取る。","イワシ":"群れを作る代表的な小型魚。プランクトンを食べ、多くの大型魚や海鳥の餌となる。","カタクチイワシ":"大きな口が特徴の小型魚。プランクトンを食べ、沿岸の食物網で重要な役割をもつ。","キビナゴ":"銀色の帯が美しい細身の小魚。群れで泳ぎ、カツオやブリなどの餌になる。","イカナゴ":"細長い小型魚。砂に潜る習性をもち、海鳥や大型魚の重要な餌となる。","ハゼ":"海底付近で暮らす種類が多い魚。テッポウエビと巣穴を共有する種類がよく知られる。","クマノミ":"イソギンチャクの触手の間で暮らすことで有名。互いに利益を得る共生関係をつくる。","コバンザメ":"頭部の吸盤で大型魚やウミガメなどに付着する。移動や餌のおこぼれなどの利益を得る。","アジ":"沿岸から外洋まで広く見られる回遊魚。小型甲殻類や小魚などを食べる。","ホタルイカ":"発光器をもつ小型のイカ。腕や腹部などから青白い光を出すことで知られる。","ミミイカ":"小型で丸みのあるイカの仲間。海底近くで暮らし、砂に潜る種類もいる。","イイダコ":"浅い海に暮らす小型のタコ。甲殻類や貝類などを捕食する。","ヒメイカ":"非常に小型のイカ。海藻などに付着しながら小型甲殻類を捕食する。","ヒトデ":"棘皮動物の仲間。貝類などを捕食する種類も多く、管足を使って移動する。","イソギンチャク":"刺胞をもつ触手で小動物を捕らえる。クマノミなどとの共生でよく知られる。","ウミウシ":"殻をほぼ失った巻貝の仲間。鮮やかな色彩をもつ種類が多く、食性も多様。","ナマコ":"海底を這う棘皮動物。砂や泥に含まれる有機物を取り込み、海底環境の循環に関わる。","アカクラゲ":"赤褐色の傘と長い触手をもつクラゲ。触手の刺胞で小型の動物プランクトンなどを捕らえる。","タコクラゲ":"丸い傘と複雑な口腕が特徴。体内に共生藻をもつ種類として知られる。","カツオノエボシ":"青紫色の浮き袋で海面を漂う群体生物。長い触手には強い刺胞がある。","オキクラゲ":"外洋性のクラゲ。長い触手を使って動物プランクトンなどを捕食する。","ユウレイクラゲ":"大型になるクラゲの仲間。長い口腕や触手を漂わせながら小動物を捕らえる。","アマクサクラゲ":"沿岸で見られるクラゲの一種。触手で動物プランクトンや小型生物を捕らえる。","クルマエビ":"砂泥底に暮らす大型のエビ。夜間に活動し、小動物や有機物などを食べる。","シャコ":"強力な捕脚をもつ甲殻類。貝や甲殻類などを素早く捕らえる捕食者。","ガザミ":"遊泳脚をもつワタリガニの仲間。貝や小魚など多様な餌を利用する。","イセエビ":"長い触角と棘の多い甲羅が特徴。岩礁に暮らし、貝や小動物などを食べる。","ケガニ":"全身に毛が多いカニ。冷たい海に暮らし、海底の小動物などを食べる。","ズワイガニ":"長い脚をもつ深場のカニ。海底の小動物や有機物などを利用する。","サザエ":"岩礁に暮らす大型の巻貝。主に海藻を削り取って食べる。","アワビ":"岩に強く吸着する大型の巻貝。海藻を食べて成長する。","ムラサキウニ":"長い棘をもつウニ。岩礁で海藻などを食べる重要な植食者。","マナマコ":"日本沿岸の砂泥底で見られるナマコ。海底の砂とともに有機物を取り込む。","ミルクイ":"大型の二枚貝で、長い水管を砂泥底から伸ばして海水を濾過する。","タイラギ":"大型で縦長の二枚貝。砂泥底に殻の一部を埋めて直立するように暮らす。","マダイ":"甲殻類や貝、小魚などを食べる沿岸性の魚。丈夫な歯をもつ。","ウツボ":"岩穴を住みかにする細長い捕食魚。魚や甲殻類、タコなどを食べる。","ハタ":"大きな口で魚や甲殻類を丸のみする捕食魚。岩礁やサンゴ礁に多い。","カツオ":"高速で外洋を回遊する魚。イワシなどの小魚や甲殻類を活発に捕食する。","サワラ":"細長い体をもつ高速の捕食魚。鋭い歯で小魚やイカなどを食べる。","ブリ":"成長すると大型になる回遊魚。アジやイワシなどの群泳魚を追って捕食する。","ヤリイカ":"槍のように細長い胴をもつイカ。小魚や甲殻類などを捕食する。","ケンサキイカ":"長い触腕を使って小魚や甲殻類を捕らえる中型のイカ。","アオリイカ":"幅広いひれが胴を囲む大型のイカ。視覚が発達し、小魚やエビを狙う。","コウイカ":"体内に石灰質の甲をもつ。体色を素早く変え、甲殻類や魚を捕食する。","マダコ":"岩礁に暮らす代表的なタコ。吸盤とくちばしを使い、カニや貝を捕食する。","オウムガイ":"螺旋状の外殻を残す頭足類。多数の触手を使って餌を探す。","エチゼンクラゲ":"非常に大型になるクラゲ。大きな傘と複雑な口腕をもち、プランクトンを捕らえる。","キタユウレイクラゲ":"冷たい海に暮らす大型クラゲ。長い触手と口腕を広げて餌を捕らえる。","ヒカリボヤ群体":"多数の個体が集まって筒状の群体を作る被嚢動物。刺激を受けると発光することがある。","大型クダクラゲ類":"多数の役割の異なる個体がつながった群体生物。長い触手を使って獲物を捕らえる。","タカアシガニ":"世界最大級の脚幅をもつカニ。深海の海底で小動物や有機物などを利用する。","アメリカンロブスター":"巨大な左右のはさみが特徴の大型甲殻類。岩礁の海底で貝や小動物を食べる。","タラバガニ":"大型の甲殻類で、実際にはヤドカリに近い仲間。冷たい海の海底に暮らす。","ダイオウグソクムシ":"深海に暮らす巨大な等脚類。落ちてきた生物の死骸なども利用する。","オオシャコガイ":"世界最大級の二枚貝。外套膜に共生藻をもち、その光合成産物も利用する。","ホラガイ":"大型の巻貝。ヒトデ類を捕食することがあり、サンゴ礁の食物網でも重要。","カブトガニ":"古い形態を残す節足動物。カニの仲間ではなく、クモやサソリに近い系統。","オニヒトデ":"多数の腕と鋭い棘をもつ大型ヒトデ。サンゴを食べることで知られる。","ロウニンアジ":"大型になるアジ科の捕食魚。サンゴ礁周辺で魚や甲殻類を追う。","タマカイ":"非常に大型になるハタの仲間。大きな口で魚や甲殻類などを捕食する。","クロマグロ":"大型で高速遊泳するマグロ。外洋を広く回遊し、魚やイカを捕食する。","バショウカジキ":"帆のような大きな背びれと長い吻が特徴。高速で小魚の群れを追う。","アメリカオオアカイカ":"フンボルトイカとも呼ばれる大型のイカ。外洋で魚やイカなどを捕食する。","ミズダコ":"世界最大級のタコ。冷たい海の岩礁でカニや貝、魚などを捕食する。","ダイオウイカ":"深海に暮らす巨大なイカ。非常に長い触腕と大きな目をもつ。","ダイオウホウズキイカ":"南極海の深海に暮らす巨大イカ。ダイオウイカより太く重量のある体が特徴。","ジンベエザメ":"現生最大の魚類。巨大な体に反して主にプランクトンや小魚を濾し取って食べる。","ザトウクジラ":"長い胸びれが特徴の大型クジラ。オキアミや小魚を群れごと捕食する。","ラッコ":"海面で生活する海獣。ウニ、貝、カニなどを食べ、道具を使うことでも知られる。","セイウチ":"北極圏に暮らす大型海獣。長い牙と敏感なひげをもち、海底の二枚貝などを探す。","オサガメ":"現生最大のウミガメ。革のような柔らかい背面をもち、クラゲ類を主に食べる。","コククジラ":"沿岸を長距離回遊するヒゲクジラ。海底のヨコエビ類などを吸い込んで食べる。","ナガスクジラ":"シロナガスクジラに次ぐ大型クジラの一つ。オキアミや小魚を濾し取って食べる。","マンボウ":"大きく扁平な体が特徴の外洋性魚類。クラゲ類など多様な餌を利用する。","アカウミガメ":"大きな頭と強い顎をもつウミガメ。カニや貝など硬い底生動物も食べる。","キタトックリクジラ":"北大西洋の深海域に暮らすハクジラ。深く潜り、イカや深海魚などを捕食する。"};
+const SYMBIOSES = [{"id": "S1", "a": "クマノミ", "b": ["イソギンチャク"], "label": "クマノミ＋イソギンチャク"}, {"id": "S2", "a": "ハゼ", "b": ["テッポウエビ"], "label": "ハゼ＋テッポウエビ"}, {"id": "S3", "a": "ウツボ", "b": ["オトヒメエビ"], "label": "ウツボ＋オトヒメエビ"}, {"id": "S4", "a": "ヤドカリ", "b": ["イソギンチャク"], "label": "ヤドカリ＋イソギンチャク"}, {"id": "S5", "a": "コバンザメ", "b": ["ジンベエザメ", "マンボウ", "クロマグロ", "バショウカジキ"], "label": "コバンザメ＋大型宿主"}];
+const TYPES = ["P","C","B","F","I"];
+const TYPE_LABEL = {P:"プランクトン",C:"甲殻類",B:"貝・底生",F:"魚類",I:"軟体・無脊椎",W:"豊かな海域"};
+const TOKEN_LIMIT = 10;
+const TYPE_ICON = {P:"🦠",C:"🦐",B:"🐚",F:"🐟",I:"🦑",W:"🌊"};
+
+let state;
+let tokenMode = null;
+let tokenSelection = [];
+let returnNeeded = 0;
+
+function blankPlayer(name){
+  return {
+    name, points:0,
+    tokens:{P:0,C:0,B:0,F:0,I:0,W:0},
+    bonuses:{P:0,C:0,B:0,F:0,I:0},
+    owned:[], reserved:[], objectives:[],
+    symbiosisScored:[]
+  };
+}
+function shuffle(a){
+  a=[...a];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+function newGame(){
+  const byLevel={1:[],2:[],3:[]};
+  CARD_DATA.forEach(c=>byLevel[c.level].push({...c}));
+  state={
+    supplyTokens:{P:4,C:4,B:4,F:4,I:4,W:4},
+    decks:{1:shuffle(byLevel[1]),2:shuffle(byLevel[2]),3:shuffle(byLevel[3])},
+    face:{1:[],2:[],3:[]},
+    objectivePool:shuffle(OBJECTIVE_DATA.map(x=>({...x}))).slice(0,4),
+    player:blankPlayer("あなた"),
+    bot:blankPlayer("BOT"),
+    turn:"player", round:1, over:false, logs:[]
+  };
+  [1,2,3].forEach(l=>{for(let i=0;i<4;i++) refill(l);});
+  tokenMode=null; tokenSelection=[]; returnNeeded=0;
+  logMsg("ゲーム開始。あなたの手番です。");
+  render();
+}
+function refill(level){
+  if(state.decks[level].length) state.face[level].push(state.decks[level].pop());
+}
+function costText(cost){
+  return TYPES.filter(t=>cost[t]).map(t=>`${TYPE_ICON[t]}${cost[t]}`).join(" ");
+}
+function requirementText(req){
+  return TYPES.filter(t=>req[t]).map(t=>`${TYPE_ICON[t]}${req[t]}`).join(" ");
+}
+function bonusCount(p){return TYPES.filter(t=>p.bonuses[t]>0).length;}
+function canWin(p){return p.points>=20 && bonusCount(p)>=4;}
+function ownedHas(p,name){return p.owned.some(c=>c.name===name) || p.objectives.some(o=>o.name===name);}
+function effectiveNeed(p,card){
+  const need={};
+  let total=0;
+  TYPES.forEach(t=>{
+    need[t]=Math.max(0,(card.cost[t]||0)-p.bonuses[t]);
+    total+=need[t];
+  });
+  return {need,total};
+}
+function canAfford(p,card){
+  const {need}=effectiveNeed(p,card);
+  let wildNeed=0;
+  for(const t of TYPES) wildNeed += Math.max(0,need[t]-p.tokens[t]);
+  return wildNeed<=p.tokens.W;
+}
+function paymentFor(p,card){
+  const {need}=effectiveNeed(p,card);
+  const pay={P:0,C:0,B:0,F:0,I:0,W:0};
+  let wild=0;
+  TYPES.forEach(t=>{
+    pay[t]=Math.min(p.tokens[t],need[t]);
+    wild += need[t]-pay[t];
+  });
+  pay.W=wild;
+  return pay;
+}
+function eligiblePrey(p,card){
+  if(!card.prey || !card.prey.length) return [];
+  return p.owned.filter(c=>card.prey.includes(c.name));
+}
+function removeOwnedCard(p, cardId){
+  const idx=p.owned.findIndex(c=>c.id===cardId);
+  if(idx<0) return null;
+  const [c]=p.owned.splice(idx,1);
+  p.bonuses[c.bonus]=Math.max(0,p.bonuses[c.bonus]-1);
+  p.points-=c.points;
+  return c;
+}
+function takeFaceCard(level, id){
+  const idx=state.face[level].findIndex(c=>c.id===id);
+  if(idx<0) return null;
+  const [card]=state.face[level].splice(idx,1);
+  refill(level);
+  return card;
+}
+function getFaceCard(id){
+  for(const l of [1,2,3]){
+    const c=state.face[l].find(x=>x.id===id);
+    if(c) return {card:c,level:l};
+  }
+  return null;
+}
+function returnTokens(pay){
+  Object.entries(pay).forEach(([t,n])=>{state.supplyTokens[t]+=n;});
+}
+function scoreSymbiosis(p){
+  let gained=[];
+  for(const s of SYMBIOSES){
+    if(p.symbiosisScored.includes(s.id)) continue;
+    const hasA=ownedHas(p,s.a);
+    const hasB=s.b.some(n=>ownedHas(p,n));
+    if(hasA && hasB){
+      p.symbiosisScored.push(s.id);
+      p.points+=1; gained.push(s.label);
+    }
+  }
+  if(gained.length) logMsg(`${p.name}：🤝 共生成立「${gained.join("」「")}」 +${gained.length}点`);
+}
+function awardObjective(p){
+  const eligible=state.objectivePool.filter(o=>{
+    if(p.objectives.some(x=>x.id===o.id)) return false;
+    return TYPES.every(t=>p.bonuses[t] >= (o.req[t]||0));
+  });
+  if(!eligible.length) return;
+  const o=eligible[Math.floor(Math.random()*eligible.length)];
+  state.objectivePool=state.objectivePool.filter(x=>x.id!==o.id);
+  p.objectives.push(o); p.points+=o.points;
+  logMsg(`${p.name}の海域に「${o.name}」が現れた！ +${o.points}点`);
+}
+function afterAcquisition(p){ awardObjective(p); scoreSymbiosis(p); }
+
+function tokenTotal(p){
+  return [...TYPES,"W"].reduce((sum,t)=>sum+(p.tokens[t]||0),0);
+}
+function startReturnMode(){
+  returnNeeded=Math.max(0,tokenTotal(state.player)-TOKEN_LIMIT);
+  if(returnNeeded<=0){ finishPlayerAction(); return; }
+  tokenMode="return"; tokenSelection=[];
+  logMsg(`トークン上限は${TOKEN_LIMIT}枚です。${returnNeeded}枚を選んでサプライへ返してください。`);
+  render();
+}
+function botReturnExcess(p,need=null){
+  const returned={P:0,C:0,B:0,F:0,I:0,W:0};
+  while(tokenTotal(p)>TOKEN_LIMIT){
+    const candidates=[...TYPES,"W"].filter(t=>p.tokens[t]>0);
+    candidates.sort((a,b)=>{
+      const score=t=>{
+        if(t==="W") return -1000; // 万能はなるべく残す
+        const req=need?(need[t]||0):0;
+        return (p.tokens[t]-req)*10+p.tokens[t];
+      };
+      return score(b)-score(a);
+    });
+    const t=candidates[0];
+    p.tokens[t]--; state.supplyTokens[t]++; returned[t]++;
+  }
+  const parts=[...TYPES,"W"].filter(t=>returned[t]).map(t=>`${TYPE_ICON[t]}${returned[t]}`);
+  if(parts.length) logMsg(`${p.name}：上限10枚のため ${parts.join(" ")} をサプライへ返却`);
+}
+
+
+let actionAnimating=false;
+function flyCardToPlayer(cardId,onDone){
+  const source=document.querySelector(`.card[data-card-id="${cardId}"]`);
+  const target=document.getElementById("playerPanel");
+  if(!source){onDone();return;}
+  const sr=source.getBoundingClientRect();
+  const tr=target?target.getBoundingClientRect():null;
+  const clone=source.cloneNode(true);
+  clone.classList.add("card-flyer");
+  clone.querySelectorAll("button").forEach(b=>b.remove());
+  clone.style.left=sr.left+"px";
+  clone.style.top=sr.top+"px";
+  clone.style.width=sr.width+"px";
+  clone.style.height=sr.height+"px";
+
+  // 移動先が画面外でも、必ず十分な移動量が見えるようにする
+  let destX = window.innerWidth/2 - sr.width/2;
+  let destY = window.innerHeight - Math.min(120, sr.height*.7);
+  if(tr && tr.top < window.innerHeight){
+    destX = tr.left + tr.width/2 - sr.width/2;
+    destY = Math.min(window.innerHeight - sr.height*.35, tr.top + 24);
+  }
+  const dx = destX - sr.left;
+  const dy = Math.max(110, destY - sr.top);
+
+  clone.style.setProperty("--fly-x", dx+"px");
+  clone.style.setProperty("--fly-y", dy+"px");
+  document.body.appendChild(clone);
+  source.classList.add("acquire-pulse");
+
+  requestAnimationFrame(()=>clone.classList.add("flying"));
+  setTimeout(()=>{
+    clone.remove();
+    onDone();
+  },700);
+}
+function playerBuyWithAnimation(id){
+  if(actionAnimating||state.over||state.turn!=="player"||tokenMode==="return")return;
+  const found=getFaceCard(id);
+  if(!found||!canAfford(state.player,found.card)){
+    normalBuy("player",id,false);return;
+  }
+  actionAnimating=true;
+  flyCardToPlayer(id,()=>{
+    normalBuy("player",id,false);
+    actionAnimating=false;
+  });
+}
+
+function normalBuy(actor,id,fromReserve=false){
+  if(state.over || (actor==="player" && tokenMode==="return")) return false;
+  const p=actor==="player"?state.player:state.bot;
+  let card,level,resIdx=-1;
+  if(fromReserve){
+    resIdx=p.reserved.findIndex(c=>c.id===id);
+    if(resIdx<0) return false;
+    card=p.reserved[resIdx];
+  } else {
+    const found=getFaceCard(id); if(!found) return false;
+    card=found.card; level=found.level;
+  }
+  if(!canAfford(p,card)){
+    if(actor==="player") logMsg(`「${card.name}」はまだ獲得できません。`);
+    return false;
+  }
+  const pay=paymentFor(p,card);
+  Object.entries(pay).forEach(([t,n])=>{p.tokens[t]-=n;});
+  returnTokens(pay);
+  if(fromReserve) p.reserved.splice(resIdx,1);
+  else card=takeFaceCard(level,id);
+  p.owned.push(card); p.bonuses[card.bonus]++; p.points+=card.points;
+  logMsg(`${p.name}：「${card.name}」を獲得（${card.points}点 / ${TYPE_ICON[card.bonus]}ボーナス）`);
+  afterAcquisition(p);
+  if(actor==="player") finishPlayerAction();
+  return true;
+}
+function predationBuy(actor,id){
+  if(state.over || (actor==="player" && tokenMode==="return")) return false;
+  const p=actor==="player"?state.player:state.bot;
+  const found=getFaceCard(id); if(!found) return false;
+  const prey=eligiblePrey(p,found.card);
+  if(!prey.length) return false;
+  const chosen=prey[Math.floor(Math.random()*prey.length)];
+  const removed=removeOwnedCard(p,chosen.id);
+  const card=takeFaceCard(found.level,id);
+  p.owned.push(card);p.bonuses[card.bonus]++;p.points+=card.points;
+  logMsg(`${p.name}：捕食！「${removed.name}」を破棄して「${card.name}」を無償獲得`);
+  afterAcquisition(p);
+  if(actor==="player") finishPlayerAction();
+  return true;
+}
+function reserveCard(actor,id){
+  if(state.over || (actor==="player" && tokenMode==="return")) return false;
+  const p=actor==="player"?state.player:state.bot;
+  if(p.reserved.length>=3){if(actor==="player")logMsg("予約は3枚までです。");return false;}
+  if(state.supplyTokens.W<1){if(actor==="player")logMsg("万能トークンが残っていません。");return false;}
+  const found=getFaceCard(id);if(!found)return false;
+  const card=takeFaceCard(found.level,id);
+  p.reserved.push(card);p.tokens.W++;state.supplyTokens.W--;
+  logMsg(`${p.name}：「${card.name}」を予約し、🌊万能トークン1枚を獲得`);
+  if(actor==="player"){
+    if(tokenTotal(p)>TOKEN_LIMIT) startReturnMode(); else finishPlayerAction();
+  }else{
+    botReturnExcess(p);
+  }
+  return true;
+}
+
+function setTokenMode(mode){
+  if(state.over||state.turn!=="player"||tokenMode==="return")return;
+  tokenMode=mode;tokenSelection=[];
+  logMsg(mode==="three"?"異なる3種類のトークンを選んでください。":"2枚取るトークンを1種類選んでください。");
+  render();
+}
+function clickToken(t){
+  if(state.turn!=="player"||!tokenMode)return;
+  if(tokenMode==="return"){
+    const selectedCount=tokenSelection.filter(x=>x===t).length;
+    if(state.player.tokens[t]<=selectedCount)return;
+    if(tokenSelection.length<returnNeeded) tokenSelection.push(t);
+    render(); return;
+  }
+  if(t==="W"||state.supplyTokens[t]<=0)return;
+  if(tokenMode==="three"){
+    if(tokenSelection.includes(t)) tokenSelection=tokenSelection.filter(x=>x!==t);
+    else if(tokenSelection.length<3) tokenSelection.push(t);
+  }else{
+    tokenSelection=[t];
+  }
+  render();
+}
+
+function flyTokenChips(types,onDone){
+  const target=document.getElementById("playerPanel");
+  const tr=target?target.getBoundingClientRect():null;
+  const jobs=[];
+  types.forEach((t,index)=>{
+    const source=document.querySelector(`#tokenPool .token.${t}`);
+    if(!source)return;
+    const disc=source.querySelector(".token-disc.d1")||source.querySelector(".token-stack");
+    if(!disc)return;
+    const sr=disc.getBoundingClientRect();
+    jobs.push({t,index,sr});
+  });
+  if(!jobs.length){onDone();return;}
+  let maxDelay=0;
+  jobs.forEach(({t,index,sr})=>{
+    const chip=document.createElement("div");
+    chip.className=`token-chip-flyer token ${t}`;
+    chip.dataset.icon=TYPE_ICON[t];
+    const chipColors={P:"#6c4ccf",C:"#e06b2d",B:"#8b5a2b",F:"#2878c8",I:"#2f9b72",W:"#d7ad24"};
+    chip.style.setProperty("--chip-bg",chipColors[t]||"#777");
+    chip.style.left=sr.left+"px"; chip.style.top=sr.top+"px";
+    chip.style.width=sr.width+"px"; chip.style.height=sr.height+"px";
+    const destX=(tr?tr.left+Math.min(tr.width*.35,120):window.innerWidth*.25)-sr.left+(index%2)*12;
+    const destY=(tr?Math.min(window.innerHeight-sr.height-8,tr.top+85):window.innerHeight-100)-sr.top+(index%3)*5;
+    chip.style.setProperty("--chip-x",destX+"px");
+    chip.style.setProperty("--chip-y",Math.max(80,destY)+"px");
+    document.body.appendChild(chip);
+    const delay=index*70;
+    maxDelay=Math.max(maxDelay,delay);
+    setTimeout(()=>chip.classList.add("flying"),delay);
+    setTimeout(()=>chip.remove(),delay+520);
+  });
+  setTimeout(onDone,maxDelay+530);
+}
+
+function confirmTokens(){
+  if(state.over||state.turn!=="player")return;
+  if(tokenMode==="return"){
+    if(tokenSelection.length!==returnNeeded){
+      logMsg(`${returnNeeded}枚選んで返してください。`);return;
+    }
+    const counts={}; tokenSelection.forEach(t=>counts[t]=(counts[t]||0)+1);
+    if(Object.entries(counts).some(([t,n])=>state.player.tokens[t]<n)){
+      logMsg("手持ち枚数を超えて返却することはできません。");return;
+    }
+    Object.entries(counts).forEach(([t,n])=>{state.player.tokens[t]-=n;state.supplyTokens[t]+=n;});
+    logMsg(`あなた：${tokenSelection.map(t=>TYPE_ICON[t]).join(" ")} をサプライへ返却（所持${TOKEN_LIMIT}枚）`);
+    tokenMode=null;tokenSelection=[];returnNeeded=0;
+    finishPlayerAction(); return;
+  }
+  if(tokenMode==="three"){
+    if(tokenSelection.length!==3){logMsg("異なる3種類を選んでください。");return;}
+    if(tokenSelection.some(t=>state.supplyTokens[t]<1)){logMsg("サプライにないトークンが含まれます。");return;}
+    const picks=[...tokenSelection];
+    tokenMode=null;tokenSelection=[];actionAnimating=true;render();
+    flyTokenChips(picks,()=>{
+      picks.forEach(t=>{state.supplyTokens[t]--;state.player.tokens[t]++;});
+      logMsg(`あなた：${picks.map(t=>TYPE_ICON[t]).join(" ")} を1枚ずつ獲得`);
+      actionAnimating=false;
+      if(tokenTotal(state.player)>TOKEN_LIMIT) startReturnMode(); else finishPlayerAction();
+    });
+    return;
+  }else if(tokenMode==="two"){
+    if(tokenSelection.length!==1){logMsg("1種類選んでください。");return;}
+    const t=tokenSelection[0];
+    if(state.supplyTokens[t]<2){logMsg("同じ種類を2枚取るにはサプライに2枚必要です。");return;}
+    tokenMode=null;tokenSelection=[];actionAnimating=true;render();
+    flyTokenChips([t,t],()=>{
+      state.supplyTokens[t]-=2;state.player.tokens[t]+=2;
+      logMsg(`あなた：${TYPE_ICON[t]}${TYPE_LABEL[t]}を2枚獲得`);
+      actionAnimating=false;
+      if(tokenTotal(state.player)>TOKEN_LIMIT) startReturnMode(); else finishPlayerAction();
+    });
+    return;
+  } else return;
+}
+function cancelTokenMode(){
+  if(tokenMode==="return"){tokenSelection=[];logMsg("返却するトークンの選択をリセットしました。");render();return;}
+  tokenMode=null;tokenSelection=[];render();
+}
+function finishPlayerAction(){
+  if(state.over)return;
+  state.turn="bot";render();
+  setTimeout(botTurn,350);
+}
+
+
+let botBannerTimer=null;
+function showBotAction(text,imgSrc=null,duration=900){
+  const el=document.getElementById("botActionBanner");
+  if(!el)return;
+  clearTimeout(botBannerTimer);
+  el.innerHTML="";
+  if(imgSrc){
+    const img=document.createElement("img");
+    img.className="bot-action-thumb";img.src=imgSrc;img.alt="";
+    el.appendChild(img);
+  }
+  const span=document.createElement("div");
+  span.className="bot-action-text";span.innerHTML=text;
+  el.appendChild(span);
+  requestAnimationFrame(()=>el.classList.add("show"));
+  botBannerTimer=setTimeout(()=>el.classList.remove("show"),duration);
+}
+function botTargetPoint(){
+  const target=document.getElementById("botBtn");
+  const r=target?target.getBoundingClientRect():null;
+  return r?{x:r.left+r.width/2,y:r.top+r.height/2}:{x:window.innerWidth*.72,y:42};
+}
+function animateBotCard(card,sourceId,label,onDone){
+  const source=sourceId?document.querySelector(`.card[data-card-id="${sourceId}"] .cardart`):null;
+  const target=botTargetPoint();
+  let sr;
+  if(source){
+    source.closest(".card")?.classList.add("bot-target-flash");
+    sr=source.getBoundingClientRect();
+  }else{
+    sr={left:window.innerWidth/2-44,top:Math.min(window.innerHeight*.45,330),width:88,height:66};
+  }
+
+  showBotAction(label,cardImage(card),1000);
+
+  const fly=document.createElement("div");
+  fly.className="bot-card-flyer";
+  fly.style.left=sr.left+"px";fly.style.top=sr.top+"px";
+  fly.style.width=Math.max(56,Math.min(110,sr.width))+"px";
+  fly.style.height=Math.max(42,Math.min(84,sr.height))+"px";
+  const img=document.createElement("img");img.src=cardImage(card);img.alt="";
+  fly.appendChild(img);document.body.appendChild(fly);
+
+  const fr=fly.getBoundingClientRect();
+  fly.style.setProperty("--bot-x",(target.x-(fr.left+fr.width/2))+"px");
+  fly.style.setProperty("--bot-y",(target.y-(fr.top+fr.height/2))+"px");
+  requestAnimationFrame(()=>fly.classList.add("flying"));
+  setTimeout(()=>{fly.remove();onDone();},680);
+}
+function animateBotTokens(types,label,onDone){
+  showBotAction(label,null,950);
+  const target=botTargetPoint();
+  const jobs=[];
+  types.forEach((t,index)=>{
+    const source=document.querySelector(`#tokenPool .token.${t}`);
+    const disc=source?.querySelector(".token-disc.d1")||source?.querySelector(".token-stack");
+    if(!disc)return;
+    const sr=disc.getBoundingClientRect();
+    jobs.push({t,index,sr});
+  });
+  if(!jobs.length){setTimeout(onDone,520);return;}
+
+  const colors={P:"#6c4ccf",C:"#e06b2d",B:"#8b5a2b",F:"#2878c8",I:"#2f9b72",W:"#d7ad24"};
+  let finalDelay=0;
+  jobs.forEach(({t,index,sr})=>{
+    const chip=document.createElement("div");
+    chip.className=`token-chip-flyer token ${t}`;
+    chip.dataset.icon=TYPE_ICON[t];
+    chip.style.setProperty("--chip-bg",colors[t]||"#777");
+    chip.style.left=sr.left+"px";chip.style.top=sr.top+"px";
+    chip.style.width=sr.width+"px";chip.style.height=sr.height+"px";
+    chip.style.setProperty("--chip-x",(target.x-(sr.left+sr.width/2)+(index%2)*7)+"px");
+    chip.style.setProperty("--chip-y",(target.y-(sr.top+sr.height/2)+(index%3)*4)+"px");
+    document.body.appendChild(chip);
+    const delay=index*75;finalDelay=Math.max(finalDelay,delay);
+    setTimeout(()=>chip.classList.add("flying"),delay);
+    setTimeout(()=>chip.remove(),delay+530);
+  });
+  setTimeout(onDone,finalDelay+550);
+}
+function botPassWithNotice(text){
+  showBotAction(text,null,700);
+  setTimeout(finishBotTurn,600);
+}
+
+function botTurn(){
+  if(state.over)return;
+  const p=state.bot;
+
+  // 1. 今すぐ獲得できるカードを優先
+  let options=[];
+  [1,2,3].forEach(l=>state.face[l].forEach(c=>{
+    if(canAfford(p,c))options.push({kind:"buy",card:c});
+    if(eligiblePrey(p,c).length)options.push({kind:"pred",card:c});
+  }));
+  p.reserved.forEach(c=>{if(canAfford(p,c))options.push({kind:"buyReserved",card:c});});
+
+  if(options.length){
+    const op=options[Math.floor(Math.random()*options.length)];
+    const isReserved=op.kind==="buyReserved";
+    const label=op.kind==="pred"
+      ? `BOT：捕食で <strong>${op.card.name}</strong> を獲得`
+      : isReserved
+        ? `BOT：予約していた <strong>${op.card.name}</strong> を獲得`
+        : `BOT：<strong>${op.card.name}</strong> を獲得`;
+    animateBotCard(op.card,isReserved?null:op.card.id,label,()=>{
+      if(op.kind==="pred")predationBuy("bot",op.card.id);
+      else normalBuy("bot",op.card.id,isReserved);
+      finishBotTurn();
+    });
+    return;
+  }
+
+  // 2. ボーナス＋手持ちから、あと少しで獲得できるカードを狙う
+  const targets=[];
+  [1,2,3].forEach(l=>state.face[l].forEach(c=>{
+    const {need}=effectiveNeed(p,c);
+    let missing=0;
+    TYPES.forEach(t=>missing+=Math.max(0,need[t]-p.tokens[t]));
+    missing=Math.max(0,missing-p.tokens.W);
+    targets.push({card:c,missing,need});
+  }));
+  targets.sort((a,b)=>a.missing-b.missing);
+  const min=targets.length?targets[0].missing:999;
+  const easiest=targets.filter(x=>x.missing===min);
+  const target=easiest[Math.floor(Math.random()*easiest.length)];
+
+  // ときどきL2/L3を予約
+  if(target && state.supplyTokens.W>0 && p.reserved.length<3 && target.card.level>=2 && Math.random()<0.18){
+    animateBotCard(
+      target.card,target.card.id,
+      `BOT：<strong>${target.card.name}</strong> を予約 ＋ 🌊万能`,
+      ()=>{
+        reserveCard("bot",target.card.id);
+        finishBotTurn();
+      }
+    );
+    return;
+  }
+
+  if(target){
+    const wants=TYPES.filter(t=>Math.max(0,target.need[t]-p.tokens[t])>0 && state.supplyTokens[t]>0);
+    const wants2=wants.filter(t=>Math.max(0,target.need[t]-p.tokens[t])>=2 && state.supplyTokens[t]>=2);
+
+    if(wants2.length && Math.random()<0.45){
+      const t=wants2[Math.floor(Math.random()*wants2.length)];
+      animateBotTokens(
+        [t,t],
+        `BOT：${TYPE_ICON[t]} <strong>${TYPE_LABEL[t]}×2</strong> を獲得<br><small>狙い：${target.card.name}</small>`,
+        ()=>{
+          state.supplyTokens[t]-=2;p.tokens[t]+=2;
+          logMsg(`BOT：${TYPE_ICON[t]}${TYPE_LABEL[t]}を2枚獲得（狙い：${target.card.name}）`);
+          botReturnExcess(p,target.need);
+          finishBotTurn();
+        }
+      );
+      return;
+    }
+
+    let picks=shuffle(wants).slice(0,3);
+    if(picks.length<3){
+      const extras=shuffle(TYPES.filter(t=>!picks.includes(t)&&state.supplyTokens[t]>0)).slice(0,3-picks.length);
+      picks=picks.concat(extras);
+    }
+
+    if(picks.length){
+      animateBotTokens(
+        picks,
+        `BOT：<strong>${picks.map(t=>`${TYPE_ICON[t]}${TYPE_LABEL[t]}`).join("・")}</strong> を獲得<br><small>狙い：${target.card.name}</small>`,
+        ()=>{
+          picks.forEach(t=>{state.supplyTokens[t]--;p.tokens[t]++;});
+          logMsg(`BOT：${picks.map(t=>TYPE_ICON[t]).join(" ")} を獲得（狙い：${target.card.name}）`);
+          botReturnExcess(p,target.need);
+          finishBotTurn();
+        }
+      );
+      return;
+    }
+
+    if(state.supplyTokens.W>0 && p.reserved.length<3){
+      animateBotCard(
+        target.card,target.card.id,
+        `BOT：<strong>${target.card.name}</strong> を予約 ＋ 🌊万能`,
+        ()=>{
+          reserveCard("bot",target.card.id);
+          finishBotTurn();
+        }
+      );
+      return;
+    }
+
+    botPassWithNotice("BOT：取れるトークンがなく手番終了");
+    return;
+  }
+
+  botPassWithNotice("BOT：手番終了");
+}
+
+function finishBotTurn(){
+  checkRoundEnd();
+  if(!state.over){
+    state.turn="player";state.round++;
+    logMsg(`ラウンド${state.round}：あなたの手番`);
+    render();
+  }
+}
+function checkRoundEnd(){
+  const pw=canWin(state.player), bw=canWin(state.bot);
+  if(!pw&&!bw){render();return;}
+  state.over=true;
+  let result;
+  if(pw&&!bw) result="あなたの勝利！";
+  else if(!pw&&bw) result="BOTの勝利";
+  else if(state.player.points!==state.bot.points) result=state.player.points>state.bot.points?"あなたの勝利！":"BOTの勝利";
+  else{
+    const pc=state.player.owned.length, bc=state.bot.owned.length;
+    if(pc!==bc) result=pc<bc?"あなたの勝利！":"BOTの勝利";
+    else result="引き分け";
+  }
+  document.getElementById("endBody").innerHTML=
+    `<div class="win">${result}</div>
+     <p style="text-align:center">あなた ${state.player.points}点（${bonusCount(state.player)}系統） / BOT ${state.bot.points}点（${bonusCount(state.bot)}系統）</p>
+     <p style="text-align:center;font-size:12px;color:#5e7479">勝利条件：20点以上＋4系統以上</p>`;
+  render();document.getElementById("endDialog").showModal();
+}
+
+function logMsg(msg){
+  if(!state)return;
+  state.logs.unshift(msg);
+  state.logs=state.logs.slice(0,80);
+}
+function renderTokens(){
+  const el=document.getElementById("tokenPool");el.innerHTML="";
+  [...TYPES,"W"].forEach(t=>{
+    const b=document.createElement("button");
+    const selectedCount=tokenSelection.filter(x=>x===t).length;
+    b.className=`token ${t} ${selectedCount?"selected":""}`;
+    const count=tokenMode==="return"?state.player.tokens[t]:state.supplyTokens[t];
+    const shown=Math.min(4,count);
+    const discs=Array.from({length:shown},(_,i)=>`<span class="token-disc d${i+1}"></span>`).join("");
+    const extra=tokenMode==="return"&&selectedCount?` -${selectedCount}`:"";
+    b.innerHTML=`<span class="token-stack">${discs}<span class="token-icon">${TYPE_ICON[t]}</span><span class="token-count">${count}${extra}</span><span class="token-label">${TYPE_LABEL[t]}</span></span>`;
+    if(tokenMode==="return"){
+      b.disabled=state.turn!=="player"||state.player.tokens[t]<=selectedCount||tokenSelection.length>=returnNeeded;
+    }else{
+      b.disabled=t==="W"||!tokenMode||state.supplyTokens[t]===0||state.turn!=="player";
+    }
+    b.onclick=()=>clickToken(t);el.appendChild(b);
+  });
+  const confirm=document.getElementById("tokenConfirm");
+  confirm.style.display=tokenMode?"inline-block":"none";
+  confirm.textContent=tokenMode==="return"?`${returnNeeded}枚返却を確定`:"選択を確定";
+  document.getElementById("tokenCancel").textContent=tokenMode==="return"?"返却選択をリセット":"選択解除";
+}
+function cardImage(card){ return `assets/cards/${card.id}.png`; }
+function objectiveImage(o){ return `assets/objectives/${o.id}.png`; }
+function imageThumb(card){ return `<img class="owned-thumb inspect-thumb" data-detail-card="${card.id}" src="${cardImage(card)}" alt="${card.name}" loading="lazy">`; }
+function creatureInfo(name,bonus){
+  return CREATURE_INFO[name] || `${TYPE_LABEL[bonus]||"海洋生物"}の仲間。海の食物網の中で他の生物と関わりながら暮らしている。`;
+}
+function detailCostHTML(cost){
+  return TYPES.filter(t=>cost[t]).map(t=>`<span class="badge ${t}">${TYPE_ICON[t]}${cost[t]}</span>`).join("");
+}
+function safeDetailImageHTML(sourceEl,fallbackSrc,alt){
+  let src=fallbackSrc;
+  try{
+    if(sourceEl && sourceEl.complete && sourceEl.naturalWidth>0 && sourceEl.naturalHeight>0){
+      const canvas=document.createElement("canvas");
+      canvas.width=sourceEl.naturalWidth;
+      canvas.height=sourceEl.naturalHeight;
+      const ctx=canvas.getContext("2d",{alpha:false,colorSpace:"srgb"});
+      ctx.fillStyle="#ffffff";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(sourceEl,0,0,canvas.width,canvas.height);
+      src=canvas.toDataURL("image/png");
+    }
+  }catch(err){
+    src=fallbackSrc;
+  }
+  return `<img class="detail-image" src="${src}" alt="${alt}">`;
+}
+function openCardDetail(card,sourceEl){
+  const dlg=document.getElementById("detailDialog");
+  document.getElementById("detailBody").innerHTML=`
+    <div class="detail-layout">
+      <div><div class="detail-image-wrap">${safeDetailImageHTML(sourceEl,cardImage(card),card.name)}</div><div class="longpress-hint">画像長押しで拡大表示（カード上の画像をそのまま拡大）</div></div>
+      <div>
+        <h3 class="detail-name">${card.name}</h3>
+        <div class="detail-stats"><span class="detail-stat">レベル ${card.level}</span><span class="detail-stat">${card.points}点</span><span class="detail-stat">${TYPE_ICON[card.bonus]} ${TYPE_LABEL[card.bonus]} +1</span></div>
+        <div><strong>獲得コスト</strong></div><div class="detail-cost">${detailCostHTML(card.cost)}</div>
+        <div class="detail-info">${creatureInfo(card.name,card.bonus)}</div>
+        ${card.prey&&card.prey.length?`<div class="detail-prey">捕食対象：${card.prey.join(" / ")}</div>`:""}
+      </div>
+    </div>`;
+  dlg.showModal();
+}
+function openObjectiveDetail(o,sourceEl){
+  const dlg=document.getElementById("detailDialog");
+  document.getElementById("detailBody").innerHTML=`
+    <div class="detail-layout">
+      <div><div class="detail-image-wrap">${safeDetailImageHTML(sourceEl,objectiveImage(o),o.name)}</div><div class="longpress-hint">大型海洋生物：条件達成で自動加入</div></div>
+      <div>
+        <h3 class="detail-name">${o.name}</h3>
+        <div class="detail-stats"><span class="detail-stat">大型海洋生物</span><span class="detail-stat">${o.points}点</span></div>
+        <div><strong>出現条件</strong></div><div class="detail-cost">${detailCostHTML(o.req)}</div>
+        <div class="detail-info">${creatureInfo(o.name,null)}</div>
+      </div>
+    </div>`;
+  dlg.showModal();
+}
+function bindLongPress(el,callback){
+  let timer=null,startX=0,startY=0;
+  const clear=()=>{if(timer){clearTimeout(timer);timer=null;}};
+  el.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse"&&e.button!==0)return;startX=e.clientX;startY=e.clientY;clear();timer=setTimeout(()=>{timer=null;callback(el);},520);});
+  el.addEventListener("pointermove",e=>{if(Math.abs(e.clientX-startX)>10||Math.abs(e.clientY-startY)>10)clear();});
+  ["pointerup","pointercancel","pointerleave"].forEach(ev=>el.addEventListener(ev,clear));
+  el.addEventListener("contextmenu",e=>e.preventDefault());
+}
+
+function renderCard(card){
+  const prey=eligiblePrey(state.player,card);
+  const affordable=canAfford(state.player,card);
+  const div=document.createElement("div");
+  div.className=`card bonus-${card.bonus}`;
+  div.dataset.cardId=card.id;
+  div.innerHTML=`
+    <div class="cardart-wrap">
+      <img class="cardart" src="${cardImage(card)}" alt="${card.name}" loading="lazy">
+      <div class="art-tags"><span class="art-tag">L${card.level}</span><span class="art-tag">${card.points}点 ${TYPE_ICON[card.bonus]}+1</span></div>
+      <div class="art-cost cost-${TYPES.filter(t=>card.cost[t]).length}"><span class="art-cost-label">必要</span>${TYPES.filter(t=>card.cost[t]).map(t=>`<span class="badge ${t}">${TYPE_ICON[t]}${card.cost[t]}</span>`).join("")}</div>
+    </div>
+    <div class="cardname">${card.name}</div>
+    ${card.prey&&card.prey.length?`<div class="prey">捕食：${card.prey.join(" / ")}</div>`:""}
+    <div class="cardactions">
+      <button ${(!affordable||state.turn!=="player"||state.over||tokenMode==="return"||actionAnimating)?"disabled":""} data-buy="${card.id}">獲得</button>
+      <button data-reserve="${card.id}" ${state.turn!=="player"||state.over||tokenMode==="return"||actionAnimating?"disabled":""}>予約</button>
+      ${prey.length?`<button class="predate" data-pred="${card.id}" ${state.turn!=="player"||state.over||tokenMode==="return"||actionAnimating?"disabled":""}>捕食</button>`:""}
+    </div>`;
+  bindLongPress(div.querySelector(".cardart"),(imgEl)=>openCardDetail(card,imgEl));
+  div.querySelector("[data-buy]").onclick=()=>playerBuyWithAnimation(card.id);
+  div.querySelector("[data-reserve]").onclick=()=>reserveCard("player",card.id);
+  const pb=div.querySelector("[data-pred]"); if(pb)pb.onclick=()=>predationBuy("player",card.id);
+  return div;
+}
+function renderObjective(o){
+  const div=document.createElement("div");div.className="card objective";
+  div.innerHTML=`<div class="cardart-wrap"><img class="cardart" src="${objectiveImage(o)}" alt="${o.name}" loading="lazy"><div class="art-tags"><span class="art-tag">大型</span><span class="art-tag">${o.points}点</span></div><div class="art-cost cost-${TYPES.filter(t=>o.req[t]).length}"><span class="art-cost-label">条件</span>${TYPES.filter(t=>o.req[t]).map(t=>`<span class="badge ${t}">${TYPE_ICON[t]}${o.req[t]}</span>`).join("")}</div></div><div class="cardname">${o.name}</div><div style="font-size:10px;color:#5e7479;margin-top:auto">条件達成で自動加入</div>`;
+  bindLongPress(div.querySelector(".cardart"),(imgEl)=>openObjectiveDetail(o,imgEl));
+  return div;
+}
+function renderSupply(){
+  const root=document.getElementById("supply");root.innerHTML="";
+  const ob=document.createElement("div");ob.className="rowbox";
+  ob.innerHTML=`<div class="row-head"><span>大型海洋生物</span><span>残り ${state.objectivePool.length}種</span></div>`;
+  const orow=document.createElement("div");orow.className="cards";
+  state.objectivePool.forEach(o=>orow.appendChild(renderObjective(o)));
+  // Keep visual row at four slots even after objectives are claimed
+  for(let i=state.objectivePool.length;i<4;i++){
+    const d=document.createElement("div");d.className="card objective achieved";d.innerHTML="<div class='cardname'>獲得済み</div>";
+    orow.appendChild(d);
+  }
+  ob.appendChild(orow);root.appendChild(ob);
+  [3,2,1].forEach(level=>{
+    const box=document.createElement("div");box.className="rowbox";
+    const head=document.createElement("div");head.className="row-head";head.innerHTML=`<span>レベル${level}</span><span>山札 ${state.decks[level].length}枚</span>`;
+    const row=document.createElement("div");row.className="cards";
+    state.face[level].forEach(c=>row.appendChild(renderCard(c)));
+    box.append(head,row);root.appendChild(box);
+  });
+}
+function renderPlayer(p,targetId){
+  const sym=SYMBIOSES.filter(s=>p.symbiosisScored.includes(s.id)).map(s=>s.label);
+  const reservedCards=p.reserved.map(c=>`
+    <span class="owned-chip reserved">${imageThumb(c)}<span>${c.name}</span>
+      <button style="font-size:10px;margin-left:3px" ${canAfford(p,c)&&state.turn==="player"&&!state.over?"":"disabled"} onclick="normalBuy('player','${c.id}',true)">獲得</button>
+    </span>`).join("");
+  document.getElementById(targetId).innerHTML=`
+    <div class="summary-grid">
+      <div class="summary-item">得点<b>${p.points}</b></div>
+      <div class="summary-item">系統<b>${bonusCount(p)}/5</b></div>
+      <div class="summary-item">生物<b>${p.owned.length}</b></div>
+    </div>
+    <div><strong>永久ボーナス</strong></div>
+    <div class="bonus-line">${TYPES.map(t=>`<span class="badge ${t}">${TYPE_ICON[t]}${p.bonuses[t]}</span>`).join("")}</div>
+    <div><strong>手持ちトークン（合計 ${tokenTotal(p)}/${TOKEN_LIMIT}）</strong></div>
+    <div class="token-line">${[...TYPES,"W"].map(t=>`<span class="badge ${t}">${TYPE_ICON[t]}${p.tokens[t]}</span>`).join("")}</div>
+    <div><strong>大型海洋生物：</strong>${p.objectives.length?p.objectives.map(x=>x.name).join("、"):"なし"}</div>
+    <div class="sym"><strong>共生：</strong>${sym.length?sym.join("、"):"なし"}</div>
+    <div style="margin-top:6px"><strong>予約：</strong>${reservedCards||"なし"}</div>
+    <div class="owned-list"><strong>獲得生物</strong><br>${p.owned.length?p.owned.map(c=>`<span class="owned-chip">${imageThumb(c)}<span>${TYPE_ICON[c.bonus]}${c.name}(${c.points})</span></span>`).join(""):"まだいません"}</div>`;
+
+  // 獲得済み・予約カードの画像も長押しで図鑑表示
+  const panel=document.getElementById(targetId);
+  const detailCards=[...p.owned,...p.reserved];
+  panel.querySelectorAll(".inspect-thumb[data-detail-card]").forEach(img=>{
+    const card=detailCards.find(c=>c.id===img.dataset.detailCard);
+    if(card)bindLongPress(img,(imgEl)=>openCardDetail(card,imgEl));
+  });
+}
+
+function renderPlayerHud(){
+  if(!state)return;
+  const p=state.player;
+  const bonusEl=document.getElementById("hudBonuses");
+  const tokenEl=document.getElementById("hudTokens");
+  if(!bonusEl||!tokenEl)return;
+  bonusEl.innerHTML=TYPES.map(t=>`<div class="hud-chip ${t}" title="${TYPE_LABEL[t]}"><span>${TYPE_ICON[t]}</span><span class="hud-num">${p.bonuses[t]}</span></div>`).join("");
+  tokenEl.innerHTML=[...TYPES,"W"].map(t=>`<div class="hud-chip ${t}" title="${TYPE_LABEL[t]}"><span>${TYPE_ICON[t]}</span><span class="hud-num">${p.tokens[t]}</span></div>`).join("");
+  document.getElementById("hudBonusKinds").textContent=`${bonusCount(p)}/5系統`;
+  document.getElementById("hudTokenTotal").textContent=`${tokenTotal(p)}/${TOKEN_LIMIT}`;
+}
+function initPlayerHud(){
+  const hud=document.getElementById("playerHud");
+  const handle=document.getElementById("playerHudHandle");
+  const mini=document.getElementById("playerHudMini");
+  if(!hud||!handle||!mini)return;
+
+  // 前回位置を復元
+  try{
+    const saved=JSON.parse(localStorage.getItem("seaPlayerHud")||"null");
+    if(saved){
+      if(Number.isFinite(saved.left))hud.style.left=saved.left+"px";
+      if(Number.isFinite(saved.top))hud.style.top=saved.top+"px";
+      if(Number.isFinite(saved.left))hud.style.right="auto";
+      if(saved.compact)hud.classList.add("compact");
+      mini.textContent=hud.classList.contains("compact")?"＋":"−";
+    }
+  }catch(e){}
+
+  let dragging=false,dx=0,dy=0,moved=false;
+  const clamp=()=>{
+    const r=hud.getBoundingClientRect();
+    let left=Math.max(2,Math.min(window.innerWidth-r.width-2,r.left));
+    let top=Math.max(2,Math.min(window.innerHeight-r.height-2,r.top));
+    hud.style.left=left+"px";hud.style.top=top+"px";hud.style.right="auto";
+  };
+  const save=()=>{
+    const r=hud.getBoundingClientRect();
+    try{localStorage.setItem("seaPlayerHud",JSON.stringify({
+      left:Math.round(r.left),top:Math.round(r.top),compact:hud.classList.contains("compact")
+    }));}catch(e){}
+  };
+
+  handle.addEventListener("pointerdown",e=>{
+    if(e.target===mini)return;
+    const r=hud.getBoundingClientRect();
+    dragging=true;moved=false;dx=e.clientX-r.left;dy=e.clientY-r.top;
+    handle.setPointerCapture?.(e.pointerId);
+    e.preventDefault();
+  });
+  handle.addEventListener("pointermove",e=>{
+    if(!dragging)return;
+    moved=true;
+    const maxX=Math.max(2,window.innerWidth-hud.offsetWidth-2);
+    const maxY=Math.max(2,window.innerHeight-hud.offsetHeight-2);
+    const x=Math.max(2,Math.min(maxX,e.clientX-dx));
+    const y=Math.max(2,Math.min(maxY,e.clientY-dy));
+    hud.style.left=x+"px";hud.style.top=y+"px";hud.style.right="auto";
+    e.preventDefault();
+  });
+  const endDrag=e=>{
+    if(!dragging)return;
+    dragging=false;
+    try{handle.releasePointerCapture?.(e.pointerId);}catch(_){}
+    clamp();save();
+  };
+  handle.addEventListener("pointerup",endDrag);
+  handle.addEventListener("pointercancel",endDrag);
+
+  mini.addEventListener("click",e=>{
+    e.stopPropagation();
+    hud.classList.toggle("compact");
+    mini.textContent=hud.classList.contains("compact")?"＋":"−";
+    clamp();save();
+  });
+  window.addEventListener("resize",()=>{clamp();save();});
+  setTimeout(clamp,0);
+}
+
+function renderBot(){
+  const p=state.bot;
+  const sym=SYMBIOSES.filter(s=>p.symbiosisScored.includes(s.id)).map(s=>s.label);
+  document.getElementById("botPanel").innerHTML=`
+    <p><b>${p.points}点 / ${bonusCount(p)}系統 / 生物${p.owned.length}枚</b></p>
+    <p>ボーナス：${TYPES.map(t=>`${TYPE_ICON[t]}${p.bonuses[t]}`).join("　")}</p>
+    <p>トークン：${[...TYPES,"W"].map(t=>`${TYPE_ICON[t]}${p.tokens[t]}`).join("　")}　<b>合計${tokenTotal(p)}/${TOKEN_LIMIT}</b></p>
+    <p>予約：${p.reserved.length?p.reserved.map(x=>x.name).join("、"):"なし"}</p>
+    <p>大型海洋生物：${p.objectives.length?p.objectives.map(x=>x.name).join("、"):"なし"}</p>
+    <p>共生：${sym.length?sym.join("、"):"なし"}</p>
+    <p style="font-size:12px;line-height:1.7">獲得生物：${p.owned.length?p.owned.map(x=>x.name).join("、"):"なし"}</p>`;
+}
+function render(){
+  if(!state)return;
+  renderTokens();renderSupply();renderPlayer(state.player,"playerPanel");renderPlayerHud();renderBot();
+  document.getElementById("statusline").innerHTML=
+    `<strong>ラウンド ${state.round}</strong>　${state.over?"ゲーム終了":state.turn==="player"?"あなたの手番":"BOT思考中…"}　
+     あなた：<strong>${state.player.points}点 / ${bonusCount(state.player)}系統</strong>　
+     BOT：<strong>${state.bot.points}点 / ${bonusCount(state.bot)}系統</strong>　
+     <span style="color:#5e7479">勝利：20点＋4系統</span>`;
+  document.getElementById("log").innerHTML=state.logs.map(x=>`<div>${x}</div>`).join("");
+  const disabled=state.turn!=="player"||state.over;
+  document.getElementById("take3Btn").disabled=disabled;
+  document.getElementById("take2Btn").disabled=disabled;
+}
+document.getElementById("take3Btn").onclick=()=>setTokenMode("three");
+document.getElementById("take2Btn").onclick=()=>setTokenMode("two");
+document.getElementById("tokenConfirm").onclick=confirmTokens;
+document.getElementById("tokenCancel").onclick=cancelTokenMode;
+document.getElementById("newGameBtn").onclick=()=>{if(confirm("現在のゲームをリセットしますか？"))newGame();};
+document.getElementById("botBtn").onclick=()=>document.getElementById("botDialog").showModal();
+document.getElementById("rulesBtn").onclick=()=>document.getElementById("rulesDialog").showModal();
+
+initPlayerHud();
+newGame();
+</script>
+</body>
+</html>
