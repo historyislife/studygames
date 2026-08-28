@@ -121,6 +121,17 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
 .manual-note{padding:10px 12px;border-radius:12px;background:#fff2c7;border:1px solid #e2c36d;font-weight:700}.manual-table{width:100%;border-collapse:collapse;font-size:14px}.manual-table th,.manual-table td{padding:8px;border-bottom:1px solid #ddd2c2;text-align:left;vertical-align:top}.manual-table th{background:#f6eee1}
 @media(max-width:600px){.manual-btn{right:auto;left:10px;top:54px}.manual-overlay{padding:8px}.manual-body{padding:14px}.manual-table{font-size:13px}}
 
+
+.music-credit{
+  width:min(94vw,720px);
+  margin:10px auto 18px;
+  padding:8px 10px;
+  text-align:center;
+  font-size:12px;
+  opacity:.82;
+}
+.music-credit a{color:inherit;font-weight:800}
+
 </style></head><body>
 <button id="manualBtn" class="manual-btn" type="button" aria-label="遊び方を開く">📖 遊び方</button>
 <div id="manualOverlay" class="manual-overlay" role="dialog" aria-modal="true" aria-labelledby="manualTitle">
@@ -135,8 +146,8 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
       <ul><li><b>四字熟語札を3枚完成</b>すると勝利。</li><li>または、他の3勢力がすべて脱落して<b>最後の1勢力</b>になっても勝利。</li></ul>
       <div class="manual-note">漢字は「熟語を作る」「城を建てる」「城を強化する」「市場で交換する」のすべてに使う大切な資源です。</div>
 
-      <h3>ゲーム開始</h3>
-      <ul><li>あなた（紅）＋CPU3勢力（蒼・翠・紫）の4人戦。</li><li>全員が四隅の本陣からスタート。</li><li>初期手札は<b>5字</b>。</li><li>開始時に四字熟語が<b>10種類</b>選ばれ、その10熟語に使われる漢字だけが登場します。</li></ul>
+      <h3>ゲーム開始</h3><p><b>この対局では5種類の熟語</b>が選ばれ、その5熟語に使う漢字だけが登場します。</p>
+      <ul><li>あなた（紅）＋CPU3勢力（蒼・翠・紫）の4人戦。</li><li>全員が四隅の本陣からスタート。</li><li>初期手札は<b>5字</b>。</li><li>開始時に四字熟語が<b>5種類</b>選ばれ、その5熟語に使われる漢字だけが登場します。</li></ul>
 
       <h3>自分のターン</h3>
       <ol><li>作れる四字熟語があれば、任意で<b>1枚だけ</b>作れます。</li><li>サイコロを振ります。</li><li>出た目だけ進みます。</li><li>止まったマスの効果を処理します。</li></ol>
@@ -173,6 +184,15 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
       <p>手札の漢字が<b>0字</b>になると脱落します。</p>
       <ul><li>コマは盤上から消えます。</li><li>所有していた城はすべて空地に戻ります。</li><li>以後その勢力のターンはありません。</li></ul>
 
+      
+      <h3>BGM・音楽素材</h3>
+      <p>
+        BGMは
+        <a href="https://amachamusic.chagasi.com/" target="_blank" rel="noopener"><b>甘茶の音楽工房</b></a>
+        （作曲：甘茶）の「イカロスの墜落」「残業戦士」を使用しています。
+      </p>
+      <p>楽曲の著作権は甘茶氏にあります。ゲーム開始時は「イカロスの墜落」、誰かが熟語札を2枚完成すると「残業戦士」へ切り替わります。</p>
+
       <h3>勝つためのコツ</h3>
       <ul><li>熟語完成に近い漢字は、むやみに城へ使わない。</li><li>不要な漢字は市場で整理する。</li><li>3文字城は強力なので、手札が少ないときは注意。</li><li>熟語3枚を狙うか、城で相手を削るかを状況で選ぶ。</li></ul>
     </div>
@@ -191,40 +211,136 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
 <div class="stage"><div class="die" id="die"><div class="face f1">1</div><div class="face f2">2</div><div class="face f3">3</div><div class="face f4">4</div><div class="face f5">5</div><div class="face f6">6</div></div></div>
 <button id="roll">🎲 サイコロを振る</button></div></div></div>
 <div id="below"><div class="panel"><h2>🀄 あなたの漢字</h2><div id="hand"></div><small>空地では1字を城に使います。熟語作成後に最低1字残る必要があります。</small></div><div class="panel"><h2>📜 四字熟語札</h2><div class="small">この対局で使う10熟語</div><div id="idioms"></div></div></div>
+
+<div class="music-credit">
+  BGM：<a href="https://amachamusic.chagasi.com/" target="_blank" rel="noopener">甘茶の音楽工房</a>（作曲：甘茶）
+  ／「イカロスの墜落」「残業戦士」
+</div>
 <div class="modal" id="modal"><div class="dialog"><h2 id="mt"></h2><div id="mb"></div><div class="choices" id="choices"></div></div></div>
 <script>
-// ===== Background music (original synthesized loop) =====
-const BGM_SRC="assets/bgm/senki_loop.ogg";
-const bgm=new Audio(BGM_SRC);
-bgm.loop=true;
-bgm.preload="auto";
-bgm.volume=.16;
+// ===== Background music: 甘茶の音楽工房 =====
+// 「イカロスの墜落」→ 誰かが熟語札2枚で「残業戦士」へ
+const BGM_TRACKS={
+  opening:{src:"assets/bgm/icarus_no_tsuiraku.mp3",title:"イカロスの墜落"},
+  climax:{src:"assets/bgm/zangyou_senshi.mp3",title:"残業戦士"}
+};
+const bgmAudio=new Audio(BGM_TRACKS.opening.src);
+bgmAudio.loop=true;
+bgmAudio.preload="auto";
+
+const BGM_VOLUME=.18;
 let bgmEnabled=true;
 let bgmStarted=false;
+let bgmPhase="opening";
+let bgmFadeToken=0;
+
 try{bgmEnabled=localStorage.getItem("kanjiSenkiBGM")!=="off"}catch(e){}
+
+function currentBGM(){
+  return BGM_TRACKS[bgmPhase];
+}
 function updateBGMButton(){
   bgmToggle.textContent=bgmEnabled?"🎵 BGM":"🔇 BGM";
   bgmToggle.classList.toggle("off",!bgmEnabled);
   bgmToggle.setAttribute("aria-pressed",String(bgmEnabled));
+  bgmToggle.title=`BGM：${currentBGM().title}／甘茶の音楽工房`;
+}
+function cancelBGMFade(){
+  bgmFadeToken++;
+}
+function setBGMSourceForPhase(reset=true){
+  const track=currentBGM();
+  if(!bgmAudio.src.endsWith(track.src)){
+    bgmAudio.src=track.src;
+    bgmAudio.load();
+  }
+  if(reset){
+    try{bgmAudio.currentTime=0}catch(e){}
+  }
+  updateBGMButton();
 }
 function startBGM(){
   if(!bgmEnabled||bgmStarted)return;
+  setBGMSourceForPhase(false);
+  bgmAudio.volume=BGM_VOLUME;
   bgmStarted=true;
-  const pr=bgm.play();
+  const pr=bgmAudio.play();
   if(pr&&pr.catch)pr.catch(()=>{bgmStarted=false});
 }
 function stopBGM(){
-  try{bgm.pause()}catch(e){}
+  cancelBGMFade();
+  try{bgmAudio.pause()}catch(e){}
   bgmStarted=false;
 }
+async function fadeOutCurrentBGM(ms=2200){
+  const token=++bgmFadeToken;
+  const steps=22;
+  const from=bgmAudio.volume;
+  for(let i=1;i<=steps;i++){
+    if(token!==bgmFadeToken)return false;
+    bgmAudio.volume=Math.max(0,from*(1-i/steps));
+    await new Promise(r=>setTimeout(r,ms/steps));
+  }
+  if(token!==bgmFadeToken)return false;
+  try{bgmAudio.pause()}catch(e){}
+  return true;
+}
+async function fadeInCurrentBGM(ms=1400){
+  const token=++bgmFadeToken;
+  bgmAudio.volume=0;
+  bgmStarted=true;
+  const pr=bgmAudio.play();
+  if(pr&&pr.catch){
+    try{await pr}catch(e){bgmStarted=false;return false}
+  }
+  const steps=18;
+  for(let i=1;i<=steps;i++){
+    if(token!==bgmFadeToken)return false;
+    bgmAudio.volume=BGM_VOLUME*(i/steps);
+    await new Promise(r=>setTimeout(r,ms/steps));
+  }
+  return true;
+}
+async function switchToClimaxBGM(){
+  if(bgmPhase==="climax")return;
+  bgmPhase="climax";
+  updateBGMButton();
+
+  // BGMオフ中はフェーズだけ切り替え、再度ONにした時に「残業戦士」から開始
+  if(!bgmEnabled){
+    setBGMSourceForPhase(true);
+    return;
+  }
+
+  if(bgmStarted&&!bgmAudio.paused){
+    const faded=await fadeOutCurrentBGM(2200);
+    if(!faded)return;
+  }
+  setBGMSourceForPhase(true);
+  if(bgmEnabled)await fadeInCurrentBGM(1400);
+}
+function checkBGMPhase(){
+  if(bgmPhase==="opening"&&typeof ps!=="undefined"&&ps.some(p=>p.w.length>=2)){
+    switchToClimaxBGM();
+  }
+}
+
 bgmToggle.onclick=()=>{
   bgmEnabled=!bgmEnabled;
   try{localStorage.setItem("kanjiSenkiBGM",bgmEnabled?"on":"off")}catch(e){}
   updateBGMButton();
-  if(bgmEnabled)startBGM();else stopBGM();
+  if(bgmEnabled){
+    setBGMSourceForPhase(false);
+    startBGM();
+  }else{
+    stopBGM();
+  }
 };
 updateBGMButton();
-// Browsers block autoplay. Start after the player's first interaction.
+
+// ブラウザの自動再生制限対策。
+// ページ表示時に再生を試み、拒否された場合は最初の操作で開始する。
+startBGM();
 document.addEventListener("pointerdown",()=>{if(bgmEnabled)startBGM()},{once:true});
 
 // ===== Sound effects (self-contained generated WAV files) =====
@@ -271,7 +387,7 @@ Object.keys(SE).forEach(getSEPool);
 
 const MASTER_WORDS=["一石二鳥", "電光石火", "起死回生", "七転八起", "四面楚歌", "一期一会", "一心不乱", "天下無双", "百発百中", "温故知新", "一日千秋", "一朝一夕", "一喜一憂", "一進一退", "一長一短", "以心伝心", "異口同音", "我田引水", "画竜点睛", "危機一髪", "起承転結", "疑心暗鬼", "空前絶後", "言行一致", "公明正大", "五里霧中", "三日坊主", "自画自賛", "自業自得", "十人十色", "心機一転", "森羅万象", "千差万別", "大器晩成", "単刀直入", "天真爛漫", "東奔西走", "日進月歩", "八方美人", "半信半疑", "百戦錬磨", "不言実行", "無我夢中", "有名無実", "臨機応変"];
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-const words=shuffle([...new Set(MASTER_WORDS)]).slice(0,10);
+const words=shuffle([...new Set(MASTER_WORDS)]).slice(0,5);
 // The draw pool is made by concatenating the 10 selected idioms.
 // Therefore a kanji occurring multiple times is proportionally more likely to be drawn.
 const pool=words.flatMap(w=>[...w]);
@@ -871,6 +987,7 @@ async function resolveWord(i,w){
   if(!p.alive||p.w.includes(w)||!can(p,w))return false;
   let used=[...w];
   consume(p,w);p.w.push(w);wordMadeThisTurn=true;
+  checkBGMPhase();
   playSE("idiomComplete");
   showIdiomFlash("gain",w,effects[w]||"");
   render();
