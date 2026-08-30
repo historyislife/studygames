@@ -20,7 +20,7 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
 .modal{display:none;position:fixed;inset:0;background:#0008;z-index:100;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.dialog{background:#fff2c8;border:5px double #805820;border-radius:16px;padding:18px;text-align:center;max-width:520px}.choices{display:flex;flex-wrap:wrap;justify-content:center;gap:7px}.choice{font:900 28px serif;background:#fff;border:3px solid #a67a39;border-radius:10px;padding:8px 13px}
 @media(max-width:600px){h1{margin-top:50px}#hud{grid-template-columns:1fr 1fr}#below{grid-template-columns:1fr}.stage{transform:scale(.78);margin:-12px}#msg{font-size:11px}}
 
-/* 熟語札・能力発動の強調表示 */
+/* 熟語札・能力はたらくの強調表示 */
 .idiom-flash{
   position:fixed;
   inset:0;
@@ -132,7 +132,374 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
 }
 .music-credit a{color:inherit;font-weight:800}
 
+
+#hud .p{width:100%;border:2px solid transparent;color:inherit;text-align:left;cursor:pointer;font-family:inherit}
+#hud .p.viewing{border-color:#5d4428;background:#fffbe8}
+#hud .p .role{display:inline-block;margin-left:4px;padding:1px 5px;border-radius:999px;background:#0001;font-size:10px;font-weight:900}
+#turnBanner{width:min(94vw,720px);margin:8px auto 0;padding:8px 10px;border-radius:10px;border:2px solid #8d6632;background:#fffbdcdd;text-align:center;font-weight:1000}
+#viewNotice{width:min(94vw,720px);margin:5px auto 0;text-align:center;font-size:12px;font-weight:800;opacity:.8}
+.setup-overlay{position:fixed;inset:0;z-index:40000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(20,14,8,.78)}
+.setup-overlay.hide{display:none}
+.setup-card{width:min(92vw,520px);background:#fff7d9;border:5px double #805820;border-radius:18px;padding:20px;text-align:center;box-shadow:0 20px 70px #0008}
+.setup-card h2{margin:0 0 8px;font:1000 28px serif}.setup-card p{margin:7px 0 14px;line-height:1.6}
+.player-count-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.player-count-btn{min-height:64px;border:3px solid #a67a39;border-radius:12px;background:#fff;color:#2b2118;font-weight:1000;font-size:18px;cursor:pointer}
+.player-count-btn:hover,.player-count-btn:focus{background:#ffe9a8}
+.setup-note{margin-top:12px;padding:9px;border-radius:10px;background:#fff2c7;font-size:12px;text-align:left}
+@media(max-width:600px){.player-count-grid{grid-template-columns:repeat(2,1fr)}#turnBanner{font-size:14px}}
+
+
+.progress-quick-btn{
+  margin-top:7px;
+  min-height:40px;
+  padding:7px 12px;
+  border:2px solid #8d6632;
+  border-radius:10px;
+  background:#fff8d8;
+  color:#2b2118;
+  font-weight:1000;
+  cursor:pointer;
+}
+.progress-quick-btn:hover,.progress-quick-btn:focus{background:#ffe8a2}
+.progress-box{
+  margin:10px 0 2px;
+  padding:10px;
+  border:2px solid #b38a50;
+  border-radius:12px;
+  background:#fffaf0;
+  text-align:left;
+}
+.progress-box-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:6px;
+  font-weight:1000;
+}
+.progress-hand{
+  margin:0 0 8px;
+  padding:5px 7px;
+  border-radius:8px;
+  background:#f4ead7;
+  font-size:13px;
+  line-height:1.5;
+  overflow-wrap:anywhere;
+}
+.progress-list{
+  display:grid;
+  gap:5px;
+}
+.progress-row{
+  display:grid;
+  grid-template-columns:minmax(76px,auto) 1fr auto;
+  align-items:center;
+  gap:7px;
+  padding:5px 7px;
+  border-radius:8px;
+  background:#fff;
+  border:1px solid #e2d5c1;
+}
+.progress-row.owned{
+  opacity:.58;
+  background:#eee9df;
+}
+.progress-word{
+  font-weight:1000;
+  white-space:nowrap;
+}
+.progress-chars{
+  display:flex;
+  gap:3px;
+  flex-wrap:wrap;
+}
+.progress-char{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:27px;
+  height:27px;
+  border-radius:6px;
+  border:1px solid #c9bca8;
+  font-weight:1000;
+  font-size:16px;
+}
+.progress-char.have{
+  background:#f7d77b;
+  border-color:#a87820;
+  color:#24190d;
+}
+.progress-char.miss{
+  background:#f2f2f2;
+  color:#aaa;
+}
+.progress-state{
+  font-size:11px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.progress-state.ready{color:#a54424}
+.progress-state.done{color:#58705b}
+.progress-fog{
+  padding:10px;
+  text-align:center;
+  border-radius:8px;
+  background:#e7e7e7;
+  font-weight:900;
+}
+@media(max-width:480px){
+  .progress-box{padding:8px}
+  .progress-row{grid-template-columns:72px 1fr;gap:5px}
+  .progress-state{grid-column:1/-1;text-align:right}
+  .progress-char{width:25px;height:25px;font-size:15px}
+}
+
+
+.dual-progress{
+  margin-top:10px;
+}
+.dual-progress-head{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin-bottom:6px;
+  font-size:12px;
+  font-weight:900;
+}
+.dual-progress-dots{
+  display:inline-flex;
+  gap:5px;
+}
+.dual-progress-dot{
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background:#c8b89f;
+}
+.dual-progress-dot.on{
+  background:#76552c;
+}
+.dual-progress-track{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  padding-bottom:4px;
+}
+.dual-progress-page{
+  flex:0 0 100%;
+  min-width:0;
+  scroll-snap-align:start;
+}
+.dual-progress-page .progress-box{
+  margin:0;
+}
+.kanji-inventory{
+  margin:10px 0 4px;
+  padding:9px;
+  border:2px solid #9b733d;
+  border-radius:10px;
+  background:#fff5cf;
+  text-align:left;
+}
+.kanji-inventory-title{
+  margin-bottom:6px;
+  font-weight:1000;
+}
+.kanji-inventory-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+.kanji-inventory-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:34px;
+  height:34px;
+  padding:0 7px;
+  border:2px solid #b48a42;
+  border-radius:8px;
+  background:#fff;
+  font-size:18px;
+  font-weight:1000;
+}
+
+
+
+/* v27: スマホ縦画面の余白・改行を圧縮 */
+.setup-card{width:min(92vw,430px);padding:14px}
+.setup-card h2{margin:0 0 4px;font-size:25px;line-height:1.15}
+.setup-card p{margin:4px 0 9px;line-height:1.35}
+.player-count-grid{gap:6px}
+.player-count-btn{min-height:54px;padding:5px 4px;line-height:1.12;font-size:17px}
+.player-count-btn .cpu-count{display:block;margin-top:3px;font-size:11px;white-space:nowrap}
+.setup-note{margin-top:8px;padding:7px 8px;line-height:1.35}
+
+#hud{gap:5px!important}
+#hud .p{padding:5px 6px!important;line-height:1.2}
+#hud .p .hud-head{display:flex;align-items:center;justify-content:space-between;gap:4px;min-width:0}
+#hud .p .hud-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:1000}
+#hud .p .role{flex:0 0 auto;margin-left:0;padding:1px 4px;font-size:9px;white-space:nowrap}
+#hud .p .hud-stats{display:flex;flex-wrap:wrap;gap:2px 7px;margin-top:2px;font-size:11px;font-weight:800}
+#hud .p .hud-hand{display:block;margin-top:2px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#turnBanner{margin-top:5px;padding:5px 8px;line-height:1.2}
+#viewNotice{margin-top:2px;line-height:1.2}
+
+.modal .dialog,.dialog{padding:12px!important}
+.dialog h2{margin:0 0 7px!important;line-height:1.15}
+.choices{gap:6px!important}
+.choice{min-height:42px!important;padding:7px 10px!important;line-height:1.15!important}
+
+.kanji-inventory{margin:6px 0 4px;padding:6px 7px}
+.kanji-inventory-title{margin-bottom:4px;line-height:1.2}
+.kanji-inventory-list{gap:4px}
+.kanji-inventory-chip{min-width:30px;height:30px;padding:0 5px;font-size:17px}
+.progress-box{margin:6px 0 2px;padding:6px}
+.progress-box-title{margin-bottom:4px;line-height:1.15}
+.progress-hand{margin:0 0 5px;padding:4px 6px;line-height:1.3}
+.progress-list{gap:3px}
+.progress-row{min-height:32px;grid-template-columns:minmax(66px,auto) 1fr auto;gap:4px;padding:3px 5px}
+.progress-word{font-size:13px}
+.progress-char{width:24px;height:24px;font-size:14px}
+.progress-state{font-size:10px}
+
+#below{gap:6px!important}
+#below .panel{padding:8px!important}
+#below h2{margin:0 0 5px!important;line-height:1.15}
+#hand{gap:4px!important}
+#hand .k{margin:0!important}
+#idioms{gap:3px!important}
+.idiom{padding:4px 5px!important;line-height:1.18}
+.idiom br{display:none}
+.idiom>span[style*="opacity"]{display:block;margin-top:2px;font-size:11px;line-height:1.2}
+
+@media(max-width:600px){
+  body{line-height:1.28}
+  h1{margin:4px 0 1px!important;font-size:23px!important;line-height:1.1}
+  .lead{margin-bottom:4px!important;line-height:1.2}
+  .player-count-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #hud{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #hud .p{min-width:0}
+  .progress-row{grid-template-columns:66px 1fr auto}
+  .progress-state{grid-column:auto;text-align:right}
+}
+
+
+/* v28: PC表示の補正 */
+@media(min-width:601px){
+  .setup-card{
+    width:min(90vw,560px);
+    padding:20px;
+  }
+  .setup-card h2{
+    margin-bottom:7px;
+    font-size:28px;
+  }
+  .setup-card p{
+    margin:7px 0 13px;
+    line-height:1.5;
+  }
+  .player-count-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .player-count-btn{
+    min-width:0;
+    min-height:64px;
+    padding:8px 10px;
+    font-size:18px;
+  }
+  .player-count-btn .cpu-count{
+    margin-top:4px;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  .setup-note{
+    margin-top:11px;
+    padding:9px 10px;
+    line-height:1.45;
+  }
+
+  /* PCではスマホほど詰めすぎない */
+  #hud{
+    gap:8px!important;
+  }
+  #hud .p{
+    padding:7px 8px!important;
+    line-height:1.3;
+  }
+  #turnBanner{
+    margin-top:8px;
+    padding:7px 10px;
+  }
+  #viewNotice{
+    margin-top:4px;
+  }
+
+  .modal .dialog,.dialog{
+    padding:18px!important;
+  }
+  .dialog h2{
+    margin:0 0 10px!important;
+  }
+  .choices{
+    gap:8px!important;
+  }
+  .choice{
+    min-height:46px!important;
+    padding:9px 13px!important;
+  }
+
+  .kanji-inventory{
+    margin:9px 0 6px;
+    padding:9px;
+  }
+  .progress-box{
+    margin:9px 0 3px;
+    padding:9px;
+  }
+  .progress-list{
+    gap:5px;
+  }
+  .progress-row{
+    min-height:36px;
+    grid-template-columns:minmax(76px,auto) 1fr auto;
+    gap:7px;
+    padding:5px 7px;
+  }
+  .progress-char{
+    width:27px;
+    height:27px;
+    font-size:16px;
+  }
+  .progress-state{
+    font-size:11px;
+  }
+}
+
 </style></head><body>
+<div id="setupOverlay" class="setup-overlay" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+  <div class="setup-card">
+    <h2 id="setupTitle">すごろく漢字戦記</h2>
+    <p><b>遊ぶ人数</b>を選んでください。<br>1台のスマホやPCを、順番に使いながら遊べます。</p>
+    <div class="player-count-grid">
+      <button type="button" class="player-count-btn" data-count="1"><b>1人</b><span class="cpu-count">＋コンピューター3人</span></button>
+      <button type="button" class="player-count-btn" data-count="2"><b>2人</b><span class="cpu-count">＋コンピューター2人</span></button>
+      <button type="button" class="player-count-btn" data-count="3"><b>3人</b><span class="cpu-count">＋コンピューター1人</span></button>
+      <button type="button" class="player-count-btn" data-count="4"><b>4人</b><span class="cpu-count">4人で対戦</span></button>
+    </div>
+    <div class="setup-note">
+      遊ぶ人は紅→蒼→翠→紫の順です。<br>
+      上の勢力パネルを押すと、ほかの人の手札・四字熟語・城のようすもいつでも見られます。
+    </div>
+  </div>
+</div>
+
 <button id="manualBtn" class="manual-btn" type="button" aria-label="遊び方を開く">📖 遊び方</button>
 <div id="manualOverlay" class="manual-overlay" role="dialog" aria-modal="true" aria-labelledby="manualTitle">
   <section class="manual-panel">
@@ -143,46 +510,51 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
     <div class="manual-body">
       <h3>ゲームの目的</h3>
       <p>漢字を集めて四字熟語札を作り、天下統一を目指します。</p>
-      <ul><li><b>四字熟語札を3枚完成</b>すると勝利。</li><li>または、他の3勢力がすべて脱落して<b>最後の1勢力</b>になっても勝利。</li></ul>
-      <div class="manual-note">漢字は「熟語を作る」「城を建てる」「城を強化する」「市場で交換する」のすべてに使う大切な資源です。</div>
+      <ul><li><b>四字熟語札を3枚完成</b>すると勝利。</li><li>または、ほかの3勢力がすべてゲームからぬけて、<b>最後の1勢力</b>になっても勝ちです。</li></ul>
+      <div class="manual-note">漢字は、四字熟語を作ったり、築城や城強化をしたり、市場で入れかえたりするときに使います。使いすぎないように考えましょう。</div>
 
       <h3>ゲーム開始</h3><p><b>この対局では5種類の熟語</b>が選ばれ、その5熟語に使う漢字だけが登場します。</p>
-      <ul><li>あなた（紅）＋CPU3勢力（蒼・翠・紫）の4人戦。</li><li>全員が四隅の本陣からスタート。</li><li>初期手札は<b>5字</b>。</li><li>開始時に四字熟語が<b>5種類</b>選ばれ、その5熟語に使われる漢字だけが登場します。</li></ul>
+      <ul><li>ゲーム開始時に遊ぶ人を1～4人から選び、残りの勢力はコンピューターが動かします。</li><li>1台のスマホやPCを、番が来るたびに次の人へわたして遊べます。</li><li>全員が四隅の本陣からスタート。</li><li>初期手札は<b>5字</b>。</li><li>開始時に四字熟語が<b>5種類</b>選ばれ、その5熟語に使われる漢字だけが登場します。</li></ul>
 
+      <h3>遊ぶ人数と、みんなのようす</h3><p>遊ぶ人は紅→蒼→翠→紫の順です。画面の上にある勢力パネルを押すと、今の番ではない人の手札・四字熟語のそろい具合・城の数も見られます。番がかわると、表示も次の人に自動で切りかわります。</p><h3>四字熟語のそろい具合を見る</h3>
+      <p>相手から漢字をうばうときは、<b>自分と相手の四字熟語を左右にスワイプして見くらべられます</b>。自分にほしい漢字や、相手に残したくない漢字を考えてえらびましょう。</p>
+      <p>築城や城強化では、四字熟語のそろい具合といっしょに、<b>今持っている漢字</b>も大きく表示します。</p>
+      <p>盤面の真ん中にある「📜 熟語のそろい具合」を押すと、画面を下へ動かさなくても、今の人の5つの四字熟語を見られます。</p>
+      <p>本陣・おみくじ・市場で漢字を選ぶときや、築城・城強化で漢字を消費するときも、同じ画面に熟語のそろい具合が表示されます。色の付いた文字は所持中、薄い文字は不足中です。</p>
       <h3>自分のターン</h3>
-      <ol><li>作れる四字熟語があれば、任意で<b>1枚だけ</b>作れます。</li><li>サイコロを振ります。</li><li>出た目だけ進みます。</li><li>止まったマスの効果を処理します。</li></ol>
-      <p>熟語を作ってもターンは終わらず、能力解決後にサイコロを振れます。</p>
+      <ol><li>作れる四字熟語があれば、好きなら<b>1枚だけ</b>作れます。</li><li>サイコロを振ります。</li><li>出た目だけ進みます。</li><li>止まったマスの効果を行います。</li></ol>
+      <p>熟語を作ってもターンは終わらず、能力使う後にサイコロを振れます。</p>
 
       <h3>本陣</h3>
-      <p>自分の本陣を<b>通過または停止</b>すると、漢字3字が提示され、その中から<b>2字</b>獲得します。</p>
+      <p>自分の本陣を<b>通過または停止</b>すると、漢字3字が提示され、その中から<b>2字</b>手に入れます。</p>
 
       <h3>おみくじ</h3>
-      <p>漢字5字が提示され、その中から<b>2字</b>獲得します。</p>
-      <p>「一心不乱」発動中は、次のおみくじが<b>7字から2字</b>になります。</p>
+      <p>漢字5字が提示され、その中から<b>2字</b>手に入れます。</p>
+      <p>「一心不乱」の能力があるときは、次のおみくじが<b>7字から2字</b>になります。</p>
 
       <h3>市場</h3>
-      <ol><li><b>無料獲得：</b>漢字2字から1字を選んで獲得。</li><li><b>交換：</b>手札2字を支払い、提示された5字から1字を選んで獲得。</li></ol>
+      <ol><li><b>1字もらう：</b>漢字2字から1字を選んで手に入れる。</li><li><b>交換：</b>手札2字を支払い、提示された5字から1字を選んで手に入れる。</li></ol>
 
       <h3>築城</h3>
-      <p>空地に止まったとき、任意で手札の漢字1字を使って城を建てられます。例：「山」→<b>山城</b>。</p>
+      <p>空地に止まったら、築城するかどうかをえらべます。築城するなら、手札の漢字を1字使います。例：「山」→<b>山城</b>。</p>
       <p><b>最後の1字</b>は築城には使えません。</p>
 
       <h3>城の強化</h3>
-      <p>自分の城に止まると、手札の漢字1字を追加して最大3文字まで強化できます。</p>
-      <table class="manual-table"><thead><tr><th>城</th><th>例</th><th>徴収</th></tr></thead><tbody><tr><td>1文字城</td><td>山城</td><td>1字</td></tr><tr><td>2文字城</td><td>山海城</td><td>2字</td></tr><tr><td>3文字城</td><td>山海風城</td><td>3字</td></tr></tbody></table>
-      <p>敵が止まると、城の文字数ぶん漢字を徴収します。</p>
+      <p>自分の城に止まると、城強化するかどうかをえらべます。手札の漢字を1字使い、城は3文字まで強くできます。</p>
+      <table class="manual-table"><thead><tr><th>城</th><th>例</th><th>相手からうばう漢字</th></tr></thead><tbody><tr><td>1文字城</td><td>山城</td><td>1字</td></tr><tr><td>2文字城</td><td>山海城</td><td>2字</td></tr><tr><td>3文字城</td><td>山海風城</td><td>3字</td></tr></tbody></table>
+      <p>敵が自分の城に止まると、城の文字数と同じだけ相手の漢字をうばいます。</p>
 
       <h3>四字熟語札</h3>
-      <ul><li>必要な4字がそろうと作成可能。</li><li>同じプレイヤーは<b>同じ熟語を2回取得できません</b>。</li><li>他プレイヤーが同じ熟語を取ることはできます。</li><li>作成後に手札が0字になる熟語は作れません。</li><li>取得済みは<b>「✓ 獲得済み」</b>と表示。</li></ul>
-      <p>完成時には<b>読み・意味・特殊能力</b>が表示されます。</p>
+      <ul><li>必要な4字がそろうと、その四字熟語を作れます。</li><li>同じ人は、<b>同じ四字熟語を2回作れません</b>。</li><li>ほかの人は、同じ四字熟語を作ってもかまいません。</li><li>作ったあとに手札が0字になる四字熟語は作れません。</li><li>取得済みは<b>「✓ 手に入れた」</b>と表示。</li></ul>
+      <p>できあがったときには<b>読み・意味・特殊能力</b>が表示されます。</p>
 
       <h3>熟語札の能力</h3>
-      <ul><li><b>電光石火：</b>もう一度行動。</li><li><b>起死回生：</b>脱落寸前から復活。</li><li><b>画竜点睛：</b>あと1字で完成する熟語を助ける。</li><li><b>五里霧中：</b>相手の熟語進捗を隠し、熟語札作成を妨害。</li></ul>
-      <p>他にも多数あります。熟語の意味と能力のつながりにも注目してください。</p>
+      <ul><li><b>電光石火：</b>もう一度行動。</li><li><b>起死回生：</b>ゲームからぬける寸前から復活。</li><li><b>画竜点睛：</b>あと1字で完成する熟語を助ける。</li><li><b>五里霧中：</b>相手の熟語のそろい具合を隠し、熟語札作成を妨害。</li></ul>
+      <p>ほかにもいろいろな能力があります。四字熟語の意味と能力のつながりにも注目してみましょう。</p>
 
-      <h3>脱落</h3>
-      <p>手札の漢字が<b>0字</b>になると脱落します。</p>
-      <ul><li>コマは盤上から消えます。</li><li>所有していた城はすべて空地に戻ります。</li><li>以後その勢力のターンはありません。</li></ul>
+      <h3>漢字が0字になったら</h3>
+      <p>手札の漢字が<b>0字</b>になると、その人はゲームからぬけます。</p>
+      <ul><li>コマは盤上から消えます。</li><li>その人が持っていた城は、すべて空地に戻ります。</li><li>そのあとは、その勢力の番はありません。</li></ul>
 
       
       <h3>BGM・音楽素材</h3>
@@ -207,10 +579,10 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
   </div>
 </div>
 <a class="home" href="/">← ガクハコ</a><button class="sound-toggle" id="bgmToggle" type="button" aria-label="BGMのオンオフ">🎵 BGM</button><button class="sound-toggle" id="soundToggle" type="button" aria-label="効果音のオンオフ">🔊 SE</button><h1>すごろく漢字戦記</h1><div class="lead">漢字を集め、城を築き、四字熟語で天下統一！</div>
-<div id="hud"></div><div id="wrap"><div class="board" id="board"><div class="center"><div id="msg">あなたの番です。サイコロを振ろう！</div>
+<div id="turnBanner">遊ぶ人数を選んでゲームを始めてください</div><div id="hud"></div><div id="viewNotice"></div><div id="wrap"><div class="board" id="board"><div class="center"><div id="msg">あなたの番です。サイコロを振ろう！</div>
 <div class="stage"><div class="die" id="die"><div class="face f1">1</div><div class="face f2">2</div><div class="face f3">3</div><div class="face f4">4</div><div class="face f5">5</div><div class="face f6">6</div></div></div>
-<button id="roll">🎲 サイコロを振る</button></div></div></div>
-<div id="below"><div class="panel"><h2>🀄 あなたの漢字</h2><div id="hand"></div><small>空地では1字を城に使います。熟語作成後に最低1字残る必要があります。</small></div><div class="panel"><h2>📜 四字熟語札</h2><div class="small">この対局で使う10熟語</div><div id="idioms"></div></div></div>
+<button id="roll">🎲 サイコロを振る</button><button id="progressQuickBtn" class="progress-quick-btn" type="button">📜 熟語のそろい具合</button></div></div></div>
+<div id="below"><div class="panel"><h2 id="handTitle">🀄 漢字</h2><div id="hand"></div><small>空地では1字を城に使います。熟語作成後に最低1字残る必要があります。</small></div><div class="panel"><h2 id="idiomTitle">📜 四字熟語札</h2><div class="small">この対局で使う5熟語</div><div id="idioms"></div></div></div>
 
 <div class="music-credit">
   BGM：<a href="https://amachamusic.chagasi.com/" target="_blank" rel="noopener">甘茶の音楽工房</a>（作曲：甘茶）
@@ -340,8 +712,7 @@ updateBGMButton();
 
 // ブラウザの自動再生制限対策。
 // ページ表示時に再生を試み、拒否された場合は最初の操作で開始する。
-startBGM();
-document.addEventListener("pointerdown",()=>{if(bgmEnabled)startBGM()},{once:true});
+// BGMは人数選択後のゲーム開始操作から再生する。
 
 // ===== Sound effects (self-contained generated WAV files) =====
 const SE={
@@ -401,7 +772,7 @@ function showIdiomFlash(type,word,effectText){
   const effectEl=document.getElementById("idiomFlashEffect");
   if(!box)return;
   box.classList.toggle("skill",type==="skill");
-  kicker.textContent=type==="skill"?"能力発動！":"四字熟語札 獲得！";
+  kicker.textContent=type==="skill"?"能力はたらく！":"四字熟語札を手に入れた！";
   wordEl.textContent=word;
   const info=idiomInfo[word];
   if(type==="gain"&&info){
@@ -418,47 +789,168 @@ function showIdiomFlash(type,word,effectText){
   idiomFlashTimer=setTimeout(()=>box.classList.remove("show"), type==="skill"?1800:2600);
 }
 
-const effects={"一石二鳥": "漢字を2字獲得", "電光石火": "このターン終了後、もう一度自分のターン", "起死回生": "次に漢字0字になったとき、3字獲得して脱落を1回回避", "七転八起": "次に受ける城からの徴収を1回無効化", "四面楚歌": "他の生存者全員からランダムに1字ずつ奪う", "一期一会": "漢字を2字獲得", "一心不乱": "次のおみくじで7字から2字獲得", "天下無双": "漢字を3字獲得", "百発百中": "次回のサイコロの出目を1～6から選ぶ", "温故知新": "この熟語に使った4字からランダムに2字を手札へ戻す", "一日千秋": "次に自陣を通過・停止したとき、漢字を3字獲得", "一朝一夕": "このターン終了後、もう一度自分のターン", "一喜一憂": "1～6を判定。偶数なら3字獲得、奇数なら1字失う", "一進一退": "次の移動前に、進む／戻るを選択", "一長一短": "漢字を3字獲得した後、ランダムに1字失う", "以心伝心": "ランダムな相手1人の手札から1字をコピーして獲得", "異口同音": "手札に同じ漢字があればその字を1字追加。なければ1字獲得", "我田引水": "ランダムな相手1人から最大2字を奪う", "画竜点睛": "あと1字で完成する未完成熟語があれば不足字を獲得。なければ1字獲得", "危機一髪": "次に漢字0字になったとき、1字獲得して脱落を1回回避", "起承転結": "ランダム4字を提示し、その中から1字選んで獲得", "疑心暗鬼": "ランダムな相手1人から1字をランダムに奪う", "空前絶後": "次に受ける城からの徴収を1回無効化", "言行一致": "次の築城・城強化で使った漢字を1字手札へ戻す", "公明正大": "漢字を2字獲得", "五里霧中": "他プレイヤーは次の自分の1ターン、熟語進捗が霧に隠れ熟語札を作れない", "三日坊主": "漢字を3字獲得。次の自分の1ターンは築城・城強化不可", "自画自賛": "自分の城数と同じだけ、最大3字まで獲得", "自業自得": "ランダムな相手1人から、その相手の城数と同じだけ最大3字奪う", "十人十色": "ランダム5字を提示し、その中から1字選んで獲得", "心機一転": "手札をすべて捨て、同じ枚数の漢字を引き直す", "森羅万象": "漢字を3字獲得", "千差万別": "異なるランダム5字を提示し、その中から2字選んで獲得", "大器晩成": "この札が2枚目以降なら漢字を3字獲得。1枚目なら効果なし", "単刀直入": "ランダムな相手1人から1字をランダムに奪う", "天真爛漫": "1～6を判定。4～6なら3字、1～3なら2字獲得", "東奔西走": "次の移動前に、進む／戻るを選択", "日進月歩": "次の自分のターン開始時に1字獲得。2回発動", "八方美人": "他の生存者それぞれの手札からランダムに1字をコピー", "半信半疑": "ランダム3字を提示し、その中から1字選んで獲得", "百戦錬磨": "次に自分の城で徴収するとき、さらに1字奪う", "不言実行": "次の築城は手札の漢字を消費しない", "無我夢中": "このターン終了後、もう一度自分のターン", "有名無実": "敵の城をランダムに1つ空地へ戻す", "臨機応変": "次に受ける城からの徴収を1回無効化"};
-const cols=["red","blue","green","purple"],names=["あなた（紅）","CPU蒼","CPU翠","CPU紫"];
-const starts=[0,5,10,15];const ps=cols.map((c,i)=>({c,n:names[i],pos:starts[i],h:[],w:[],shield:false,alive:true,revives:[],omikuji2:false,hqBonus:false,aim:false,reverse:false,chooseDirection:false,noBuild:false,buildLock:0,freeBuild:false,buildRefund:false,doubleTax:false,growth:0,fogTurns:0,fogActive:false}));ps.forEach(p=>{for(let i=0;i<5;i++)p.h.push(rk())});
-let turn=0,busy=false,extra=false,wordMadeThisTurn=false,cells=[];function rk(){return pool[Math.floor(Math.random()*pool.length)]}
+const effects={"一石二鳥":"漢字を2字もらう","電光石火":"この番が終わったあと、もう一度自分の番になる","起死回生":"次に漢字が0字になったとき、3字もらって1回だけゲームに残る","七転八起":"次に城で漢字をうばわれるのを1回ふせぐ","四面楚歌":"残っている相手全員から、漢字を1字ずつランダムにうばう","一期一会":"漢字を2字もらう","一心不乱":"次のおみくじでは、7字の中から2字もらう","天下無双":"漢字を3字もらう","百発百中":"次に振るサイコロの数を1～6からえらべる","温故知新":"この四字熟語に使った4字のうち、2字がランダムで手札に戻る","一日千秋":"次に自分の本陣を通るか止まると、漢字を3字もらう","一朝一夕":"この番が終わったあと、もう一度自分の番になる","一喜一憂":"1～6の数字を出す。偶数なら3字もらい、奇数なら1字失う","一進一退":"次に進む前に、前へ進むか後ろへ進むかえらべる","一長一短":"漢字を3字もらったあと、1字をランダムに失う","以心伝心":"ランダムに選ばれた相手の手札1字と同じ漢字をもらう","異口同音":"手札に同じ漢字が2字以上あれば、その漢字をもう1字もらう。なければ1字もらう","我田引水":"ランダムに選ばれた相手から、漢字を最大2字うばう","画竜点睛":"あと1字で作れる四字熟語があれば、その足りない漢字をもらう。なければ1字もらう","危機一髪":"次に漢字が0字になったとき、1字もらって1回だけゲームに残る","起承転結":"出てきた4字の中から1字えらんでもらう","疑心暗鬼":"ランダムに選ばれた相手から、漢字を1字うばう","空前絶後":"次に城で漢字をうばわれるのを1回ふせぐ","言行一致":"次の築城か城強化で使った漢字が、手札に戻る","公明正大":"漢字を2字もらう","五里霧中":"ほかの人は次の自分の番、四字熟語のそろい具合が見えず、四字熟語札も作れない","三日坊主":"漢字を3字もらう。ただし次の自分の番は築城と城強化ができない","自画自賛":"自分の城の数と同じだけ漢字をもらう。最大3字","自業自得":"ランダムに選ばれた相手から、その相手の城の数と同じだけ漢字をうばう。最大3字","十人十色":"出てきた5字の中から1字えらんでもらう","心機一転":"手札を全部入れかえ、同じ枚数の漢字を引き直す","森羅万象":"漢字を3字もらう","千差万別":"ちがう漢字5字の中から2字えらんでもらう","大器晩成":"この札が2枚目か3枚目なら漢字を3字もらう。1枚目なら何も起こらない","単刀直入":"ランダムに選ばれた相手から、漢字を1字うばう","天真爛漫":"1～6の数字を出す。4～6なら3字、1～3なら2字もらう","東奔西走":"次に進む前に、前へ進むか後ろへ進むかえらべる","日進月歩":"次の自分の番のはじめに1字もらう。これを2回行う","八方美人":"残っている相手全員の手札から、ランダムな1字と同じ漢字を1字ずつもらう","半信半疑":"出てきた3字の中から1字えらんでもらう","百戦錬磨":"次に自分の城で相手から漢字をうばうとき、さらに1字多くうばう","不言実行":"次の築城では、手札の漢字を使わずに城を建てられる","無我夢中":"この番が終わったあと、もう一度自分の番になる","有名無実":"敵の城をランダムに1つ空地へ戻す","臨機応変":"次に城で漢字をうばわれるのを1回ふせぐ"};
+const cols=["red","blue","green","purple"],factionNames=["紅","蒼","翠","紫"];
+const starts=[0,5,10,15];
+const ps=cols.map((c,i)=>({c,n:`${factionNames[i]}軍`,human:false,pos:starts[i],h:[],w:[],shield:false,alive:true,revives:[],omikuji2:false,hqBonus:false,aim:false,reverse:false,chooseDirection:false,noBuild:false,buildLock:0,freeBuild:false,buildRefund:false,doubleTax:false,growth:0,fogTurns:0,fogActive:false}));
+ps.forEach(p=>{for(let i=0;i<5;i++)p.h.push(rk())});
+let turn=0,busy=false,extra=false,wordMadeThisTurn=false,cells=[],humanCount=1,gameStarted=false,viewPlayer=0;
+function rk(){return pool[Math.floor(Math.random()*pool.length)]}
+function isHuman(i){return !!ps[i]?.human}
+function playerRoleLabel(i){return isHuman(i)?"プレイヤー":"コンピューター"}
+function setViewPlayer(i){if(i<0||i>=ps.length)return;viewPlayer=i;render()}
 function rc(i){if(i<6)return[1,i+1];if(i<11)return[i-4,6];if(i<16)return[6,16-i];return[21-i,1]}
 const sp={0:["start","紅軍本陣"],3:["omikuji","おみくじ"],5:["start","蒼軍本陣"],6:["market","市場"],8:["omikuji","おみくじ"],10:["start","翠軍本陣"],13:["omikuji","おみくじ"],15:["start","紫軍本陣"],16:["market","市場"],18:["omikuji","おみくじ"]};
 const B=document.getElementById("board");for(let i=0;i<20;i++){let [r,c]=rc(i),d=document.createElement("div"),s=sp[i];d.className="cell "+(s?s[0]:"");d.style.gridRow=r;d.style.gridColumn=c;d.innerHTML=s?s[1]:"空地";if([0,5,10,15].includes(i))d.dataset.faction=cols[[0,5,10,15].indexOf(i)];B.appendChild(d);cells.push({el:d,own:null,ch:null})}
 function render(){
-hud.innerHTML=ps.map((p,i)=>{
-  let shownHand=p.h.join(" ");
-  return `<div class="p ${i==turn&&p.alive?"on":""}" style="${p.alive?"":"opacity:.42;filter:grayscale(1)"}">
-    <b>${p.n}${p.alive?"":"（脱落）"}${p.fogActive?" 🌫️":""}</b><br>
-    漢字 ${p.h.length}　🏯 ${cells.filter(x=>x.own==i).length}　📜 ${p.w.length}/3<br>${shownHand}
-  </div>`;
-}).join("");
-hand.innerHTML=ps[0].h.map(x=>`<span class="k">${x}</span>`).join("")||"なし";
-idioms.innerHTML=words.map(w=>{
-  let fog=ps[0].fogActive;
-  let owned=ps[0].w.includes(w);
-  let prog=fog&&!owned?"？？？？":progress(ps[0],w);
-  let make=!fog&&!wordMadeThisTurn&&!owned&&can(ps[0],w)&&turn==0&&!busy;
-  return `<div class="idiom ${owned?"acquired":""}">
-    <b>${w}</b>
-    <span class="idiom-progress">　${owned?"●●●●":prog}</span>
-    ${owned?`<span class="idiom-owned">✓ 獲得済み</span>`:""}
-    ${make?`<button onclick="makeWord('${w}')">作る</button>`:""}
-    <br><span style="opacity:.75">⚡ ${effects[w]}</span>
-  </div>`;
-}).join("");
+  let active=ps[turn];
+  turnBanner.innerHTML=gameStarted
+    ? `今の番：<b>${active.n}</b> <span style="opacity:.7">（${playerRoleLabel(turn)}）</span>`
+    : "遊ぶ人数を選んでゲームを始めてください";
 
-document.querySelectorAll(".token").forEach(x=>x.remove());
-ps.forEach((p,i)=>{
-  if(!p.alive)return;
-  let im=document.createElement("img");im.className="token";im.src=`assets/samurai_${p.c}.png`;
-  let o=[[2,40],[52,40],[2,3],[52,3]][i];im.style.left=o[0]+"%";im.style.top=o[1]+"%";
-  cells[p.pos].el.appendChild(im)
-});
+  hud.innerHTML=ps.map((p,i)=>{
+    let shownHand=p.h.join(" ");
+    return `<button type="button" class="p ${i==turn&&p.alive?"on":""} ${i==viewPlayer?"viewing":""}"
+      style="${p.alive?"":"opacity:.42;filter:grayscale(1)"}" onclick="setViewPlayer(${i})">
+      <span class="hud-head">
+        <span class="hud-name">${p.n}${p.alive?"":"（ぬけた）"}${p.fogActive?" 🌫️":""}</span>
+        <span class="role">${playerRoleLabel(i)}</span>
+      </span>
+      <span class="hud-stats">
+        <span>漢字 ${p.h.length}</span><span>🏯 ${cells.filter(x=>x.own==i).length}</span><span>📜 ${p.w.length}/3</span>
+      </span>
+      <span class="hud-hand">${shownHand||"なし"}</span>
+    </button>`;
+  }).join("");
+
+  let vp=ps[viewPlayer];
+  handTitle.textContent=`🀄 ${vp.n}の漢字`;
+  idiomTitle.textContent=`📜 ${vp.n}の四字熟語札`;
+  viewNotice.textContent=viewPlayer===turn
+    ? `${vp.n}のようすを表示中`
+    : `${vp.n}の状況を確認中　｜　現在の今の番：${active.n}`;
+
+  hand.innerHTML=vp.h.map(x=>`<span class="k">${x}</span>`).join("")||"なし";
+  idioms.innerHTML=words.map(w=>{
+    let fog=vp.fogActive;
+    let owned=vp.w.includes(w);
+    let prog=fog&&!owned?"？？？？":progress(vp,w);
+    let make=gameStarted&&viewPlayer===turn&&isHuman(turn)&&!fog&&!wordMadeThisTurn&&!owned&&can(vp,w)&&!busy;
+    return `<div class="idiom ${owned?"acquired":""}">
+      <b>${w}</b><span class="idiom-progress">　${owned?"●●●●":prog}</span>
+      ${owned?`<span class="idiom-owned">✓ 手に入れた</span>`:""}
+      ${make?`<button onclick="makeWord('${w}')">作る</button>`:""}
+      <span style="opacity:.75">⚡ ${effects[w]}</span>
+    </div>`;
+  }).join("");
+
+  document.querySelectorAll(".token").forEach(x=>x.remove());
+  ps.forEach((p,i)=>{
+    if(!p.alive)return;
+    let im=document.createElement("img");im.className="token";im.src=`assets/samurai_${p.c}.png`;
+    let o=[[2,40],[52,40],[2,3],[52,3]][i];im.style.left=o[0]+"%";im.style.top=o[1]+"%";
+    cells[p.pos].el.appendChild(im)
+  });
+  roll.disabled=!gameStarted||busy||!isHuman(turn);
 }
 function progress(p,w){let h=[...p.h];return [...w].map(x=>{let i=h.indexOf(x);if(i<0)return"○";h.splice(i,1);return"●"}).join("")}
 function can(p,w){return p.h.length>4&&!progress(p,w).includes("○")}function consume(p,w){for(let x of w)p.h.splice(p.h.indexOf(x),1)}
 function show(t,b,opts){mt.textContent=t;mb.innerHTML=b;choices.innerHTML="";opts.forEach(o=>{let q=document.createElement("button");q.className="choice";q.innerHTML=o[0];q.onclick=()=>{modal.classList.remove("show");o[1]()};choices.appendChild(q)});modal.classList.add("show")}
+function idiomCharacterStates(p,w){
+  let hand=[...p.h];
+  return [...w].map(ch=>{
+    let idx=hand.indexOf(ch);
+    if(idx>=0){hand.splice(idx,1);return[ch,true]}
+    return[ch,false];
+  });
+}
+function progressPanelHTML(p){
+  if(!p)return"";
+  let handText=p.h.length?p.h.join("　"):"なし";
+  let rows=words.map(w=>{
+    let owned=p.w.includes(w);
+    if(p.fogActive&&!owned){
+      return `<div class="progress-row">
+        <span class="progress-word">${w}</span>
+        <span class="progress-fog">？？？？</span>
+        <span class="progress-state">🌫️ 霧</span>
+      </div>`;
+    }
+    let states=idiomCharacterStates(p,w);
+    let have=states.filter(x=>x[1]).length;
+    let ready=!owned&&have===4&&p.h.length>4;
+    return `<div class="progress-row ${owned?"owned":""}">
+      <span class="progress-word">${w}</span>
+      <span class="progress-chars">${states.map(([ch,ok])=>`<span class="progress-char ${ok?"have":"miss"}">${ch}</span>`).join("")}</span>
+      <span class="progress-state ${owned?"done":ready?"ready":""}">${owned?"✓ 手に入れた":ready?"今作れる":`${have}/4`}</span>
+    </div>`;
+  }).join("");
+  return `<div class="progress-box">
+    <div class="progress-box-title"><span>📜 ${p.n}｜熟語</span><span>札 ${p.w.length}/3</span></div>
+    <div class="progress-hand"><b>持っている漢字：</b>${handText}</div>
+    <div class="progress-list">${rows}</div>
+  </div>`;
+}
+function showWithProgress(t,b,opts,p=ps[turn]){
+  show(t,`${b}${progressPanelHTML(p)}`,opts);
+}
+function showProgressPopup(i=turn){
+  let p=ps[i];
+  show(`${p.n}の熟語のそろい具合`,progressPanelHTML(p),[["閉じる",()=>{}]]);
+}
+function kanjiInventoryHTML(p){
+  return `<div class="kanji-inventory">
+    <div class="kanji-inventory-title">🀄 所持漢字 ${p.h.length}字</div>
+    <div class="kanji-inventory-list">${
+      p.h.length
+        ? p.h.map(ch=>`<span class="kanji-inventory-chip">${ch}</span>`).join("")
+        : `<span>なし</span>`
+    }</div>
+  </div>`;
+}
+function dualProgressHTML(a,b){
+  return `<div class="dual-progress" data-dual-progress>
+    <div class="dual-progress-head">
+      <span>左右にスワイプして見くらべる</span>
+      <span class="dual-progress-dots" aria-hidden="true">
+        <span class="dual-progress-dot on"></span>
+        <span class="dual-progress-dot"></span>
+      </span>
+    </div>
+    <div class="dual-progress-track" data-dual-track>
+      <section class="dual-progress-page" aria-label="${a.n}の熟語のそろい具合">
+        ${progressPanelHTML(a)}
+      </section>
+      <section class="dual-progress-page" aria-label="${b.n}の熟語のそろい具合">
+        ${progressPanelHTML(b)}
+      </section>
+    </div>
+  </div>`;
+}
+function wireDualProgressSwipe(){
+  const root=mb.querySelector("[data-dual-progress]");
+  const track=root?.querySelector("[data-dual-track]");
+  const dots=root?.querySelectorAll(".dual-progress-dot");
+  if(!track||!dots?.length)return;
+  const update=()=>{
+    const page=Math.round(track.scrollLeft/Math.max(1,track.clientWidth));
+    dots.forEach((d,i)=>d.classList.toggle("on",i===Math.max(0,Math.min(1,page))));
+  };
+  track.addEventListener("scroll",()=>{
+    if(track._raf)cancelAnimationFrame(track._raf);
+    track._raf=requestAnimationFrame(update);
+  },{passive:true});
+  update();
+}
+function showStealWithBothProgress(title,body,opts,thief,victim){
+  show(title,`${body}${dualProgressHTML(thief,victim)}`,opts);
+  requestAnimationFrame(wireDualProgressSwipe);
+}
+function showBuildWithInventory(title,body,opts,p){
+  show(title,`${body}${kanjiInventoryHTML(p)}${progressPanelHTML(p)}`,opts);
+}
+
+
 const rot={1:[0,0],2:[-90,0],3:[0,-90],4:[0,90],5:[90,0],6:[0,180]};
 async function dice(n){playSE("diceRoll");let st=performance.now(),rx=0,ry=0;return new Promise(done=>{function f(t){let q=Math.min(1,(t-st)/1200),v=(1-q)*(1-q);rx+=30*v+2;ry+=37*v+3;let bounce=Math.abs(Math.sin(q*16))*(1-q)*38;die.style.top=(32-bounce)+"px";die.style.left=(59+Math.sin(q*20)*25*(1-q))+"px";die.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rx/3}deg)`;if(q<1)requestAnimationFrame(f);else{playSE("diceLand");let a=rot[n];die.style.transition="transform .3s,left .2s,top .2s";die.style.left="59px";die.style.top="32px";die.style.transform=`rotateX(${a[0]}deg) rotateY(${a[1]}deg)`;setTimeout(()=>{die.style.transition="none";done()},350)}}requestAnimationFrame(f)})}
 async function chooseHQKanji(i){
@@ -467,24 +959,24 @@ async function chooseHQKanji(i){
     p.hqBonus=false;
     for(let z=0;z<3;z++)p.h.push(rk());
     playSE("kanjiGet");
-    message(`${p.n}が一日千秋の効果で本陣から漢字3字を獲得！`);
+    message(`${p.n}が一日千秋の効果で本陣から漢字3字を手に入れる！`);
     render();
     await wait(350);
     return;
   }
   let offers=[rk(),rk(),rk()];
-  if(i===0){
+  if(isHuman(i)){
     await new Promise(resolve=>{
       let chosen=[];
       const chooseStep=()=>{
         if(chosen.length>=2){
           playSE("kanjiGet");
-          message(`本陣で「${chosen.join("・")}」を獲得`);
+          message(`本陣で「${chosen.join("・")}」を手に入れる`);
           render();
           resolve();
           return;
         }
-        show("本陣",`3字から受け取る漢字を2字選ぼう<br>あと${2-chosen.length}字`,
+        showWithProgress("本陣",`3字から受け取る漢字を2字えらぼう<br>あと${2-chosen.length}字`,
           offers.map((ch,idx)=>[ch,()=>{
             p.h.push(ch);
             chosen.push(ch);
@@ -499,7 +991,7 @@ async function chooseHQKanji(i){
     let picks=cpuBestOffer(p,offers,2);
     picks.forEach(ch=>p.h.push(ch));
     playSE("kanjiGet");
-    message(`${p.n}が本陣で「${picks.join("・")}」を獲得`);
+    message(`${p.n}が本陣で「${picks.join("・")}」を手に入れる`);
     render();
     await wait(220);
   }
@@ -518,7 +1010,7 @@ async function move(i,n){
   }
 }
 function wait(n){return new Promise(r=>setTimeout(r,n))}function message(x){msg.textContent=x}
-roll.onclick=async()=>{if(busy||turn)return;busy=true;roll.disabled=true;await doRoll()}
+roll.onclick=async()=>{if(!gameStarted||busy||!isHuman(turn))return;busy=true;roll.disabled=true;await doRoll()}
 async function executeRoll(n){
   message(`${ps[turn].n}、${n}！`);
   await dice(n);
@@ -530,8 +1022,8 @@ async function doRoll(){
   const afterDirection=async()=>{
     if(p.aim){
       p.aim=false;
-      if(turn===0){
-        show("百発百中","出目を選ぼう",[1,2,3,4,5,6].map(v=>[v,async()=>{
+      if(isHuman(turn)){
+        show("百発百中","サイコロの数をえらぼう",[1,2,3,4,5,6].map(v=>[v,async()=>{
           busy=true;await executeRoll(v);
         }]));
         return;
@@ -544,10 +1036,10 @@ async function doRoll(){
   };
   if(p.chooseDirection){
     p.chooseDirection=false;
-    if(turn===0){
-      show("進行方向","次の移動方向を選ぼう",[
-        ["前へ進む",async()=>{p.reverse=false;busy=true;await afterDirection()}],
-        ["後ろへ戻る",async()=>{p.reverse=true;busy=true;await afterDirection()}]
+    if(isHuman(turn)){
+      show("進む向き","次に進む向きをえらぼう",[
+        ["前に進む",async()=>{p.reverse=false;busy=true;await afterDirection()}],
+        ["後ろに進む",async()=>{p.reverse=true;busy=true;await afterDirection()}]
       ]);
       return;
     }else{
@@ -572,7 +1064,7 @@ function upgradeCastle(handIndex){
   if(p.buildRefund){p.buildRefund=false;p.h.push(ch)}
   refreshCastleCell(c);
   playSE("castleBuild");
-  message(`${p.n}が城を強化！ ${c.ch}城になった（徴収${castleStrength(c)}字）`);
+  message(`${p.n}が城を強化！ ${c.ch}城になった（止まった相手から${castleStrength(c)}字うばう）`);
   render();
   return true;
 }
@@ -622,15 +1114,15 @@ function cpuMarketTrade(p){
 function humanMarketExchange(p){
   let firstIndex=-1;
   const chooseFirst=()=>{
-    show("市場：交換","交換に出す漢字を1枚選ぼう",p.h.map((x,i)=>[x,()=>{
+    showWithProgress("市場：交換","入れかえるために出す漢字を1枚選ぼう",p.h.map((x,i)=>[x,()=>{
       firstIndex=i;
       const secondOpts=p.h.map((y,j)=>({y,j})).filter(o=>o.j!==firstIndex);
-      show("市場：交換","交換に出す2枚目を選ぼう",secondOpts.map(o=>[o.y,()=>{
+      showWithProgress("市場：交換","入れかえるために出す2枚目を選ぼう",secondOpts.map(o=>[o.y,()=>{
         let inds=[firstIndex,o.j].sort((a,b)=>b-a);
         let paid=inds.map(i=>p.h[i]).reverse();
         inds.forEach(i=>p.h.splice(i,1));
         let offers=Array.from({length:5},()=>rk());
-        show("市場：交換",`「${paid.join("・")}」を渡した。<br>市場の5枚から1枚選ぼう`,offers.map(ch=>[ch,()=>{
+        showWithProgress("市場：交換",`「${paid.join("・")}」を渡した。<br>市場の5字から1字えらぼう`,offers.map(ch=>[ch,()=>{
           p.h.push(ch);
           playSE("kanjiGet");
           message(`市場で2枚を「${ch}」1枚と交換した`);
@@ -646,13 +1138,17 @@ function humanStealMany(victimIndex,lordIndex,count,done){
   const step=()=>{
     if(taken>=count||victim.h.length===0){done();return}
     let c=cells[victim.pos];
-    show(`${c.ch}城`,`${victim.n}から徴収：あと${Math.min(count-taken,victim.h.length)}字選べます`,
+    showStealWithBothProgress(
+      `${c.ch}城`,
+      `<b>${lord.n}</b>が<b>${victim.n}</b>からうばう：あと${Math.min(count-taken,victim.h.length)}字選べます`,
       victim.h.map((x,i)=>[x,()=>{
         lord.h.push(victim.h.splice(i,1)[0]);
         taken++;
         playSE("kanjiSteal");
         step();
-      }])
+      }]),
+      lord,
+      victim
     );
   };
   step();
@@ -665,17 +1161,17 @@ async function land(){
   if(s&&s[0]=="omikuji"){
     playSE("omikuji");
     let a=Array.from({length:p.omikuji2?7:5},()=>rk());
-    if(turn==0){
+    if(isHuman(turn)){
       let chosen=[];
       const chooseStep=()=>{
         if(chosen.length>=2){
           playSE("kanjiGet");
-          message(`おみくじで「${chosen.join("・")}」を獲得`);
+          message(`おみくじで「${chosen.join("・")}」を手に入れる`);
           p.omikuji2=false;
           end();
           return;
         }
-        show("おみくじ",`${p.omikuji2?7:5}字から2字選ぼう<br>あと${2-chosen.length}字`,
+        showWithProgress("おみくじ",`${p.omikuji2?7:5}字から2字えらぼう<br>あと${2-chosen.length}字`,
           a.map((x,ix)=>[x,()=>{
             p.h.push(x);
             chosen.push(x);
@@ -691,29 +1187,29 @@ async function land(){
       picks.forEach(ch=>p.h.push(ch));
       p.omikuji2=false;
       playSE("kanjiGet");
-      message(`${p.n}がおみくじで「${picks.join("・")}」を獲得`);
+      message(`${p.n}がおみくじで「${picks.join("・")}」を手に入れる`);
       await wait(600);
     }
   }
 
-  // 市場：1字獲得 or 2字→5択から1字交換
+  // 市場：1字手に入れる or 2字→5択から1字交換
   else if(s&&s[0]=="market"){
     playSE("omikuji");
-    if(turn==0){
+    if(isHuman(turn)){
       let opts=[
-        ["漢字を1字獲得",()=>{
+        ["漢字を1字もらう",()=>{
           let offers=[rk(),rk()];
-          show("市場：無料獲得","2字から1字選ぼう",offers.map(ch=>[ch,()=>{
+          showWithProgress("市場：1字もらう","2字から1字えらぼう",offers.map(ch=>[ch,()=>{
             p.h.push(ch);playSE("kanjiGet");
-            message(`市場で「${ch}」を獲得`);
+            message(`市場で「${ch}」を手に入れる`);
             end();
           }]));
         }]
       ];
       if(p.h.length>=2){
-        opts.push(["漢字2字を交換",()=>humanMarketExchange(p)]);
+        opts.push(["漢字2字を入れかえる",()=>humanMarketExchange(p)]);
       }
-      show("市場","どちらを利用しますか？<br><small>交換：手札2字を渡し、ランダム5字から1字を選択</small>",opts);
+      showWithProgress("市場","どちらにしますか？<br><small>入れかえ：手札から2字出して、5字の中から1字えらぶ</small>",opts,p);
       return;
     }else{
       let got=cpuMarketTrade(p);
@@ -723,19 +1219,19 @@ async function land(){
         let offers=[rk(),rk()];
         let ch=cpuBestOffer(p,offers,1)[0];
         p.h.push(ch);playSE("kanjiGet");
-        message(`${p.n}が市場で「${ch}」を獲得`);
+        message(`${p.n}が市場で「${ch}」を手に入れる`);
       }
       await wait(650);
     }
   }
 
-  // 空地：任意で築城
+  // 空地：好きなら築城
   else if(!s&&c.own===null&&canBuildCastle(p)&&!p.noBuild){
-    if(turn==0){
-      show("空地に到着","このマスに城を築きますか？",[
-        ["築城する",()=>{show("築城","城にする漢字を選ぼう",p.h.map((x,i)=>[x,()=>{build(i);end()}]));}],
+    if(isHuman(turn)){
+      showBuildWithInventory("築城","この空地に城を建てますか？",[
+        ["築城する",()=>{showBuildWithInventory("築城する漢字","城に使う1字をえらぼう",p.h.map((x,i)=>[x,()=>{build(i);end()}]),p);}],
         ["何もしない",()=>end()]
-      ]);
+      ],p);
       return;
     }else{
       let idx=cpuBuildChoice(p);
@@ -751,7 +1247,7 @@ async function land(){
   }
 
   else if(!s&&c.own===null&&p.h.length===1&&!p.freeBuild){
-    message("最後の1字は築城には使用できません");
+    message("最後の1字は築城には使えません");
     await wait(550);
   }
 
@@ -759,18 +1255,18 @@ async function land(){
   else if(c.own===turn){
     let lv=castleStrength(c);
     if(lv>=3){
-      message(`${c.ch}城は最大強化済み（徴収3字）`);
+      message(`${c.ch}城はこれ以上は城強化できません（相手から3字うばう）`);
       await wait(500);
     }else if(p.h.length<=1||p.noBuild){
       message(p.h.length===1?`${c.ch}城に到着。最後の1字は城強化には使えません`:`${c.ch}城に到着`);
       await wait(400);
-    }else if(turn==0){
-      show(`${c.ch}城`,`城を強化しますか？<br>現在：${lv}文字／徴収${lv}字<br>最大：3文字／徴収3字`,[
-        ["城を強化する",()=>{
-          show("城の強化","追加する漢字を選ぼう",p.h.map((x,i)=>[x,()=>{upgradeCastle(i);end()}]));
+    }else if(isHuman(turn)){
+      showBuildWithInventory(`${c.ch}城`,`この城を強くしますか？<br>今：${lv}文字／相手から${lv}字うばう<br>最大：3文字／相手から3字うばう`,[
+        ["城強化する",()=>{
+          showBuildWithInventory("城の強化","城に足す漢字をえらぼう",p.h.map((x,i)=>[x,()=>{upgradeCastle(i);end()}]),p);
         }],
         ["何もしない",()=>end()]
-      ]);
+      ],p);
       return;
     }else{
       let idx=cpuBuildChoice(p);
@@ -784,7 +1280,7 @@ async function land(){
     }
   }
 
-  // 敵城：城の文字数ぶん徴収（1～3字）
+  // 敵城：城の文字数ぶんうばう（1～3字）
   else if(c.own!==null&&c.own!==turn&&p.h.length){
     let lord=ps[c.own];
     let amount=castleStrength(c);
@@ -794,16 +1290,16 @@ async function land(){
     if(p.shield){
       p.shield=false;
       playSE("skill");
-      message("七転八起！ 徴収を防いだ");
+      message("七転八起！ 城で漢字をうばわれるのをふせいだ！");
       await wait(600);
     }
-    else if(c.own==0){
+    else if(isHuman(c.own)){
       humanStealMany(turn,c.own,amount,()=>end());
       return;
     }
     else{
       stealRandom(turn,c.own,amount);
-      message(`${lord.n}の${c.ch}城が漢字を${amount}字徴収！`);
+      message(`${lord.n}の${c.ch}城が、漢字を${amount}字うばった！`);
       await wait(650);
     }
   }
@@ -834,7 +1330,7 @@ function build(i){
   let p=ps[turn],c=cells[p.pos];
   if(i<0||i>=p.h.length)return false;
   if(!p.freeBuild&&p.h.length<=1){
-    message("最後の1字は築城には使用できません");
+    message("最後の1字は築城には使えません");
     return false;
   }
   let usedChar=p.h[i];
@@ -858,12 +1354,12 @@ function uniqueRandomKanji(n){
 }
 function chooseKanjiOffer(i,title,offers,count=1){
   return new Promise(resolve=>{
-    if(i!==0){
+    if(!isHuman(i)){
       let p=ps[i];
       let chosen=[...offers].sort((a,b)=>cpuKanjiValue(p,b)-cpuKanjiValue(p,a)).slice(0,count);
       chosen.forEach(ch=>p.h.push(ch));
       if(chosen.length)playSE("kanjiGet");
-      message(`${p.n}が「${chosen.join("・")}」を獲得`);
+      message(`${p.n}が「${chosen.join("・")}」を手に入れる`);
       resolve(chosen);
       return;
     }
@@ -873,7 +1369,7 @@ function chooseKanjiOffer(i,title,offers,count=1){
         if(chosen.length)playSE("kanjiGet");
         resolve(chosen);return;
       }
-      show(title,`候補：${remain.join("　")}<br>${count===1?"1字":"あと"+(count-chosen.length)+"字"}選ぼう`,
+      showWithProgress(title,`えらべる漢字：${remain.join("　")}<br>${count===1?"1字":"あと"+(count-chosen.length)+"字"}選ぼう`,
         remain.map((ch,idx)=>[ch,()=>{
           ps[i].h.push(ch);chosen.push(ch);remain.splice(idx,1);step();
         }])
@@ -890,9 +1386,9 @@ function stealRandom(from,to,n){
   if(moved)playSE("kanjiSteal");
 }
 async function effect(i,w,usedChars){
-  showIdiomFlash("skill",w,effects[w]||"能力発動");
+  showIdiomFlash("skill",w,effects[w]||"能力はたらく");
   playSE("skill");
-  message(`【${w}】能力発動：${effects[w]||""}`);
+  message(`【${w}】能力はたらく：${effects[w]||""}`);
   let p=ps[i],others=ps.map((q,j)=>q.alive&&j!==i?j:-1).filter(j=>j>=0);
   const gain=n=>{for(let z=0;z<n;z++)p.h.push(rk());if(n>0)playSE("kanjiGet")};
 
@@ -913,7 +1409,7 @@ async function effect(i,w,usedChars){
   else if(w==="一日千秋")p.hqBonus=true;
   else if(w==="一喜一憂"){
     let d=1+Math.floor(Math.random()*6);
-    message(`一喜一憂の判定は${d}。${d%2===0?"漢字3字獲得！":"漢字1字を失う…"}`);
+    message(`一喜一憂の判定は${d}。${d%2===0?"漢字3字手に入れる！":"漢字1字を失う…"}`);
     if(d%2===0)gain(3);else if(p.h.length)p.h.splice(Math.floor(Math.random()*p.h.length),1);
   }
   else if(w==="一進一退"||w==="東奔西走")p.chooseDirection=true;
@@ -942,7 +1438,7 @@ async function effect(i,w,usedChars){
     if(target){
       let h=[...p.h],miss=[];
       for(let c of target){let j=h.indexOf(c);if(j>=0)h.splice(j,1);else miss.push(c)}
-      p.h.push(miss[0]);playSE("kanjiGet");message(`画竜点睛！「${target}」に必要な「${miss[0]}」を獲得`);
+      p.h.push(miss[0]);playSE("kanjiGet");message(`画竜点睛！「${target}」に必要な「${miss[0]}」を手に入れる`);
     }else gain(1);
   }
   else if(w==="起承転結")await chooseKanjiOffer(i,"起承転結：4字から選択",[rk(),rk(),rk(),rk()],1);
@@ -963,7 +1459,7 @@ async function effect(i,w,usedChars){
   else if(w==="大器晩成"){if(p.w.length>=2)gain(3)}
   else if(w==="天真爛漫"){
     let d=1+Math.floor(Math.random()*6),n=d>=4?3:2;
-    gain(n);message(`天真爛漫の判定は${d}。漢字${n}字獲得！`);
+    gain(n);message(`天真爛漫の判定は${d}。漢字${n}字手に入れる！`);
   }
   else if(w==="日進月歩")p.growth=2;
   else if(w==="八方美人")others.forEach(j=>{
@@ -1005,20 +1501,20 @@ async function resolveWord(i,w){
   return true;
 }
 async function makeWord(w){
-  if(turn!==0||busy||wordMadeThisTurn||ps[0].fogActive||!can(ps[0],w)||ps[0].w.includes(w))return;
+  let p=ps[turn];
+  if(!gameStarted||!isHuman(turn)||busy||wordMadeThisTurn||p.fogActive||!can(p,w)||p.w.includes(w))return;
   busy=true;roll.disabled=true;
-  let ok=await resolveWord(0,w);
+  let ok=await resolveWord(turn,w);
   if(!ok)return;
   let info=idiomInfo[w];
-  show("四字熟語 完成！",
+  show("四字熟語ができた！",
     `<div style="font:900 38px serif">${w}</div>
      <div style="font-weight:900">（${info.reading}）</div>
      <p style="font-weight:700">${info.meaning}</p>
      <p>⚡ <b>能力：</b>${effects[w]}</p>`,
     [["サイコロへ",()=>{
-      busy=false;roll.disabled=false;
-      message("熟語札の能力を解決しました。サイコロを振ろう！");
-      render();
+      busy=false;viewPlayer=turn;render();
+      message("熟語札の能力を使うしました。サイコロを振ろう！");
     }]]
   );
 }
@@ -1037,7 +1533,7 @@ function eliminate(i){
   p.alive=false;p.h=[];
   playSE("eliminated");
   clearCastles(i);
-  message(`${p.n}は漢字を失い、戦線から脱落！ 城はすべて空白地に戻った。`);
+  message(`${p.n}は漢字を失い、戦いからぬける！ 城はすべて空白地に戻った。`);
   render();
 }
 function checkEliminations(){
@@ -1048,7 +1544,7 @@ function checkEliminations(){
         p.revives.splice(p.revives.indexOf(amount),1);
         for(let z=0;z<amount;z++)p.h.push(rk());
         playSE("skill");playSE("kanjiGet");
-        message(`${p.n}、${amount===3?"起死回生":"危機一髪"}！ 漢字${amount}字を得て脱落回避！`);
+        message(`${p.n}、${amount===3?"起死回生":"危機一髪"}！ 漢字${amount}字を得てゲームからぬけるのをふせいだ！`);
       }else eliminate(i);
     }
   });
@@ -1073,7 +1569,7 @@ function startTurn(i){
   if(p.fogTurns>0)p.fogTurns--;
   if(p.growth>0){
     p.growth--;p.h.push(rk());playSE("kanjiGet");
-    message(`${p.n}、日進月歩で漢字1字獲得！`);
+    message(`${p.n}、日進月歩で漢字1字手に入れる！`);
   }
 }
 function end(){
@@ -1087,7 +1583,7 @@ function end(){
     ps[turn].reverse=false;
     busy=false;render();
     message(`${ps[turn].n}は熟語能力でもう一度！`);
-    if(turn==0)roll.disabled=false;else setTimeout(cpu,600);
+    viewPlayer=turn;render();if(!isHuman(turn))setTimeout(cpu,600);
     return
   }
   let old=turn,nxt=nextAlive(turn);
@@ -1095,14 +1591,41 @@ function end(){
   if(ps[old]){ps[old].noBuild=false;ps[old].reverse=false;ps[old].fogActive=false}
   turn=nxt;
   startTurn(turn);
-  busy=false;render();
-  if(turn==0){
-    roll.disabled=false;
-    message(ps[turn].fogActive?"五里霧中！ このターンは熟語進捗が霧に隠れ、熟語札を作れません。":"あなたの番です。熟語を作るか、サイコロを振ろう！");
+  busy=false;
+  viewPlayer=turn;
+  render();
+  if(isHuman(turn)){
+    message(ps[turn].fogActive
+      ? `【${ps[turn].n}の番】五里霧中！ このターンは熟語のそろい具合が霧に隠れ、熟語札を作れません。`
+      : `【${ps[turn].n}の番】四字熟語を作るか、サイコロを振ろう！`);
   }else{
-    roll.disabled=true;setTimeout(cpu,650)
+    message(`【${ps[turn].n}の番】コンピューターが行動します…`);
+    setTimeout(cpu,650);
   }
 }
+
+
+function startLocalGame(count){
+  humanCount=Math.max(1,Math.min(4,Number(count)||1));
+  ps.forEach((p,i)=>{
+    p.human=i<humanCount;
+    p.n=p.human?`プレイヤー${i+1}（${factionNames[i]}）`:`${factionNames[i]}軍`;
+  });
+  gameStarted=true;turn=0;viewPlayer=0;busy=false;
+  startTurn(0);
+  setupOverlay.classList.add("hide");
+  render();
+  message(`【${ps[0].n}の番】四字熟語を作るか、サイコロを振ろう！`);
+  if(bgmEnabled)startBGM();
+  if(!isHuman(0))setTimeout(cpu,650);
+}
+progressQuickBtn.addEventListener("click",()=>{
+  if(!gameStarted)return;
+  showProgressPopup(turn);
+});
+document.querySelectorAll(".player-count-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>startLocalGame(Number(btn.dataset.count)));
+});
 
 function cpuWordAbilityScore(p,w){
   const s={
@@ -1133,7 +1656,7 @@ function cpuChooseWord(p){
 }
 
 async function cpu(){
-  if(busy)return;
+  if(busy||!gameStarted||isHuman(turn))return;
   busy=true;
   let p=ps[turn],w=null;
   if(!p.fogActive&&!wordMadeThisTurn)w=cpuChooseWord(p);
