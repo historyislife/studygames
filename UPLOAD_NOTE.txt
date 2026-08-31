@@ -1,0 +1,12 @@
+ガクハコ「遊説遊戯」公開用差分
+
+1. ルートの index.html と sitemap.xml を既存サイトの同名ファイルと置き換えます。
+2. yuuzei_yuugi フォルダをサイト直下へ追加します。
+3. BGMは yuuzei_yuugi/assets/audio/icarusnotsuiraku.mp3 をゲーム内BGMとして使用します。
+
+BGMクレジット
+「イカロスの墜落」 / 甘茶の音楽工房（作曲：甘茶）
+https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
+https://amachamusic.chagasi.com/
+
+注意：音源単体での販売・二次配布、Content ID登録は行わないでください。

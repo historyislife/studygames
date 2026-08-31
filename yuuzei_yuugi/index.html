@@ -1,0 +1,1425 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>遊説遊戯｜春秋戦国の故事成語・戦略ゲーム｜ガクハコ</title>
+<style>
+:root{
+  --bg:#efe6cf;--paper:#fffaf0;--ink:#2e2a24;--muted:#6f665a;--line:#b7a88d;
+  --red:#8e2d2d;--gold:#b88728;--green:#365f45;--blue:#355c7d;--purple:#67507d;
+  --shadow:0 8px 22px rgba(51,39,22,.14);--r:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:linear-gradient(180deg,#e8dcc0,#f5efdf);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+button,select,input{font:inherit}button{cursor:pointer}.app{max-width:1180px;margin:0 auto;padding:12px}
+.topbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:10px}.titlebox h1{font-family:serif;margin:0;font-size:clamp(22px,3vw,34px);letter-spacing:.06em}.titlebox small{color:var(--muted)}
+.badge{background:#2c2923;color:#fff;border-radius:999px;padding:7px 11px;font-weight:800;font-size:13px;white-space:nowrap}
+.home-back-btn{
+  position:fixed;top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));z-index:45;
+  display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:7px 12px;border-radius:999px;
+  background:rgba(255,255,255,.9);color:#263238;border:1px solid rgba(0,0,0,.14);text-decoration:none;
+  font-size:13px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.16);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)
+}
+.home-back-btn:active{transform:translateY(1px)}
+body:not(.game-running) .topbar{padding-left:112px}
+body.game-running .home-back-btn{background:rgba(24,27,22,.9);color:#f2dfaf;border-color:rgba(222,193,133,.34);box-shadow:0 4px 14px rgba(0,0,0,.32)}
+body.game-running #game .turn-hud{top:58px}
+.panel{background:rgba(255,250,240,.94);border:1px solid #cfbea0;border-radius:var(--r);box-shadow:var(--shadow)}
+.setup{padding:18px;max-width:760px;margin:36px auto}.setup h2{margin-top:0;font-family:serif}.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-weight:800;font-size:13px}.local-players{display:grid;gap:8px;margin-top:12px}.local-player-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:8px;padding:10px;border:1px solid #d3c2a4;border-radius:12px;background:#fffaf0}.local-player-row .row-title{grid-column:1/-1;font-weight:900;font-size:13px}.hidden-ui{display:none!important}.pass-note{font-size:13px;line-height:1.7;color:var(--muted)}
+select,input{border:1px solid #b8a98e;background:#fff;padding:10px;border-radius:10px}.btn{border:0;border-radius:11px;padding:10px 14px;font-weight:900;background:#3b3329;color:#fff;box-shadow:0 3px 0 #211c17}.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #211c17}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}.btn.secondary{background:#766b5d}.btn.red{background:var(--red)}.btn.gold{background:#9b7425}.btn.ghost{background:#f4ead7;color:#3d3429;border:1px solid #cdbb9c;box-shadow:none}
+.hint{font-size:12px;color:var(--muted);line-height:1.6}.game{display:none}.statusbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:10px}.status{padding:10px 12px;text-align:center}.status b{display:block;font-size:18px}
+.layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(340px,.7fr);gap:10px}.map-panel{padding:12px;position:relative;overflow:hidden}.map-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}.map-title h2{font-family:serif;margin:0;font-size:20px}
+.map-wrap{position:relative;width:100%;aspect-ratio:1.14/1;min-height:500px;background:radial-gradient(circle at 50% 52%,rgba(255,255,255,.65),rgba(255,255,255,.2)),linear-gradient(90deg,rgba(97,76,45,.05) 1px,transparent 1px),linear-gradient(rgba(97,76,45,.05) 1px,transparent 1px);background-size:auto,26px 26px,26px 26px;border:1px solid #d4c5a8;border-radius:14px;overflow:hidden}
+.map-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.map-svg line{stroke:#6c604d;stroke-width:1.8;vector-effect:non-scaling-stroke}.state{position:absolute;z-index:5;transform:translate(-50%,-50%);width:116px;min-height:94px;border:2px solid #5d4f3f;border-radius:18px;background:#fff8e9;padding:8px;text-align:center;box-shadow:0 5px 12px rgba(45,35,22,.17);transition:.15s}.state.valid{outline:4px solid rgba(184,135,40,.45);transform:translate(-50%,-50%) scale(1.04)}.state-name{font:900 24px/1 serif;margin-bottom:3px}.state-stats{display:flex;justify-content:center;gap:5px;font-size:11px;font-weight:800}.state-stats span{background:#eee1c8;border-radius:999px;padding:3px 6px}.state-troops{font-size:10px;color:var(--muted);margin-top:5px}.buff{font-size:10px;color:#7a3d1f;font-weight:900;margin-top:3px}
+.map-troops{position:absolute;inset:0;z-index:2;pointer-events:none}.troop-piece{position:absolute;transform:translate(-50%,-50%);width:28px;height:38px;pointer-events:none;z-index:2}
+.troop-badge{position:absolute;left:50%;top:50%;width:24px;height:24px;transform:translate(-50%,-50%);border-radius:50%;background:rgba(255,244,214,.92);border:2px solid rgba(62,43,19,.62);box-shadow:0 2px 5px rgba(0,0,0,.28)}
+.troop-head{position:absolute;left:50%;top:7px;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:var(--piece,#888);border:1.6px solid rgba(34,24,12,.66);z-index:1}
+.troop-body{position:absolute;left:50%;top:14px;transform:translateX(-50%);width:12px;height:11px;border-radius:4px 4px 3px 3px;background:var(--piece,#888);border:1.6px solid rgba(34,24,12,.66);z-index:1}
+.troop-shield{position:absolute;left:50%;top:16px;transform:translateX(3px);width:7px;height:8px;border-radius:45% 45% 40% 40%;background:color-mix(in srgb, var(--piece,#888) 70%, #fff2bf);border:1.4px solid rgba(34,24,12,.54);z-index:2}
+.troop-spear{position:absolute;left:50%;top:5px;width:2px;height:21px;background:rgba(64,45,19,.82);transform:translateX(7px) rotate(8deg);border-radius:99px;z-index:0}
+.troop-piece.fatigue{transform:translate(-50%,-50%) rotate(90deg);opacity:.74;filter:grayscale(.18)}
+.troop-piece.fatigue .troop-badge{background:rgba(232,223,201,.92)}
+.troop-piece.fatigue .troop-spear{transform:translateX(7px) rotate(-10deg)}
+.troop-piece[data-state='秦']{--piece:#9a5432}.troop-piece[data-state='趙']{--piece:#7b62a5}.troop-piece[data-state='魏']{--piece:#908240}.troop-piece[data-state='韓']{--piece:#5c83ac}.troop-piece[data-state='燕']{--piece:#61a1b0}.troop-piece[data-state='斉']{--piece:#c39a34}.troop-piece[data-state='楚']{--piece:#619452}
+.map-borders{position:absolute;inset:0;z-index:4;pointer-events:none}.border-node{position:absolute;pointer-events:auto;transform:translate(-50%,-50%);width:104px;border:1px solid #c8b99d;border-radius:12px;background:rgba(255,250,240,.92);box-shadow:0 4px 10px rgba(45,35,22,.12);padding:5px;transition:.15s}.border-node.valid{outline:4px solid rgba(53,92,125,.2);border-color:#547a9a}.border-node.war{box-shadow:0 0 0 3px rgba(142,45,45,.28),0 5px 12px rgba(45,35,22,.18)}.border-node-top{display:flex;justify-content:space-between;align-items:center;gap:4px;margin-bottom:4px}.border-node-name{font-size:10px;font-weight:900}.border-node-sides{display:grid;grid-template-columns:1fr 1fr;gap:4px}.border-side-btn{border:1px solid #b9a789;background:#fff;border-radius:8px;padding:4px 2px;font-size:11px;font-weight:800;line-height:1.1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:42px}.border-side-btn.valid{background:#f5e5bd;border-color:#ad7c23}.border-side-btn.source{outline:3px solid rgba(142,45,45,.45);background:#f8ded8}.border-side-btn small{display:block;font-size:9px;color:#6f665a}.border-side-btn .side-num{font-size:17px;font-weight:1000}.border-side-btn .fatigue-num{font-size:9px;color:#6b6152}.threat{font-weight:900;border-radius:999px;padding:2px 6px;background:#eee2cb;font-size:11px}.threat.hot{background:#f0c4b9;color:#791d10}
+.side{padding:12px;display:flex;flex-direction:column;gap:10px}.turn-head{padding:12px;border-radius:14px;background:#332d25;color:#fff}.turn-head.bot{background:#4f435a}.turn-head .who{font-size:20px;font-weight:900}.turn-head .school{font-size:13px;opacity:.85}.public-board{padding:9px;border:1px solid #cdbb9e;border-radius:12px;background:#f7eddc}.public-board h3{font-family:serif;font-size:15px;margin:0 0 7px}.public-row{font-size:12px;padding:5px 0;border-bottom:1px dotted #d2c1a4}.public-row:last-child{border-bottom:0}.public-row.me{font-weight:900}
+.missions{display:grid;gap:7px}.mission{padding:9px;border:1px dashed #a88b5b;background:#fff6df;border-radius:12px}.mission.secret{background:#f5f0f8;border-color:#8f7a9f}.mission.hidden .secret-body{filter:blur(7px);user-select:none}.mission-title{display:flex;justify-content:space-between;gap:8px;align-items:center;font-weight:900}.mission-body,.secret-body{font-size:12px;line-height:1.45;margin-top:5px}.pts{display:inline-block;background:#332d25;color:#fff;border-radius:999px;padding:2px 7px;font-size:11px;margin-left:5px}
+.hand-title{display:flex;justify-content:space-between;align-items:center;gap:8px}.cards{position:relative;min-height:225px;height:225px;width:100%;overflow:visible;margin:2px 0 0}.cards>.hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center}.card{appearance:none;-webkit-appearance:none;position:absolute;left:50%;bottom:4px;width:154px;height:205px;border:2px solid #bbaa8a;border-radius:14px;background:linear-gradient(180deg,#fffdf7,#fbf2df);padding:10px;text-align:left;color:inherit;box-shadow:0 7px 14px rgba(51,39,22,.18);transform-origin:50% 115%;transform:translateX(calc(-50% + var(--fan-x))) translateY(var(--fan-y)) rotate(var(--fan-angle));transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,filter .2s ease;z-index:var(--fan-z);overflow:hidden}.card::after{content:"";position:absolute;inset:auto 8px 6px;height:3px;border-radius:99px;background:rgba(93,79,63,.13)}.card.selected{border-color:var(--gold);box-shadow:0 0 0 4px rgba(184,135,40,.18),0 16px 28px rgba(51,39,22,.28);transform:translateX(calc(-50% + var(--fan-x))) translateY(calc(var(--fan-y) - 30px)) rotate(var(--fan-angle)) scale(1.07);z-index:50}.card-top{display:flex;justify-content:space-between;gap:6px;align-items:start}.card-name{font-family:serif;font-weight:900;font-size:16px;line-height:1.25;min-width:0}.type{flex:0 0 auto;font-size:10px;font-weight:900;border-radius:999px;padding:3px 6px;color:#fff}.type.internal{background:var(--green)}.type.diplomacy{background:var(--blue)}.type.military{background:var(--red)}.card-desc{font-size:11px;line-height:1.45;color:#5e5549;margin-top:8px}.action-box{padding:10px;border:1px solid #cdbb9e;border-radius:12px;background:#f8edd8;font-size:13px;min-height:48px}.action-box strong{color:#7b5720}.endrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}.log{margin-top:10px;padding:10px;max-height:210px;overflow:auto;font-size:12px;line-height:1.5}.log p{margin:0;padding:4px 0;border-bottom:1px dotted #d8c9ad}.log p:last-child{border-bottom:0}
+.card-play-fx{position:fixed;inset:0;z-index:80;pointer-events:none;display:none;align-items:center;justify-content:center;background:rgba(31,27,22,0)}.card-play-fx.show{display:flex;animation:fxBackdrop 1.56s ease both}.played-card-wrap{text-align:center;animation:playedCard 1.56s cubic-bezier(.18,.8,.24,1) both}.played-by{display:inline-block;margin-bottom:9px;padding:5px 11px;border-radius:999px;background:rgba(36,31,26,.9);color:#fff;font-size:12px;font-weight:900;letter-spacing:.03em}.played-card{width:210px;min-height:280px;border:3px solid #bbaa8a;border-radius:18px;background:linear-gradient(180deg,#fffdf7,#f7ead0);padding:16px;text-align:left;box-shadow:0 24px 60px rgba(0,0,0,.35);position:relative}.played-card.internal{border-color:#557c61}.played-card.diplomacy{border-color:#547a9a}.played-card.military{border-color:#9b4a42}.played-card .card-name{font-size:24px}.played-card .type{font-size:11px}.played-card .card-desc{font-size:13px;line-height:1.6;margin-top:14px}.played-stamp{position:absolute;right:11px;bottom:11px;padding:5px 9px;border:2px solid var(--red);color:var(--red);font-weight:1000;font-size:14px;letter-spacing:.12em;transform:rotate(-8deg);border-radius:5px;background:rgba(255,250,240,.84)}
+
+.card{height:236px;padding:8px 8px 10px}
+.cards{height:242px;min-height:242px}
+.card-top{min-height:24px}
+.card-art{margin-top:7px;height:110px;border-radius:10px;overflow:hidden;border:1px solid rgba(78,58,27,.35);background:#d9c69d;box-shadow:inset 0 0 0 1px rgba(255,246,220,.35)}
+.card-art img{width:100%;height:100%;display:block;object-fit:cover;object-position:center center}
+.card-desc{font-size:10px;line-height:1.35;margin-top:7px}
+.played-card{width:238px;min-height:392px}
+.played-card .card-art{height:188px;margin-top:12px;border-radius:12px}
+.played-card .card-desc{font-size:13px;line-height:1.55;margin-top:12px}
+@media(max-width:560px){.cards{height:224px;min-height:224px}.card{width:140px;height:214px}.card-art{height:94px}.card-desc{font-size:9px}.played-card{min-height:356px}.played-card .card-art{height:160px}}
+#game .cards{height:238px;min-height:238px}
+#game .card{width:150px;height:228px;padding:8px}
+#game .card-art{height:102px}
+#game .card-desc{font-size:10px}
+@media(max-width:560px){#game .cards{height:206px;min-height:206px}#game .card{width:128px;height:196px}#game .card-art{height:82px}#game .card-desc{font-size:8.7px}}
+
+@keyframes playedCard{0%{opacity:0;transform:translateY(70px) scale(.58) rotate(-8deg)}12.5%{opacity:1;transform:translateY(0) scale(1.12) rotate(1deg)}42%{opacity:1;transform:translateY(0) scale(1.03) rotate(0)}83%{opacity:1;transform:translateY(0) scale(1.03) rotate(0)}100%{opacity:0;transform:translateY(-18px) scale(1.08)}}@keyframes fxBackdrop{0%,100%{background:rgba(31,27,22,0)}12.5%,83%{background:rgba(31,27,22,.24)}}
+@media(hover:hover) and (pointer:fine){.card:not(.selected):hover{transform:translateX(calc(-50% + var(--fan-x))) translateY(calc(var(--fan-y) - 14px)) rotate(var(--fan-angle));box-shadow:0 13px 23px rgba(51,39,22,.25);z-index:40}}
+@media(prefers-reduced-motion:reduce){.card{transition:none}.card-play-fx.show,.played-card-wrap{animation:none}.card-play-fx.show{background:rgba(31,27,22,.24)}.card-play-fx.show .played-card-wrap{opacity:1;transform:none}}
+.overlay{position:fixed;inset:0;background:rgba(31,27,22,.74);display:none;align-items:center;justify-content:center;z-index:50;padding:18px}.overlay.show{display:flex}.modal{max-width:620px;width:100%;background:#fffaf0;border-radius:18px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.32);text-align:center}.modal h2{font-family:serif;margin-top:0}.mission-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mission-choice{border:2px solid #c9b99c;border-radius:14px;background:#fffdf6;padding:14px;text-align:left;cursor:pointer}.mission-choice:hover{border-color:#9b7425}.mission-choice h3{margin:0 0 6px;font-family:serif}.result-list{text-align:left;display:grid;gap:8px;margin:12px 0}.result-item{padding:10px;border-radius:10px;background:#f1e6d0}.result-item.winner{outline:3px solid rgba(184,135,40,.55)}.ok{color:#246239;font-weight:900}.ng{color:#8e2d2d;font-weight:900}.legend{font-size:11px;color:var(--muted)}.tiny{font-size:11px;color:var(--muted)}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.map-wrap{min-height:560px}.statusbar{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.app{padding:7px}.topbar{align-items:flex-start}.badge{font-size:11px}.setup{margin:14px auto;padding:13px}.setup-grid{grid-template-columns:1fr}.map-panel,.side{padding:8px}.map-wrap{min-height:560px;aspect-ratio:.74/1}.state{width:88px;min-height:78px;padding:6px;border-radius:14px}.state-name{font-size:20px}.state-stats{gap:2px;font-size:10px;flex-direction:column}.state-stats span{padding:2px 4px}.state-troops{display:none}.buff{font-size:9px}.endrow{grid-template-columns:1fr}.border-node{width:88px;padding:4px}.border-node-name{font-size:8px}.border-side-btn{font-size:10px;padding:3px 1px;min-height:36px}.border-side-btn small{font-size:8px}.border-side-btn .side-num{font-size:14px}.border-side-btn .fatigue-num{font-size:8px}.threat{font-size:9px;padding:2px 5px}.troop-piece{width:24px;height:32px}.troop-badge{width:20px;height:20px}.troop-head{top:6px;width:7px;height:7px}.troop-body{top:12px;width:10px;height:9px}.troop-shield{top:14px;width:6px;height:7px}.troop-spear{top:5px;height:17px}.mission-choice-grid{grid-template-columns:1fr}.local-player-row{grid-template-columns:1fr}.cards{height:205px;min-height:205px}.card{width:138px;height:188px;padding:9px}.card-name{font-size:14px}.card-desc{font-size:10px}.played-card{width:min(72vw,210px);min-height:260px}.played-card .card-name{font-size:21px}}
+
+/* ===== 歴史戦略マップ UI ===== */
+body.game-running{overflow:hidden;background:#151811}
+#game.game{
+  position:fixed;inset:0;z-index:20;overflow:hidden;background:#1b2018;color:#f7f0dc;
+}
+#game .map-viewport{position:absolute;inset:0;overflow:hidden;touch-action:none;cursor:grab;background:#20251b}
+#game .map-viewport.dragging{cursor:grabbing}
+#game .map-scene{
+  position:absolute;left:0;top:0;width:1500px;height:1125px;transform-origin:0 0;
+  background:url('warring_states_map.png') center/100% 100% no-repeat,#8d7c54;
+  box-shadow:inset 0 0 160px rgba(28,24,16,.42);
+  will-change:transform;
+}
+
+#game .map-scene::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.34;background-image:
+  repeating-linear-gradient(12deg,rgba(255,255,255,.045) 0 1px,transparent 1px 10px),
+  repeating-linear-gradient(92deg,rgba(35,28,16,.035) 0 1px,transparent 1px 14px);
+  mix-blend-mode:overlay}
+#game .map-scene::after{content:"戰國七雄　天下形勢圖";position:absolute;left:50%;top:4.2%;transform:translateX(-50%);font-family:serif;font-size:30px;font-weight:900;letter-spacing:.35em;color:rgba(45,33,20,.56);text-shadow:0 1px rgba(255,244,207,.25);pointer-events:none;white-space:nowrap}
+#game .map-scene::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,244,211,.08),transparent 18%,transparent 78%,rgba(32,21,9,.08));}
+#game .map-svg,#game .mountains,#game .terrain-label{display:none}
+#game .hud.draggable{touch-action:auto}
+#game .hud-drag-handle{position:absolute;right:5px;top:5px;width:24px;height:24px;padding:0;border:1px solid rgba(226,199,142,.28);border-radius:6px;background:rgba(20,22,18,.62);color:#e5cf9c;font-size:14px;line-height:22px;z-index:30;cursor:move;opacity:.72}
+#game .hud-drag-handle:hover{opacity:1;background:rgba(47,43,31,.88)}
+#game .hud.dragging-window{box-shadow:0 0 0 2px rgba(255,214,109,.45),0 10px 26px rgba(0,0,0,.35)!important}
+#game .hud.dragging-window .hud-drag-handle{opacity:1}
+#game .map-svg{z-index:1}
+#game .map-svg .territory{stroke:rgba(54,42,26,.62);stroke-width:.55;vector-effect:non-scaling-stroke;opacity:.72}
+#game .map-svg .qin{fill:rgba(113,55,45,.43)}#game .map-svg .zhao{fill:rgba(73,91,77,.39)}#game .map-svg .wei{fill:rgba(123,96,49,.38)}#game .map-svg .han{fill:rgba(92,71,112,.36)}#game .map-svg .yan{fill:rgba(69,89,109,.36)}#game .map-svg .qi{fill:rgba(59,100,94,.38)}#game .map-svg .chu{fill:rgba(92,103,55,.39)}
+#game .map-svg .river{fill:none;stroke:rgba(50,84,93,.72);stroke-width:1.15;vector-effect:non-scaling-stroke;filter:drop-shadow(0 1px 0 rgba(232,221,179,.25))}
+#game .map-svg .road{fill:none;stroke:rgba(71,51,31,.47);stroke-width:.55;stroke-dasharray:1.8 1.6;vector-effect:non-scaling-stroke}
+#game .map-svg .frontier{stroke:rgba(44,31,19,.6);stroke-width:1.15;stroke-dasharray:2.6 1.2;vector-effect:non-scaling-stroke}
+#game .mountains{position:absolute;z-index:1;color:rgba(47,46,31,.48);font-size:24px;letter-spacing:-7px;pointer-events:none;filter:drop-shadow(0 1px 0 rgba(224,210,161,.25))}
+#game .terrain-label{position:absolute;z-index:1;font-family:serif;font-weight:800;font-size:17px;letter-spacing:.22em;color:rgba(47,38,25,.47);pointer-events:none;writing-mode:vertical-rl}
+#game .state{
+  width:104px;min-height:68px;border:1px solid rgba(239,213,155,.65);border-radius:7px;
+  background:linear-gradient(180deg,rgba(38,35,27,.93),rgba(25,26,20,.93));color:#f9e9bd;
+  box-shadow:0 5px 0 rgba(29,20,14,.55),0 8px 20px rgba(0,0,0,.34);padding:7px;
+}
+#game .state::before{content:"";position:absolute;inset:3px;border:1px solid rgba(214,175,98,.18);pointer-events:none}
+#game .state-name{font-size:21px;color:#f7d98f;text-shadow:0 1px 0 #000}
+#game .state-stats{color:#eee2c2}.state-stats span{background:rgba(241,218,163,.11)!important;border:1px solid rgba(235,203,129,.16)}
+#game .state-troops{color:#c8b98f}.buff{color:#e9bd70!important}
+#game .state.valid{outline:3px solid rgba(255,219,114,.78);box-shadow:0 0 22px rgba(255,208,83,.52),0 5px 0 rgba(29,20,14,.55)}
+#game .border-node{
+  width:100px;border:1px solid rgba(213,188,137,.52);border-radius:7px;background:rgba(30,31,24,.90);color:#eadcb7;
+  box-shadow:0 4px 12px rgba(0,0,0,.30);backdrop-filter:blur(2px)
+}
+#game .border-node-name{color:#dbc38d}.border-side-btn{background:rgba(246,235,202,.10)!important;color:#f3e4be!important;border-color:rgba(211,187,132,.34)!important}.border-side-btn small{color:#bfae84!important}
+#game .threat{background:rgba(213,177,92,.18);color:#efdda7;border:1px solid rgba(218,185,105,.24)}#game .threat.hot{background:rgba(152,45,32,.62);color:#ffe3c9;border-color:rgba(255,132,100,.42)}
+#game .border-node.war{box-shadow:0 0 0 2px rgba(200,59,37,.6),0 0 20px rgba(190,47,27,.42)}
+#game .game-vignette{position:absolute;inset:0;z-index:4;pointer-events:none;box-shadow:inset 0 0 120px rgba(0,0,0,.62);background:linear-gradient(180deg,rgba(7,10,7,.28),transparent 18%,transparent 74%,rgba(4,7,4,.38))}
+#game .hud{position:absolute;z-index:10;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+#game .statusbar{top:12px;left:50%;transform:translateX(-50%);width:min(720px,calc(100% - 430px));margin:0;display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+#game .status{background:rgba(24,27,22,.84);border:1px solid rgba(220,192,133,.29);border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.28);padding:7px 8px;color:#d9cba8}
+#game .status span{font-size:10px;letter-spacing:.05em}#game .status b{font-size:16px;color:#fff0c7}
+#game .turn-hud{top:12px;left:12px;width:190px}
+#game .turn-head{padding:9px 10px;border-radius:8px;background:rgba(31,29,23,.88);border:1px solid rgba(221,190,126,.32);box-shadow:0 4px 14px rgba(0,0,0,.28)}
+#game .turn-head.bot{background:rgba(54,43,58,.9)}#game .turn-head .who{font-size:16px}#game .turn-head .school{font-size:11px}
+#game .message-hud{top:72px;left:50%;transform:translateX(-50%);width:min(590px,calc(100% - 420px));pointer-events:none}
+#game .action-box{margin:0;min-height:0;padding:8px 14px;text-align:center;border:1px solid rgba(221,191,128,.34);border-radius:8px;background:rgba(24,27,22,.86);color:#eee1bd;box-shadow:0 4px 14px rgba(0,0,0,.28);font-size:12px}
+#game .action-box strong{color:#ffd98a}
+#game .mission-hud{top:146px;left:12px;width:280px;max-height:calc(100% - 408px);overflow:auto;padding:9px;background:rgba(24,27,22,.82);border:1px solid rgba(221,191,128,.27);border-radius:9px;box-shadow:0 7px 20px rgba(0,0,0,.30);color:#eee0bd}
+#game .public-board{background:transparent;border:0;padding:0;color:#eadfbe}.public-board h3{color:#f1d897;font-size:13px}.public-row{border-color:rgba(219,193,140,.18)}
+#game .missions{margin-top:7px}.mission{background:rgba(109,85,44,.20);border-color:rgba(223,189,117,.35);color:#f0e1b9}.mission.secret{background:rgba(76,60,88,.28);border-color:rgba(176,144,192,.38)}
+#game .pts{background:#b88b37;color:#1b1812}
+#game .hand-hud{left:50%;bottom:12px;transform:translateX(-50%);width:min(760px,calc(100% - 30px));padding:8px 12px 10px;border:1px solid rgba(222,193,133,.29);border-radius:12px;background:linear-gradient(180deg,rgba(24,27,22,.76),rgba(18,20,17,.91));box-shadow:0 -5px 22px rgba(0,0,0,.34);color:#eadfbe}
+#game .hand-title{padding:0 6px}.cards{height:198px;min-height:198px}.card{width:150px;height:190px;background:linear-gradient(180deg,#e8d6aa,#c6aa70);border-color:#6d5632;color:#2b2419;box-shadow:0 7px 14px rgba(0,0,0,.30)}.card-desc{color:#56462e}.type.internal{background:#4e6c50}.type.diplomacy{background:#4c6674}.type.military{background:#7b443b}
+#game .endrow{position:absolute;right:10px;bottom:10px;display:flex;gap:6px;width:auto}.endrow .btn{padding:7px 10px;font-size:11px}
+#game .log{right:12px;top:118px;width:285px;max-height:190px;margin:0;padding:8px 10px;background:rgba(24,27,22,.78);border:1px solid rgba(222,193,133,.24);border-radius:8px;box-shadow:0 5px 18px rgba(0,0,0,.28);color:#d8caab;font-size:10px;overflow:auto}
+#game .log p{border-color:rgba(219,193,140,.15)}
+#game .map-controls{right:12px;bottom:245px;display:flex;flex-direction:column;gap:5px}
+#game .map-control-btn{width:40px;height:40px;border:1px solid rgba(222,193,133,.32);border-radius:8px;background:rgba(24,27,22,.86);color:#f0dfb4;font-size:21px;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.28)}
+#game .layer-hidden{display:none!important}
+#game .map-control-btn.small{font-size:11px}#game .map-control-btn.off{background:rgba(69,65,56,.84);color:#a99a75;border-color:rgba(171,151,105,.24)}.map-help{position:absolute;z-index:10;right:60px;bottom:240px;padding:5px 8px;border-radius:6px;background:rgba(24,27,22,.74);color:#cdbc98;font-size:10px;pointer-events:none}
+@media(max-width:900px){
+ #game .statusbar{width:calc(100% - 24px);top:8px;grid-template-columns:repeat(5,1fr)}
+ #game .turn-hud{top:58px;left:8px;width:142px}
+ #game .message-hud{top:58px;width:calc(100% - 316px)}
+ #game .mission-hud{top:142px;left:8px;width:220px;max-height:250px}
+ #game .log{top:108px;right:8px;width:210px;max-height:130px}
+ #game .hand-hud{bottom:7px;width:calc(100% - 14px)}
+ #game .map-controls{right:8px;bottom:222px}.map-help{display:none}
+}
+@media(max-width:600px){
+ #game .statusbar{grid-template-columns:repeat(5,minmax(0,1fr));gap:2px}.status{padding:5px 2px!important}.status span{font-size:8px!important}.status b{font-size:12px!important}
+ #game .turn-hud{top:52px;width:128px}.turn-head .who{font-size:13px!important}.turn-head .school{font-size:9px!important}
+ #game .message-hud{top:52px;left:140px;right:7px;transform:none;width:auto}.action-box{font-size:10px!important;padding:6px!important}
+ #game .mission-hud{top:92px;width:176px;max-height:190px;padding:6px;font-size:10px}.public-board h3{font-size:11px}.public-row,.mission-body,.secret-body{font-size:9px!important}
+ #game .log{display:none}
+ #game .hand-hud{padding:5px 6px 8px}.cards{height:170px;min-height:170px}.card{width:126px;height:162px}.card-name{font-size:13px}.card-desc{font-size:9px}.hand-title .tiny{display:none}
+ #game .endrow{right:5px;bottom:5px}.endrow .btn{padding:6px 7px;font-size:9px}
+ #game .map-controls{bottom:190px}.map-control-btn{width:36px;height:36px}
+ #game .state{width:104px;min-height:74px}.state-name{font-size:22px}.border-node{width:102px}
+}
+
+
+/* ===== Frontier rebuild: traced anchors + crisp vector soldier pieces ===== */
+#game .state{width:104px;min-height:72px;padding:6px;z-index:5;background:linear-gradient(180deg,rgba(30,29,23,.91),rgba(20,22,18,.91))}
+#game .state-name{font-size:23px}
+#game .state-stats{font-size:10px;gap:3px}
+#game .state-troops{font-size:9px}
+#game .buff{font-size:9px}
+#game .map-troops{z-index:4}
+#game .map-borders{z-index:7}
+#game .border-anchor{position:absolute;width:11px;height:11px;transform:translate(-50%,-50%);border-radius:50%;background:#f6e3aa;border:2px solid #332618;box-shadow:0 0 0 2px rgba(255,233,169,.35),0 2px 5px rgba(0,0,0,.45);pointer-events:none;z-index:6}
+#game .border-anchor.hot{background:#d9533f;box-shadow:0 0 0 3px rgba(220,74,52,.27),0 2px 6px rgba(0,0,0,.45)}
+#game .border-leader{position:absolute;height:2px;background:rgba(255,226,151,.92);transform-origin:0 50%;pointer-events:none;z-index:5;box-shadow:0 1px 2px rgba(0,0,0,.55)}
+#game .border-node{width:76px;padding:4px;border-radius:8px;background:rgba(22,22,18,.96)!important;border:1px solid rgba(238,207,139,.78)!important;box-shadow:0 6px 16px rgba(0,0,0,.48)!important}
+#game .border-node-top{margin-bottom:3px;gap:2px;align-items:center}
+#game .border-node-name{font-size:8.5px;white-space:nowrap;color:#ffe6a9!important;font-weight:1000}
+#game .threat{font-size:10px;min-width:19px;text-align:center;padding:1px 4px}
+#game .border-node-sides{gap:2px}
+#game .border-side-btn{min-height:30px;padding:2px 1px!important;border-radius:5px!important}
+#game .border-side-btn small{font-size:7px!important;line-height:1}
+#game .border-side-btn .side-num{font-size:14px!important;line-height:1.05}
+#game .border-side-btn .fatigue-num{font-size:7px!important;line-height:1;color:#c6b892!important}
+#game .troop-piece{position:absolute;width:30px;height:48px;transform:translate(-50%,-50%);pointer-events:none;z-index:4;filter:drop-shadow(0 3px 3px rgba(0,0,0,.34))}
+#game .troop-piece img{display:block;width:100%;height:100%;object-fit:contain}
+#game .troop-piece.fatigue{width:40px;height:26px;opacity:.94;filter:drop-shadow(0 2px 2px rgba(0,0,0,.28))}
+@media(max-width:600px){#game .border-node{width:70px}#game .border-node-name{font-size:8px}#game .troop-piece{width:26px;height:40px}#game .troop-piece.fatigue{width:34px;height:22px}}
+
+
+
+/* ===== ガクハコ / スマホ縦画面最適化 ===== */
+#game.game{height:100dvh;min-height:100dvh}
+.overlay .modal{max-height:calc(100dvh - 24px);overflow:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:600px){
+  .home-back-btn{top:max(6px,env(safe-area-inset-top));left:max(6px,env(safe-area-inset-left));min-height:36px;padding:6px 10px;font-size:12px}
+  body:not(.game-running) .topbar{padding-left:0;padding-top:42px;gap:6px}
+  body:not(.game-running) .titlebox h1{font-size:24px}
+  body:not(.game-running) .titlebox small{font-size:11px}
+  body:not(.game-running) .badge{font-size:10px;padding:5px 8px}
+  .setup{width:auto;margin:8px 4px 16px;padding:12px;border-radius:14px}
+  .setup h2{font-size:20px;margin-bottom:10px}
+  .setup-grid{grid-template-columns:1fr;gap:9px}
+  .field{gap:4px}.field label{font-size:12px}
+  select,input{min-height:44px;padding:9px 10px;font-size:16px}
+  #startBtn{min-height:46px}
+  .overlay{padding:8px;padding-top:max(8px,env(safe-area-inset-top));padding-bottom:max(8px,env(safe-area-inset-bottom))}
+  .modal{padding:14px;border-radius:14px}.modal h2{font-size:20px;margin-bottom:8px}
+  .mission-choice-grid{grid-template-columns:1fr;gap:8px}.mission-choice{padding:11px}
+
+  #game .statusbar{top:max(6px,env(safe-area-inset-top));left:108px;right:6px;width:auto;transform:none;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px}
+  #game .status{padding:4px 1px!important;min-width:0}
+  #game .status span{font-size:7px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #game .status b{font-size:11px!important;white-space:nowrap}
+  body.game-running #game .turn-hud{top:54px;left:6px;width:132px}
+  #game .turn-head{padding:6px 7px}
+  #game .turn-head .who{font-size:13px!important;padding-right:20px}
+  #game .turn-head .school{font-size:9px!important;line-height:1.25;padding-right:16px}
+  #game .message-hud{top:54px;left:144px;right:6px;transform:none;width:auto}
+  #game .action-box{font-size:9px!important;line-height:1.25;padding:6px 7px!important;min-height:38px;display:flex;align-items:center;justify-content:center}
+
+  #game .mission-hud{top:116px;left:6px;width:min(184px,48vw);max-height:min(240px,calc(100dvh - 336px));padding:6px;font-size:10px;overscroll-behavior:contain}
+  #game .public-board h3{font-size:11px;margin-bottom:4px}
+  #game .public-row,#game .mission-body,#game .secret-body{font-size:9px!important;line-height:1.35}
+  #game .mission{padding:6px}.mission-title{font-size:10px}
+  #game .log{display:none!important}
+
+  #game .hand-hud{left:4px;right:4px;bottom:max(4px,env(safe-area-inset-bottom));transform:none;width:auto;padding:5px 6px 7px;border-radius:10px}
+  #game .hand-title{padding:0 4px;font-size:13px}.hand-title .tiny{display:none}
+  #game .cards{height:156px;min-height:156px}
+  #game .card{width:118px;height:150px;padding:7px;border-radius:11px}
+  #game .card-name{font-size:12px}.card-desc{font-size:8px;line-height:1.28}.type{font-size:8px;padding:2px 4px}
+  #game .endrow{right:5px;bottom:5px;gap:4px}.endrow .btn{padding:6px 7px;font-size:9px}
+
+  #game .map-controls{right:6px;bottom:196px;display:grid;grid-template-columns:repeat(2,34px);gap:4px}
+  #game .map-control-btn,#game .map-control-btn.small{width:34px;height:34px;font-size:18px;padding:0}
+  #game .map-control-btn.small{font-size:9px}
+  #game .hud-drag-handle{width:22px;height:22px;line-height:20px;font-size:12px;right:3px;top:3px}
+  #game .state{width:92px;min-height:64px;padding:5px}
+  #game .state-name{font-size:19px}.state-stats{font-size:8px!important}.state-troops,.buff{font-size:8px!important}
+  #game .border-node{width:66px!important;padding:3px}.border-node-name{font-size:7px!important}.border-side-btn{min-height:27px!important}.border-side-btn .side-num{font-size:12px!important}
+  #game .troop-piece{width:24px;height:38px}#game .troop-piece.fatigue{width:32px;height:21px}
+  .map-help{display:none!important}
+}
+@media(max-width:380px){
+  #game .statusbar{left:102px}
+  #game .status span{font-size:6.5px!important}#game .status b{font-size:10px!important}
+  body.game-running #game .turn-hud{width:126px}#game .message-hud{left:138px}
+  #game .mission-hud{width:168px}
+  #game .card{width:110px;height:146px}#game .cards{height:152px;min-height:152px}
+}
+
+
+/* ===== Zoom-stable map UI ===== */
+/* 地図拡大時も文字UIは画面上で等倍を維持し、文字のギザつき・揺れを抑える */
+#game .state,
+#game .border-node{
+  transform:translate(-50%,-50%) scale(var(--map-ui-counter,1));
+  transform-origin:50% 50%;
+  transition:box-shadow .15s ease,outline-color .15s ease,border-color .15s ease,filter .15s ease;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  backface-visibility:hidden;
+}
+#game .state.valid{
+  transform:translate(-50%,-50%) scale(var(--map-ui-counter,1));
+}
+
+
+.setup-subcontrols{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 8px}
+.setup-subcontrols .btn{box-shadow:none}
+.rules-modal{max-width:760px!important;text-align:left!important}
+.rules-head{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:-20px;background:#fffaf0;padding:2px 0 10px;z-index:2}
+.rules-head h2{margin:0!important}
+.rules-body{display:grid;gap:10px;font-size:13px;line-height:1.65}
+.rules-body details{border:1px solid #d3c2a4;border-radius:12px;background:#fffdf7;padding:9px 11px}
+.rules-body summary{cursor:pointer;font-weight:900;font-family:serif;font-size:15px;color:#4b3a24}
+.rules-body p{margin:7px 0 0}
+.rules-body ul{margin:7px 0 0;padding-left:1.35em}
+.rules-body li+li{margin-top:4px}
+.rules-note{padding:9px 11px;border-radius:10px;background:#f1e6d0;color:#4e4030}
+.sound-on{box-shadow:0 0 0 2px rgba(216,182,107,.24),0 4px 12px rgba(0,0,0,.28)!important}
+@media(max-width:600px){
+  .setup-subcontrols{gap:6px;margin:8px 0 7px}
+  .setup-subcontrols .btn{min-height:42px;padding:8px 6px;font-size:12px}
+  .rules-modal{padding:12px!important}.rules-head{top:-12px;padding-bottom:8px}.rules-body{font-size:12px;line-height:1.55;gap:8px}.rules-body details{padding:8px 9px}.rules-body summary{font-size:14px}
+}
+
+
+
+/* ===== Military action choice modal / readable hand ===== */
+#militaryChoiceOverlay{z-index:74}
+.military-choice-modal{max-width:520px!important;text-align:left!important;border:2px solid #8f6b3e;background:linear-gradient(180deg,#fffaf0,#f2e3c5)!important}
+.military-choice-modal h2{text-align:center;margin-bottom:6px}
+.military-choice-card{text-align:center;font-weight:900;font-family:serif;font-size:20px;color:#5e3824;margin:2px 0 12px}
+.military-choice-help{text-align:center;font-size:12px;color:#6f665a;line-height:1.5;margin:0 0 12px}
+.military-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.military-choice-btn{border:2px solid #8d754f;border-radius:14px;background:#fffdf7;color:#31291f;padding:14px 12px;text-align:left;cursor:pointer;box-shadow:0 4px 10px rgba(51,39,22,.12)}
+.military-choice-btn:hover,.military-choice-btn:focus-visible{border-color:#9b7425;outline:3px solid rgba(184,135,40,.22)}
+.military-choice-btn strong{display:block;font:900 20px/1.2 serif;margin-bottom:7px;color:#6f3d2f}
+.military-choice-btn span{display:block;font-size:12px;line-height:1.55;color:#5f5548}
+.military-choice-cancel{display:block;margin:13px auto 0}
+
+/* カード効果がカード内部で切れない高さを確保 */
+#game .cards{height:248px;min-height:248px}
+#game .card{width:150px;height:238px;padding:8px 8px 10px}
+#game .card-art{height:102px}
+#game .card-desc{font-size:10px;line-height:1.38;margin-top:7px}
+
+@media(max-width:600px){
+  .military-choice-grid{grid-template-columns:1fr;gap:8px}
+  .military-choice-modal{max-width:min(94vw,440px)!important;padding:13px!important}
+  .military-choice-card{font-size:18px;margin-bottom:8px}
+  .military-choice-help{font-size:11px;margin-bottom:9px}
+  .military-choice-btn{padding:11px}.military-choice-btn strong{font-size:18px}.military-choice-btn span{font-size:11px}
+  #game .hand-hud{padding-bottom:8px}
+  #game .cards{height:220px;min-height:220px}
+  #game .card{width:120px;height:210px;padding:7px}
+  #game .card-art{height:78px}
+  #game .card-name{font-size:12px;line-height:1.18}
+  #game .card-desc{font-size:9.2px;line-height:1.28;margin-top:6px}
+  #game .map-controls{bottom:260px}
+  #game .mission-hud{max-height:min(220px,calc(100dvh - 398px))}
+}
+@media(max-width:380px){
+  #game .cards{height:212px;min-height:212px}
+  #game .card{width:114px;height:202px}
+  #game .card-art{height:72px}
+  #game .card-desc{font-size:8.8px}
+  #game .map-controls{bottom:250px}
+}
+
+
+
+/* ===== カード長押し・故事学習 ===== */
+#cardStudyOverlay{z-index:92}
+.card-study-modal{max-width:820px!important;text-align:left!important;background:linear-gradient(180deg,#fffaf0,#f0e0bd)!important;border:2px solid #8c7045;padding:16px!important}
+.card-study-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.card-study-titlewrap{min-width:0}.card-study-title{font:900 clamp(24px,4vw,34px)/1.15 serif;color:#4b321e;margin:0}.card-study-reading{font-size:12px;color:#75644e;margin-top:4px;font-weight:800}
+.card-study-grid{display:grid;grid-template-columns:minmax(240px,.8fr) minmax(0,1.2fr);gap:16px;align-items:start}
+.card-study-art{border:2px solid #8f7851;border-radius:14px;overflow:hidden;background:#d9c69a;box-shadow:0 8px 20px rgba(56,39,20,.18);aspect-ratio:420/620}
+.card-study-art img{display:block;width:100%;height:100%;object-fit:cover}
+.card-study-body{display:grid;gap:10px;min-width:0}.card-study-section{border:1px solid #cbb891;border-radius:12px;background:rgba(255,253,247,.76);padding:10px 12px}
+.card-study-section h3{font:900 16px/1.2 serif;color:#5a3b24;margin:0 0 6px}.card-study-section p{margin:0;font-size:13px;line-height:1.75;color:#42372c}
+.card-study-effect{font-weight:800;color:#6d4726!important}.card-study-note{font-size:11px;color:#796b58;line-height:1.55;margin:0;text-align:center}
+#game .card{touch-action:manipulation;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
+#game .card.study-pressing{filter:brightness(1.08);box-shadow:0 0 0 4px rgba(216,182,107,.32),0 13px 24px rgba(51,39,22,.28)}
+@media(max-width:600px){
+  .card-study-modal{padding:10px!important;max-width:calc(100vw - 12px)!important}
+  .card-study-head{margin-bottom:8px}.card-study-title{font-size:23px}.card-study-reading{font-size:11px}
+  .card-study-grid{grid-template-columns:42% minmax(0,1fr);gap:9px}
+  .card-study-section{padding:8px}.card-study-section h3{font-size:14px;margin-bottom:4px}.card-study-section p{font-size:11px;line-height:1.55}
+  .card-study-note{font-size:10px}
+}
+@media(max-width:420px){
+  .card-study-grid{grid-template-columns:1fr;max-height:calc(100dvh - 105px);overflow:auto;-webkit-overflow-scrolling:touch;padding-right:2px}
+  .card-study-art{width:min(66vw,250px);justify-self:center;aspect-ratio:420/620}
+  .card-study-body{gap:7px}
+}
+
+
+.music-credit{margin:10px 0 0;text-align:center;font-size:11px;line-height:1.6;color:var(--muted)}
+.music-credit a{color:inherit;font-weight:800;text-decoration:underline;text-underline-offset:2px}
+body.game-running .music-credit{color:#d8caab}
+@media(max-width:600px){.music-credit{font-size:9.5px;margin-top:7px}}
+</style>
+</head>
+<body>
+<a href="/" class="home-back-btn" aria-label="ガクハコのトップへ戻る">← ガクハコ</a>
+<div class="app">
+  <div class="topbar">
+    <div class="titlebox"><h1>遊説遊戯</h1><small>春秋戦国・故事成語・使命得点型 対戦ゲーム</small></div>
+    <div class="badge">HTMLのみ</div>
+  </div>
+
+  <section id="setup" class="setup panel">
+    <h2>遊説の支度</h2>
+    <div class="setup-grid">
+      <div class="field"><label>対戦モード</label><select id="gameMode"><option value="bot" selected>BOT戦</option><option value="local">ローカル対人戦</option></select></div>
+      <div class="field"><label id="playerCountLabel">参加人数（あなた＋BOT）</label><select id="playerCount"><option value="2">2人</option><option value="3" selected>3人</option><option value="4">4人</option></select></div>
+      <div id="botSchoolField" class="field"><label>あなたの学派</label><select id="humanSchool"><option>儒家</option><option>墨家</option><option>縦横家</option><option>兵家</option><option>法家</option><option>道家</option></select></div>
+      <div id="botNameField" class="field"><label>あなたの名前</label><input id="humanName" value="説客" /></div>
+      <div class="field"><label>ラウンド数</label><select id="roundLimit"><option value="12" selected>12（固定）</option></select></div>
+    </div>
+    <div id="localPlayers" class="local-players hidden-ui"></div>
+    <p id="setupHint" class="hint">あなたがP1、残りはBOTです。使命は2枚配られ、ゲーム開始時に1枚を公開、もう1枚を非公開にします。達成した使命の得点合計で勝敗を決めます。各ラウンドのスタートプレイヤーは順番に交代します。</p>
+    <div class="setup-subcontrols">
+      <button id="rulesBtnSetup" class="btn ghost" type="button">ルール解説</button>
+      <button id="soundBtnSetup" class="btn ghost sound-on" type="button">♪ 音 ON</button>
+    </div>
+
+    <p class="music-credit">BGM：<a href="https://amachamusic.chagasi.com/music_icarusnotsuiraku.html" target="_blank" rel="noopener noreferrer">「イカロスの墜落」</a> ／ <a href="https://amachamusic.chagasi.com/" target="_blank" rel="noopener noreferrer">甘茶の音楽工房</a>（作曲：甘茶）</p>
+    <button id="startBtn" class="btn" style="width:100%">BOT戦を始める</button>
+  </section>
+
+  <main id="game" class="game">
+    <div id="mapViewport" class="map-viewport" aria-label="戦国七雄の戦略マップ。ドラッグで移動、ホイールまたはピンチで拡大縮小できます。">
+      <div id="mapScene" class="map-scene">
+        <svg class="map-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <polygon class="territory zhao" points="14,6 52,4 55,28 42,38 20,33 8,20"/>
+          <polygon class="territory yan" points="52,4 92,5 96,27 77,35 55,28"/>
+          <polygon class="territory qin" points="2,26 26,25 36,52 28,78 4,82 1,55"/>
+          <polygon class="territory wei" points="26,25 58,27 61,56 44,65 36,52"/>
+          <polygon class="territory qi" points="58,27 96,27 98,65 76,72 61,56"/>
+          <polygon class="territory han" points="30,51 61,54 62,78 45,84 28,76"/>
+          <polygon class="territory chu" points="22,73 46,70 62,72 78,66 92,82 84,98 22,98 8,87"/>
+          <path class="river" d="M7 35 C26 40,35 32,49 40 S75 47,95 39"/>
+          <path class="river" d="M25 8 C28 28,42 42,44 62 S49 84,63 98"/>
+          <path class="road" d="M16 43 L35 14 L66 14 L76 43 L45 88 L16 43"/>
+          <line class="frontier" x1="35" y1="14" x2="66" y2="14"/><line class="frontier" x1="35" y1="14" x2="42" y2="43"/><line class="frontier" x1="35" y1="14" x2="16" y2="43"/>
+          <line class="frontier" x1="66" y1="14" x2="76" y2="43"/><line class="frontier" x1="16" y1="43" x2="42" y2="43"/><line class="frontier" x1="42" y1="43" x2="76" y2="43"/>
+          <line class="frontier" x1="16" y1="43" x2="44" y2="68"/><line class="frontier" x1="42" y1="43" x2="44" y2="68"/><line class="frontier" x1="16" y1="43" x2="45" y2="88"/>
+          <line class="frontier" x1="44" y1="68" x2="45" y2="88"/><line class="frontier" x1="76" y1="43" x2="45" y2="88"/>
+        </svg>
+        <div class="mountains" style="left:7%;top:19%">▲▲▲▲</div><div class="mountains" style="left:20%;top:82%">▲▲▲▲▲</div><div class="mountains" style="left:71%;top:74%">▲▲▲</div>
+        <div class="terrain-label" style="left:31%;top:34%">黄河</div><div class="terrain-label" style="left:49%;top:57%">中原</div><div class="terrain-label" style="left:82%;top:49%">東海</div>
+        <div id="mapTroops" class="map-troops" aria-hidden="true"></div><div id="mapBorders" class="map-borders"></div>
+        <div class="state" data-state="趙" style="left:36.7%;top:18.9%"></div><div class="state" data-state="燕" style="left:69.6%;top:18.3%"></div>
+        <div class="state" data-state="秦" style="left:13.3%;top:47.2%"></div><div class="state" data-state="魏" style="left:41.7%;top:41.7%"></div><div class="state" data-state="斉" style="left:70.8%;top:45.6%"></div>
+        <div class="state" data-state="韓" style="left:39.2%;top:66.7%"></div><div class="state" data-state="楚" style="left:51.0%;top:84.0%"></div>
+      </div>
+    </div>
+    <div class="game-vignette"></div>
+
+    <div id="turnHud" class="turn-hud hud draggable"><div id="turnHead" class="turn-head"><div id="turnWho" class="who"></div><div id="turnSchool" class="school"></div></div></div>
+
+    <div id="statusHud" class="statusbar hud draggable">
+      <div class="status"><span>ラウンド</span><b id="roundStat">1 / 12</b></div>
+      <div class="status"><span>手番</span><b id="turnStat">あなた</b></div>
+      <div class="status"><span>山札</span><b id="deckStat">0</b></div>
+      <div class="status"><span>開戦予定</span><b id="warStat">0</b></div>
+      <div class="status"><span>累計戦争</span><b id="totalWarStat">0</b></div>
+    </div>
+
+    <div id="messageHud" class="message-hud hud draggable"><div id="actionBox" class="action-box">カードを選ぶと対象候補が光ります。</div></div>
+
+    <aside id="missionHud" class="mission-hud hud draggable">
+      <div class="public-board"><h3>公開使命</h3><div id="publicMissions"></div></div>
+      <div id="humanMissions" class="missions">
+        <div class="mission"><div class="mission-title"><span id="myPublicLabel">自分の公開使命</span></div><div id="myPublicMission" class="mission-body"></div></div>
+        <div id="secretBox" class="mission secret hidden"><div class="mission-title"><span id="mySecretLabel">自分の非公開使命</span><button id="secretToggle" class="btn ghost" style="padding:4px 8px">見る</button></div><div id="mySecretMission" class="secret-body"></div></div>
+      </div>
+    </aside>
+
+    <section class="log hud draggable" id="log"></section>
+
+    <section id="handHud" class="hand-hud hud draggable">
+      <div class="hand-title"><strong>手札</strong><span class="tiny">毎手番3枚ドロー／何枚でも使用可／長押しで故事</span></div>
+      <div id="cards" class="cards"></div>
+      <div class="endrow"><button id="cancelCard" class="btn secondary">選択解除</button><button id="endTurn" class="btn red">ターン終了</button></div>
+    </section>
+
+    <div id="mapControls" class="map-controls hud draggable" aria-label="マップ操作">
+      <button id="zoomInBtn" class="map-control-btn" type="button" aria-label="拡大">＋</button>
+      <button id="zoomOutBtn" class="map-control-btn" type="button" aria-label="縮小">−</button>
+      <button id="mapResetBtn" class="map-control-btn small" type="button">全体</button>
+      <button id="toggleStatesBtn" class="map-control-btn small" type="button" title="国力ウインドウの表示切替">国</button>
+      <button id="toggleBordersBtn" class="map-control-btn small" type="button" title="国境ウインドウの表示切替">境</button>
+      <button id="rulesBtnGame" class="map-control-btn small" type="button" title="ルール解説">ルール</button>
+      <button id="soundBtnGame" class="map-control-btn small sound-on" type="button" title="BGM・SEの切替">音</button>
+      <button id="hudResetBtn" class="map-control-btn small" type="button" title="UI位置を初期化">UI</button>
+    </div>
+    <div class="map-help">ドラッグ：移動　ホイール／ピンチ：拡大縮小　地形統合 v4</div>
+  </main>
+</div>
+
+<div id="missionOverlay" class="overlay"><div class="modal"><h2 id="missionChoiceTitle">公開する使命を選ぶ</h2><p class="hint">選ばなかった1枚は非公開使命になります。</p><div id="missionChoices" class="mission-choice-grid"></div></div></div>
+<div id="cardPlayFx" class="card-play-fx" aria-live="polite" aria-hidden="true">
+  <div class="played-card-wrap">
+    <div id="playedBy" class="played-by"></div>
+    <div id="playedCard" class="played-card"></div>
+  </div>
+</div>
+
+<div id="passOverlay" class="overlay"><div class="modal"><h2 id="passTitle">次のプレイヤーへ</h2><p id="passText" class="pass-note"></p><button id="passBtn" class="btn" style="width:100%">準備できた</button></div></div>
+<div id="roundOverlay" class="overlay"><div class="modal"><h2>ラウンド処理</h2><div id="roundSummary" style="text-align:left;line-height:1.65;font-size:13px"></div><button id="nextRoundBtn" class="btn gold" style="width:100%;margin-top:12px">次のラウンドへ</button></div></div>
+<div id="resultOverlay" class="overlay"><div class="modal"><h2>遊説の結末</h2><div id="resultList" class="result-list"></div><button id="restartBtn" class="btn" style="width:100%">最初から</button></div></div>
+
+
+
+<div id="cardStudyOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="cardStudyTitle">
+  <div class="modal card-study-modal">
+    <div class="card-study-head">
+      <div class="card-study-titlewrap"><h2 id="cardStudyTitle" class="card-study-title"></h2><div id="cardStudyReading" class="card-study-reading"></div></div>
+      <button id="cardStudyCloseBtn" class="btn ghost" type="button">閉じる</button>
+    </div>
+    <div class="card-study-grid">
+      <div class="card-study-art"><img id="cardStudyImage" src="" alt=""></div>
+      <div class="card-study-body">
+        <div class="card-study-section"><h3>どんなお話？</h3><p id="cardStudyEpisode"></p></div>
+        <div class="card-study-section"><h3>今の意味</h3><p id="cardStudyMeaning"></p></div>
+        <div class="card-study-section"><h3>このゲームでの効果</h3><p id="cardStudyEffect" class="card-study-effect"></p></div>
+      </div>
+    </div>
+    <p class="card-study-note">手札のカードは長押しでいつでも確認できます。学習画面を開いてもカードは使用されません。</p>
+  </div>
+</div>
+
+<!--
+BGM: 「イカロスの墜落」 / 甘茶の音楽工房（作曲：甘茶）
+https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
+音源は公式配布ページからダウンロードしたローカルファイルをゲーム内BGMとして使用。外部音源への直リンクはしていません。
+-->
+<audio id="bgm" src="assets/audio/icarusnotsuiraku.mp3" preload="auto" loop></audio>
+
+<div id="militaryChoiceOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="militaryChoiceTitle">
+  <div class="modal military-choice-modal">
+    <h2 id="militaryChoiceTitle">軍事カードの使い方</h2>
+    <div id="militaryChoiceCard" class="military-choice-card"></div>
+    <p class="military-choice-help">このカードで行うアクションを選んでください。選択後、地図上の対象候補が光ります。</p>
+    <div class="military-choice-grid">
+      <button id="militaryAddBtn" class="military-choice-btn" type="button"><strong>増兵</strong><span>国力に空きがある国へ兵士を補充します。</span></button>
+      <button id="militaryMoveBtn" class="military-choice-btn" type="button"><strong>再配置</strong><span>同じ国の稼働兵士を、別の国境へ移動します。</span></button>
+    </div>
+    <button id="militaryChoiceCancel" class="btn ghost military-choice-cancel" type="button">カード選択に戻る</button>
+  </div>
+</div>
+
+<div id="rulesOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+  <div class="modal rules-modal">
+    <div class="rules-head"><h2 id="rulesTitle">遊説遊戯　ルール解説</h2><button id="rulesCloseBtn" class="btn ghost" type="button">閉じる</button></div>
+    <div class="rules-body">
+      <div class="rules-note"><b>目的：</b>12ラウンド終了時、達成した「公開使命」と「非公開使命」の合計得点が最も高い説客が勝者です。</div>
+      <details open><summary>1. ゲームの流れ</summary><ul>
+        <li>開始時に使命を2枚受け取り、1枚を公開、1枚を非公開にします。</li>
+        <li>自分の手番の開始時にカードを3枚引きます。手札上限は7枚です。</li>
+        <li>手札からカードを何枚でも使用できます。何も使わずターン終了しても構いません。</li>
+        <li>全員の手番が終わると、平和威信・戦争・疲弊回復を処理して次ラウンドへ進みます。</li>
+      </ul></details>
+      <details><summary>2. 3種類のカード</summary><ul>
+        <li><b>内政：</b>指定した国の国力や威信を増減します。</li>
+        <li><b>外交：</b>指定国境の脅威を上げたり下げたりします。</li>
+        <li><b>軍事：</b>国境への増兵、または同じ国の別国境への再配置を行います。</li>
+      </ul><p>カード名は故事成語ですが、効果はカード下部に表示された内容だけを処理します。</p></details>
+      <details><summary>3. 国力・威信・兵士</summary><ul>
+        <li><b>国力：</b>その国が補充できる兵士数の基準です。敗戦で国力が下がった場合、すでにいる兵士は即座には消えません。</li>
+        <li>国力が初めて<b>6・8・10</b>に到達したとき、それぞれ威信+1。</li>
+        <li><b>威信：</b>使命達成に使われるほか、威信5以上で戦争補正+1、10以上で+2。</li>
+        <li>兵士は国境ごとに配置されます。倒れている兵士は「疲弊中」で、次の戦争には参加できません。</li>
+      </ul></details>
+      <details><summary>4. 脅威と戦争</summary><ul>
+        <li>各ラウンド開始時、脅威1～4の国境は自動で+1されます。</li>
+        <li>脅威が<b>5</b>になった国境はラウンド終了時に戦争になります。</li>
+        <li>稼働兵士数＋威信による戦争補正を比較し、数値が高い国が勝利します。</li>
+        <li>両軍の同数分の兵士が疲弊し、次ラウンド終了時に回復します。</li>
+        <li>勝者は実兵力の差だけ威信を得ます。敗者は威信-1。敗者の威信が0なら代わりに国力-1（最低1）。</li>
+        <li>戦争後、その国境の脅威は1になります。</li>
+      </ul></details>
+      <details><summary>5. 平和威信</summary><p>ある国に接する<b>すべての国境の脅威が0</b>なら、ラウンド終了時にその国の威信+1。</p></details>
+      <details><summary>6. 六つの学派</summary><ul>
+        <li><b>儒家：</b>各ラウンド1回、内政時に対象国の威信+1。</li>
+        <li><b>墨家：</b>各ラウンド1回、脅威を下げる外交の効果をさらに-1。</li>
+        <li><b>縦横家：</b>各ラウンド1回、脅威を上げる外交の効果をさらに+1。</li>
+        <li><b>兵家：</b>各ラウンド1回、増兵・再配置の兵士数+1。</li>
+        <li><b>法家：</b>各ラウンド1回、内政で国力をさらに+1。ただし対象国に接する国境1つの脅威+1。</li>
+        <li><b>道家：</b>カードを1枚も使わず手番終了すると、次の自分の手番は5枚引きます。</li>
+      </ul></details>
+      <details><summary>7. 画面操作</summary><ul>
+        <li>地図はドラッグで移動、ホイールまたはピンチで拡大縮小できます。</li>
+        <li><b>国／境</b>ボタンで国力・国境ウインドウを表示／非表示にできます。</li>
+        <li><b>全体</b>で地図を初期表示に戻し、<b>UI</b>で移動したHUDを初期位置へ戻します。</li>
+        <li><b>音</b>でBGM・SEをまとめてON/OFFできます。</li>
+      </ul></details>
+
+      <div class="rules-note"><b>音楽：</b>BGMは「イカロスの墜落」（作曲：甘茶）を使用しています。音楽素材：<a href="https://amachamusic.chagasi.com/" target="_blank" rel="noopener noreferrer">甘茶の音楽工房</a>。音源は同サイトからダウンロードしたものをゲーム内BGMとして使用しています。</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const stateNames=['秦','趙','魏','韓','燕','斉','楚'];
+  const borderPairs=[['趙','燕'],['趙','魏'],['趙','秦'],['燕','斉'],['秦','魏'],['魏','斉'],['秦','韓'],['魏','韓'],['秦','楚'],['韓','楚'],['斉','楚']];
+  const borderLayout=[
+    {x:52.9,y:20.0,px:56.3,py:13.9}, // 趙-燕
+    {x:40.4,y:31.1,px:40.4,py:27.2}, // 趙-魏
+    {x:22.5,y:28.9,px:22.1,py:22.8}, // 趙-秦
+    {x:68.8,y:31.1,px:68.8,py:27.2}, // 燕-斉
+    {x:26.7,y:42.2,px:30.4,py:40.6}, // 秦-魏
+    {x:53.5,y:48.0,px:57.7,py:45.6}, // 魏-斉
+    {x:26.7,y:62.8,px:22.5,py:62.2}, // 秦-韓
+    {x:46.3,y:53.8,px:42.1,py:57.2}, // 魏-韓
+    {x:15.8,y:72.2,px:17.5,py:76.7}, // 秦-楚
+    {x:49.2,y:66.9,px:42.1,py:75.0}, // 韓-楚
+    {x:63.3,y:64.4,px:75.0,py:68.3}  // 斉-楚
+  ];
+  const stateLayout={趙:{x:36.7,y:18.9},燕:{x:69.6,y:18.3},秦:{x:13.3,y:47.2},魏:{x:41.7,y:41.7},斉:{x:70.8,y:45.6},韓:{x:39.2,y:66.7},楚:{x:51.0,y:84.0}};
+  const schoolDefs={
+    '儒家':'1ラウンド1回、内政した国の威信+1。',
+    '墨家':'1ラウンド1回、脅威を下げる外交の効果量+1。',
+    '縦横家':'1ラウンド1回、脅威を上げる外交の効果量+1。',
+    '兵家':'1ラウンド1回、軍事の増兵・再配置量+1。',
+    '法家':'1ラウンド1回、内政した国の国力をさらに+1。ただし接する国境1つの脅威+1。',
+    '道家':'カードを1枚も使わず手番終了すると、次の自分の手番は5枚ドロー。'
+  };
+
+  const missionDefs=[
+    {id:'qin12',name:'虎狼の国',desc:'ゲーム終了時、秦の威信が12以上。',points:4,type:'statePrestige',state:'秦',target:12},
+    {id:'han7',name:'存韓',desc:'ゲーム終了時、韓の威信が7以上。',points:3,type:'statePrestige',state:'韓',target:7},
+    {id:'hezong30',name:'合従',desc:'ゲーム終了時、秦以外6国の威信合計が30以上。',points:2,type:'sumPrestige',states:['趙','魏','韓','燕','斉','楚'],target:30},
+    {id:'lianheng',name:'連衡',desc:'ゲーム終了時、秦の威信が単独1位。',points:4,type:'rankQin'},
+    {id:'peace8',name:'天下太平',desc:'ゲーム終了時、脅威0の国境が8本以上。',points:4,type:'peace',target:8},
+    {id:'fatigue16',name:'天下疲弊',desc:'ゲーム終了時、疲弊兵が合計16個以上。',points:4,type:'fatigue',target:16},
+    {id:'qi9',name:'東方の雄',desc:'ゲーム終了時、斉の威信が9以上。',points:3,type:'statePrestige',state:'斉',target:9},
+    {id:'chu10',name:'楚の隆盛',desc:'ゲーム終了時、楚の威信が10以上。',points:4,type:'statePrestige',state:'楚',target:10},
+    {id:'sanjin12',name:'三晋均衡',desc:'趙・魏・韓が全て威信4以上、かつ最大差4以内。',points:5,type:'balance'},
+    {id:'war18',name:'乱世を望む者',desc:'ゲーム中の戦争回数が18回以上。',points:4,type:'wars',target:18}
+  ];
+
+  const cardTemplates=[
+    {name:'徙木立信',type:'internal',target:'state',delta:1,prestige:0,desc:'指定した国の国力を+1。',art:'assets/cards/01_shimoku.png'},
+    {name:'千金市骨',type:'internal',target:'state',delta:1,prestige:1,desc:'指定した国の国力を+1、威信を+1。',art:'assets/cards/02_senkinshi.png'},
+    {name:'臥薪嘗胆',type:'internal',target:'state',delta:2,prestige:-1,desc:'指定した国の国力を+2、威信を-1（最低0）。',art:'assets/cards/03_gashin.png'},
+    {name:'一鳴驚人',type:'internal',target:'state',delta:0,prestige:2,desc:'指定した国の威信を+2。',art:'assets/cards/04_ichimei.png'},
+    {name:'一字千金',type:'internal',target:'state',delta:0,prestige:1,desc:'指定した国の威信を+1。',art:'assets/cards/05_ichiji.png'},
+    {name:'奇貨可居',type:'internal',target:'state',delta:1,prestige:1,desc:'指定した国の国力を+1、威信を+1。',art:'assets/cards/06_kika.png'},
+    {name:'合従',type:'diplomacy',target:'border',delta:-2,desc:'指定国境の脅威を-2。',art:'assets/cards/07_gassho.png'},
+    {name:'連衡',type:'diplomacy',target:'border',delta:2,desc:'指定国境の脅威を+2。',art:'assets/cards/08_renko.png'},
+    {name:'朝秦暮楚',type:'diplomacyChoice',target:'border',delta:1,desc:'指定国境の脅威を+1または-1。',art:'assets/cards/09_choshin.png'},
+    {name:'完璧帰趙',type:'diplomacy',target:'border',delta:-1,desc:'指定国境の脅威を-1。',art:'assets/cards/10_kanpeki.png'},
+    {name:'鶏口牛後',type:'diplomacy',target:'border',delta:1,desc:'指定国境の脅威を+1。',art:'assets/cards/11_keikou.png'},
+    {name:'唇亡歯寒',type:'diplomacy',target:'border',delta:-2,desc:'指定国境の脅威を-2。',art:'assets/cards/12_shinbou.png'},
+    {name:'退避三舎',type:'diplomacy',target:'border',delta:-1,desc:'指定国境の脅威を-1。',art:'assets/cards/13_taihi.png'},
+    {name:'鼎の軽重を問う',type:'diplomacyState',target:'state',delta:0,prestige:-2,minPrestige:5,desc:'威信5以上の国を指定し、威信を-2（最低0）。',art:'assets/cards/14_kanae.png'},
+    {name:'漁夫之利',type:'diplomacy',target:'border',delta:1,desc:'指定国境の脅威を+1。',art:'assets/cards/15_gyofu.png'},
+    {name:'胡服騎射',type:'military',target:'borderSide',delta:2,desc:'戦力+2を補充、または同じ国の別国境へ最大2再配置。',art:'assets/cards/16_kofuku.png'},
+    {name:'一鼓作気',type:'military',target:'borderSide',delta:1,desc:'戦力+1を補充、または同じ国の別国境へ最大1再配置。',art:'assets/cards/17_ikko.png'},
+    {name:'田忌賽馬',type:'military',target:'borderSide',delta:2,desc:'戦力+2を補充、または同じ国の別国境へ最大2再配置。',art:'assets/cards/18_denki.png'},
+    {name:'囲魏救趙',type:'military',target:'borderSide',delta:1,desc:'戦力+1を補充、または同じ国の別国境へ最大1再配置。',art:'assets/cards/19_iigi.png'},
+    {name:'紙上談兵',type:'military',target:'borderSide',delta:2,desc:'戦力+2を補充、または同じ国の別国境へ最大2再配置。',art:'assets/cards/20_shijo.png'}
+  ];
+
+
+
+  const cardStudyData={
+    '徙木立信':{reading:'しぼくりっしん',episode:'秦の商鞅は大きな改革を始める前、都の門に木を立て、「これを別の門まで運べば賞金を出す」と告げました。人々は疑いましたが、本当に運んだ者へ約束どおり大金を与えます。「政府の命令は必ず実行される」と人々に信じさせてから、改革を進めたという『史記』の故事です。',meaning:'約束を実際の行動で守り、相手からの信用を得ること。'},
+    '千金市骨':{reading:'せんきんしこつ',episode:'燕の昭王が優れた人物を集めたいと郭隗に相談したとき、郭隗は「名馬を千金で求めた王が、まず死んだ名馬の骨を高値で買った」という話をしました。それを見た人々は「本気で名馬を求めている」と知り、やがて本物の名馬が集まったといいます。',meaning:'本当に欲しいものを得るため、まず強い意志を示して人材や物を呼び寄せること。'},
+    '臥薪嘗胆':{reading:'がしんしょうたん',episode:'越王勾践は呉王夫差に敗れた後、敗戦の屈辱を忘れないよう苦しい生活を続け、苦い胆をなめたと伝えられます。長い年月をかけて国力を立て直し、ついには呉を破りました。後世、こうした話が「臥薪嘗胆」という四字熟語にまとめられました。',meaning:'目的を達成するため、苦労に耐えながら長い間努力を続けること。'},
+    '一鳴驚人':{reading:'いちめいきょうじん',episode:'楚の荘王は即位後しばらく政治に力を入れず、家臣から「三年飛ばず、鳴かない鳥は何の鳥か」と問われます。王は「飛べば天まで上がり、鳴けば人を驚かせる」と答え、その後は政治を立て直して強国の君主となったと伝えられます。',meaning:'長く目立たなかった人が、ひとたび力を発揮して世間を驚かせること。'},
+    '一字千金':{reading:'いちじせんきん',episode:'秦の呂不韋は多くの学者を集めて『呂氏春秋』を編さんしました。完成すると咸陽の門に書物を置き、「一字でも書き足したり削ったりできる者には千金を与える」と掲げたといいます。それほど文章の完成度に自信を示した故事です。',meaning:'文章や文字が非常に価値あるものだということ。また、優れた文章をほめる言葉。'},
+    '奇貨可居':{reading:'きかかきょ',episode:'商人の呂不韋は、趙で人質生活をしていた秦の王子・異人を見て「これは珍しい商品で、手元に置く価値がある」と考えました。彼を支援して秦の王位につながる道を作り、自分自身も大きな権力を得ます。',meaning:'珍しく価値のある人や物を、将来の利益を見こんで確保しておくこと。'},
+    '合従':{reading:'がっしょう',episode:'戦国時代、強大になった秦に対抗するため、蘇秦らは東方の国々が南北に連合する「合従」を説いたと伝えられます。一国では秦にかなわなくても、趙・魏・韓・燕・斉・楚などが協力すれば対抗できるという外交戦略でした。',meaning:'複数の勢力が共通の強敵に対抗するため、同盟を結ぶこと。'},
+    '連衡':{reading:'れんこう',episode:'合従に対し、張儀らが秦を中心に進めた外交策が「連衡」です。東方諸国の連合を切り崩し、それぞれの国と秦が個別に関係を結ぶことで、秦に対する大同盟を作らせないようにしました。',meaning:'相手の連合を分断し、一つずつ個別に結びつける外交戦略。'},
+    '朝秦暮楚':{reading:'ちょうしんぼそ',episode:'戦国時代には秦と楚のような大国の間で、小国や人々が情勢によって味方を変えることがありました。そこから「朝は秦につき、夕方には楚につく」という表現が生まれ、態度が定まらない様子を表すようになりました。',meaning:'考えや立場がすぐ変わり、一定しないこと。'},
+    '完璧帰趙':{reading:'かんぺききちょう',episode:'趙が名宝「和氏の璧」を持っていると知った秦王は、十五の城と交換したいと申し出ました。使者の藺相如は秦王に城を渡す気がないと見抜き、命がけの交渉で璧を無傷のまま趙へ持ち帰りました。',meaning:'預かった物を少しも傷つけず、完全な状態で持ち主へ返すこと。「完璧」の語源として有名です。'},
+    '鶏口牛後':{reading:'けいこうぎゅうご',episode:'蘇秦が韓王に秦への服従をやめるよう説いたとき、「大きな牛のしっぽになるより、小さな鶏でも口になるほうがよい」という趣旨の言葉を使ったとされます。大国の末端として従うより、小国でも自分が主導する道を選べという説得でした。',meaning:'大きな集団の末端にいるより、小さくても自分が中心になるほうがよいという考え。'},
+    '唇亡歯寒':{reading:'しんぼうしかん',episode:'晋が虢を攻めるため虞に道を借りようとしたとき、虞の家臣・宮之奇は「虢と虞は唇と歯のような関係。唇がなくなれば歯も寒くなる」と反対しました。しかし虞公は聞き入れず、虢が滅んだ後、虞も晋に滅ぼされました。',meaning:'互いに支え合う関係では、一方が滅びればもう一方も危険になること。'},
+    '退避三舎':{reading:'たいひさんしゃ',episode:'晋の公子・重耳は亡命中に楚で厚遇され、「もし将来、晋と楚が戦うなら三舎だけ退きます」と約束しました。後に晋文公となり城濮の戦いで楚軍と対したとき、実際に軍を後退させて約束を守ったとされます。一舎は軍隊が一日に進むほどの距離です。',meaning:'相手に敬意を示して譲ること。転じて、相手を恐れて一歩引く意味にも使われます。'},
+    '鼎の軽重を問う':{reading:'かなえのけいちょうをとう',episode:'楚の荘王が周王室の近くまで進軍したとき、周の使者・王孫満に「王室の宝である九鼎はどれほど重いのか」と尋ねました。鼎を運び去れるかを探る質問は、周王の地位まで狙っていることをほのめかすものでした。',meaning:'相手の実力や権威を試すこと。また、その地位を奪えるか探ること。'},
+    '漁夫之利':{reading:'ぎょふのり',episode:'趙が燕を攻めようとしたとき、蘇代は「ハマグリとシギが争って互いに離れられなくなり、そこへ漁師が来て両方を捕まえた」という話をしました。燕と趙が争えば、強国の秦だけが得をすると説得したのです。',meaning:'二者が争っている間に、関係のない第三者が利益を得ること。'},
+    '胡服騎射':{reading:'こふくきしゃ',episode:'趙の武霊王は、北方民族の短く動きやすい服装を取り入れ、馬に乗ったまま弓を射る騎兵を育てようとしました。伝統を重んじる家臣から反対されましたが改革を進め、趙軍の機動力を高めました。',meaning:'古い習慣にこだわらず、優れた方法を外から取り入れて改革することの例として知られます。'},
+    '一鼓作気':{reading:'いっこさっき',episode:'斉と魯が戦った長勺の戦いで、曹劌は斉軍が一度目、二度目と太鼓を鳴らしても魯軍を動かさず、三度目の後に攻撃させました。「最初の太鼓で士気は高まり、二度目で衰え、三度目で尽きる」と考えたためです。',meaning:'最初の勢いが強いうちに、一気に物事を進めること。'},
+    '田忌賽馬':{reading:'でんきさいば',episode:'斉の将軍・田忌が王族との競馬で勝てずにいたとき、孫臏は馬を上・中・下の三段階に分け、組み合わせをずらす作戦を考えました。下級馬を相手の上級馬に当てて一敗し、残る二戦を勝って全体では二勝一敗にしたと伝えられます。',meaning:'すべてで勝とうとせず、組み合わせや順番を工夫して全体の勝利を取る戦略。'},
+    '囲魏救趙':{reading:'いぎきゅうちょう',episode:'魏が趙の都・邯鄲を攻めたとき、趙を救うため出兵した斉の孫臏は、魏軍と正面から戦うのではなく、手薄になった魏の本国を攻める作戦を選びました。魏軍は救援のため引き返し、斉は途中でこれを破りました。',meaning:'直接相手を助けるのではなく、敵の弱点を攻めて目的を達成すること。'},
+    '紙上談兵':{reading:'しじょうだんぺい',episode:'趙括は兵法の知識が豊富で議論では父にも負けないほどでしたが、実戦経験に乏しかったとされます。長平の戦いで廉頗に代わって総大将になると、秦の白起に敗れ、趙軍は大損害を受けました。後世、この逸話と結びついて「紙上談兵」と呼ばれるようになりました。',meaning:'理屈や知識だけを語り、実際の経験や行動が伴わないこと。'}
+  };
+
+  let game=null,selectedCardIndex=null,diplomacyChoiceSign=null,botBusy=false,militaryMode=null,redeploySource=null,pendingLegalist=null,missionChoicePlayerIndex=0,pendingPassAction=null;
+  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+  const shuffle=arr=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+  const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  let cardFxTimer=null;
+
+  let cardStudyTimer=null,cardStudyStart=null,cardStudySuppressClickUntil=0;
+  const CARD_STUDY_HOLD_MS=560;
+  function closeCardStudy(){
+    const ov=$('#cardStudyOverlay');if(ov)ov.classList.remove('show');
+  }
+  function openCardStudy(card){
+    if(!card)return;
+    const info=cardStudyData[card.name]||{reading:'',episode:'このカードの由来を準備中です。',meaning:'カードの効果と合わせて確認してみましょう。'};
+    $('#cardStudyTitle').textContent=card.name;
+    $('#cardStudyReading').textContent=info.reading?`読み：${info.reading}`:'';
+    const img=$('#cardStudyImage');img.src=card.art||'';img.alt=`${card.name}のイラスト`;
+    $('#cardStudyEpisode').textContent=info.episode;
+    $('#cardStudyMeaning').textContent=info.meaning;
+    $('#cardStudyEffect').textContent=card.desc;
+    $('#cardStudyOverlay').classList.add('show');
+    try{playSE('click')}catch(e){}
+  }
+  function cancelCardStudyHold(el){
+    if(cardStudyTimer){clearTimeout(cardStudyTimer);cardStudyTimer=null}
+    cardStudyStart=null;
+    if(el)el.classList.remove('study-pressing');
+  }
+  function bindCardInteraction(el,index,card){
+    el.onpointerdown=e=>{
+      if(e.pointerType==='mouse'&&e.button!==0)return;
+      cancelCardStudyHold(el);
+      cardStudyStart={x:e.clientX,y:e.clientY,pointerId:e.pointerId};
+      el.classList.add('study-pressing');
+      cardStudyTimer=setTimeout(()=>{
+        cardStudyTimer=null;
+        cardStudySuppressClickUntil=Date.now()+700;
+        el.classList.remove('study-pressing');
+        openCardStudy(card);
+      },CARD_STUDY_HOLD_MS);
+    };
+    el.onpointermove=e=>{
+      if(!cardStudyStart||e.pointerId!==cardStudyStart.pointerId)return;
+      if(Math.hypot(e.clientX-cardStudyStart.x,e.clientY-cardStudyStart.y)>12)cancelCardStudyHold(el);
+    };
+    el.onpointerup=()=>cancelCardStudyHold(el);
+    el.onpointercancel=()=>cancelCardStudyHold(el);
+    el.onpointerleave=e=>{if(e.pointerType==='mouse')cancelCardStudyHold(el)};
+    el.oncontextmenu=e=>{e.preventDefault();cancelCardStudyHold(el);cardStudySuppressClickUntil=Date.now()+500;openCardStudy(card)};
+    el.onclick=e=>{
+      if(Date.now()<cardStudySuppressClickUntil){e.preventDefault();e.stopPropagation();return}
+      selectCard(index);
+    };
+  }
+
+
+  let soundEnabled=true,audioCtx=null;
+  const bgm=$('#bgm');
+  if(bgm){bgm.volume=.24}
+  function ensureAudio(){
+    if(!audioCtx){const AC=window.AudioContext||window.webkitAudioContext;if(AC)audioCtx=new AC()}
+    if(audioCtx?.state==='suspended')audioCtx.resume().catch(()=>{});
+    return audioCtx;
+  }
+  function tone(freq,duration=.08,volume=.035,type='sine',delay=0){
+    if(!soundEnabled)return;const ctx=ensureAudio();if(!ctx)return;
+    const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime+delay;
+    o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+duration);
+    o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+duration+.02);
+  }
+  function noise(duration=.12,volume=.025,delay=0){
+    if(!soundEnabled)return;const ctx=ensureAudio();if(!ctx)return;
+    const frames=Math.max(1,Math.floor(ctx.sampleRate*duration)),buffer=ctx.createBuffer(1,frames,ctx.sampleRate),data=buffer.getChannelData(0);
+    for(let i=0;i<frames;i++)data[i]=(Math.random()*2-1)*(1-i/frames);
+    const src=ctx.createBufferSource(),g=ctx.createGain(),t=ctx.currentTime+delay;src.buffer=buffer;g.gain.setValueAtTime(volume,t);g.gain.exponentialRampToValueAtTime(.0001,t+duration);src.connect(g);g.connect(ctx.destination);src.start(t);
+  }
+  function playSE(kind='click'){
+    if(!soundEnabled)return;
+    if(kind==='card'){tone(330,.12,.04,'triangle');tone(520,.15,.035,'triangle',.07)}
+    else if(kind==='mission'){tone(440,.09,.035,'sine');tone(660,.13,.035,'sine',.08)}
+    else if(kind==='war'){noise(.20,.035);tone(110,.22,.045,'sawtooth');tone(82,.25,.035,'square',.09)}
+    else if(kind==='success'){tone(523,.13,.035,'sine');tone(659,.13,.035,'sine',.10);tone(784,.20,.04,'sine',.20)}
+    else if(kind==='round'){tone(392,.09,.03,'triangle');tone(523,.12,.03,'triangle',.08)}
+    else tone(560,.055,.025,'sine');
+  }
+  function startBGM(){if(!soundEnabled||!bgm)return;bgm.play().catch(()=>{})}
+  function stopBGM(reset=false){if(!bgm)return;bgm.pause();if(reset){try{bgm.currentTime=0}catch(e){}}}
+  function updateSoundButtons(){
+    const label=soundEnabled?'♪ 音 ON':'♪ 音 OFF';
+    const s=$('#soundBtnSetup');if(s){s.textContent=label;s.classList.toggle('sound-on',soundEnabled)}
+    const g=$('#soundBtnGame');if(g){g.textContent=soundEnabled?'音':'音×';g.classList.toggle('off',!soundEnabled);g.classList.toggle('sound-on',soundEnabled)}
+  }
+  function toggleSound(){soundEnabled=!soundEnabled;ensureAudio();if(soundEnabled){if(document.body.classList.contains('game-running'))startBGM();playSE('click')}else stopBGM(false);updateSoundButtons()}
+  function openRules(){playSE('click');$('#rulesOverlay').classList.add('show')}
+  function closeRules(){playSE('click');$('#rulesOverlay').classList.remove('show')}
+
+  const MAP_W=1500, MAP_H=1125;
+
+  const mapView={scale:1,x:0,y:0,min:.22,max:2.4,pointers:new Map(),dragStart:null,lastPinchDistance:0,lastPinchCenter:null};
+  const layerVisibility={states:true,borders:true};
+  function applyMapTransform(){const scene=$('#mapScene');if(scene){scene.style.transform=`translate(${mapView.x}px,${mapView.y}px) scale(${mapView.scale})`;const counter=mapView.scale>1?1/mapView.scale:1;scene.style.setProperty('--map-ui-counter',counter.toFixed(5))}}
+  function clampMap(){
+    const vp=$('#mapViewport');if(!vp)return;
+    const vw=vp.clientWidth,vh=vp.clientHeight,sw=MAP_W*mapView.scale,sh=MAP_H*mapView.scale;
+    // 端の国・国境UIを中央付近まで運べるよう、地図外へのパン余白を大きく確保する。
+    const overscrollX=Math.max(240,vw*.30),overscrollY=Math.max(190,vh*.28);
+    if(sw<=vw){
+      const centerX=(vw-sw)/2;
+      mapView.x=clamp(mapView.x,centerX-overscrollX,centerX+overscrollX);
+    }else{
+      mapView.x=clamp(mapView.x,vw-sw-overscrollX,overscrollX);
+    }
+    if(sh<=vh){
+      const centerY=(vh-sh)/2;
+      mapView.y=clamp(mapView.y,centerY-overscrollY,centerY+overscrollY);
+    }else{
+      mapView.y=clamp(mapView.y,vh-sh-overscrollY,overscrollY);
+    }
+  }
+  function resetMapView(){
+    const vp=$('#mapViewport');if(!vp)return;
+    const vw=vp.clientWidth,vh=vp.clientHeight;
+    const widthScale=vw/MAP_W, heightScale=vh/MAP_H;
+    let target;
+    if(vw>vh){
+      // PCでは地図を小さく全表示せず、横幅の約7割を使う歴史SLG風の初期表示。
+      target=Math.max(heightScale*.95,widthScale*.70);
+    }else{
+      // スマホでは縦地図を画面いっぱいに近い大きさで表示。
+      target=Math.max(widthScale*.96,heightScale*.92);
+    }
+    mapView.scale=clamp(target,mapView.min,mapView.max);
+    mapView.x=(vw-MAP_W*mapView.scale)/2;
+    mapView.y=Math.min(20,(vh-MAP_H*mapView.scale)/2);
+    clampMap();applyMapTransform();
+  }
+  function zoomMap(factor,clientX,clientY){
+    const vp=$('#mapViewport');if(!vp)return;const r=vp.getBoundingClientRect();
+    const px=(clientX??(r.left+r.width/2))-r.left,py=(clientY??(r.top+r.height/2))-r.top;
+    const old=mapView.scale,next=clamp(old*factor,mapView.min,mapView.max);if(next===old)return;
+    const wx=(px-mapView.x)/old,wy=(py-mapView.y)/old;mapView.scale=next;mapView.x=px-wx*next;mapView.y=py-wy*next;clampMap();applyMapTransform();
+  }
+  function initMapControls(){
+    const vp=$('#mapViewport');if(!vp||vp.dataset.panReady)return;vp.dataset.panReady='1';
+    vp.addEventListener('wheel',e=>{e.preventDefault();zoomMap(e.deltaY<0?1.12:.89,e.clientX,e.clientY)},{passive:false});
+    vp.addEventListener('pointerdown',e=>{
+      mapView.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(!e.target.closest('.state,.border-node,.border-side-btn,button')){mapView.dragStart={id:e.pointerId,x:e.clientX,y:e.clientY,mapX:mapView.x,mapY:mapView.y};vp.classList.add('dragging');vp.setPointerCapture?.(e.pointerId)}
+      if(mapView.pointers.size===2){const pts=[...mapView.pointers.values()];mapView.lastPinchDistance=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);mapView.lastPinchCenter={x:(pts[0].x+pts[1].x)/2,y:(pts[0].y+pts[1].y)/2}}
+    });
+    vp.addEventListener('pointermove',e=>{
+      if(mapView.pointers.has(e.pointerId))mapView.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(mapView.pointers.size===2){
+        const pts=[...mapView.pointers.values()],dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y),center={x:(pts[0].x+pts[1].x)/2,y:(pts[0].y+pts[1].y)/2};
+        if(mapView.lastPinchDistance>0){zoomMap(dist/mapView.lastPinchDistance,center.x,center.y);mapView.x+=center.x-(mapView.lastPinchCenter?.x||center.x);mapView.y+=center.y-(mapView.lastPinchCenter?.y||center.y);clampMap();applyMapTransform()}
+        mapView.lastPinchDistance=dist;mapView.lastPinchCenter=center;return;
+      }
+      if(mapView.dragStart&&mapView.dragStart.id===e.pointerId){mapView.x=mapView.dragStart.mapX+(e.clientX-mapView.dragStart.x);mapView.y=mapView.dragStart.mapY+(e.clientY-mapView.dragStart.y);clampMap();applyMapTransform()}
+    });
+    const finish=e=>{mapView.pointers.delete(e.pointerId);if(mapView.dragStart?.id===e.pointerId)mapView.dragStart=null;if(mapView.pointers.size<2){mapView.lastPinchDistance=0;mapView.lastPinchCenter=null}vp.classList.remove('dragging')};
+    vp.addEventListener('pointerup',finish);vp.addEventListener('pointercancel',finish);
+    $('#zoomInBtn')?.addEventListener('click',()=>{playSE('click');zoomMap(1.2)});$('#zoomOutBtn')?.addEventListener('click',()=>{playSE('click');zoomMap(.82)});$('#mapResetBtn')?.addEventListener('click',()=>{playSE('click');resetMapView()});
+    $('#toggleStatesBtn')?.addEventListener('click',()=>{playSE('click');layerVisibility.states=!layerVisibility.states;applyLayerVisibility()});
+    $('#toggleBordersBtn')?.addEventListener('click',()=>{playSE('click');layerVisibility.borders=!layerVisibility.borders;applyLayerVisibility()});
+    window.addEventListener('resize',()=>{if(document.body.classList.contains('game-running')){clampMap();applyMapTransform()}});
+    applyLayerVisibility();
+    resetMapView();
+  }
+
+
+  const hudDrag={target:null,pointerId:null,startX:0,startY:0,left:0,top:0};
+  const hudIds=['turnHud','statusHud','messageHud','missionHud','log','handHud','mapControls'];
+  function resetHudLayout(){
+    hudIds.forEach(id=>{
+      const el=document.getElementById(id);if(!el)return;
+      el.style.removeProperty('left');el.style.removeProperty('top');el.style.removeProperty('right');el.style.removeProperty('bottom');
+      el.style.removeProperty('transform');el.style.removeProperty('width');el.style.removeProperty('margin');
+      el.classList.remove('dragging-window');
+    });
+  }
+  function prepareHudWindows(){
+    const gameEl=$('#game');if(!gameEl)return;
+    hudIds.forEach(id=>{
+      const el=document.getElementById(id);if(!el)return;
+      if(!el.querySelector(':scope > .hud-drag-handle')){
+        const h=document.createElement('button');h.type='button';h.className='hud-drag-handle';h.textContent='✥';h.setAttribute('aria-label','ウインドウを移動');h.title='ドラッグして移動';
+        el.appendChild(h);h.addEventListener('pointerdown',e=>startHudDrag(e,el));
+      }
+    });
+    if(!gameEl.dataset.hudMoveReady){
+      gameEl.dataset.hudMoveReady='1';
+      window.addEventListener('pointermove',moveHudDrag,{passive:false});
+      window.addEventListener('pointerup',endHudDrag);window.addEventListener('pointercancel',endHudDrag);
+    }
+    $('#hudResetBtn')?.addEventListener('click',()=>{playSE('click');resetHudLayout();});
+  }
+  function startHudDrag(e,el){
+    if(e.button!==0)return;
+    const gameEl=$('#game'),gr=gameEl.getBoundingClientRect(),rect=el.getBoundingClientRect();
+    // 現在の見た目の位置を絶対座標へ変換するのは、実際にドラッグを始めた時だけ。
+    el.style.width=`${rect.width}px`;el.style.left=`${rect.left-gr.left}px`;el.style.top=`${rect.top-gr.top}px`;
+    el.style.right='auto';el.style.bottom='auto';el.style.transform='none';el.style.margin='0';
+    hudDrag.target=el;hudDrag.pointerId=e.pointerId;hudDrag.startX=e.clientX;hudDrag.startY=e.clientY;
+    hudDrag.left=rect.left-gr.left;hudDrag.top=rect.top-gr.top;el.classList.add('dragging-window');
+    try{e.currentTarget.setPointerCapture(e.pointerId)}catch(err){}
+    e.preventDefault();e.stopPropagation();
+  }
+  function moveHudDrag(e){
+    if(!hudDrag.target||e.pointerId!==hudDrag.pointerId)return;
+    e.preventDefault();
+    const gameEl=$('#game'),el=hudDrag.target;
+    const maxLeft=Math.max(0,gameEl.clientWidth-el.offsetWidth),maxTop=Math.max(0,gameEl.clientHeight-el.offsetHeight);
+    el.style.left=`${clamp(hudDrag.left+(e.clientX-hudDrag.startX),0,maxLeft)}px`;
+    el.style.top=`${clamp(hudDrag.top+(e.clientY-hudDrag.startY),0,maxTop)}px`;
+  }
+  function endHudDrag(e){
+    if(!hudDrag.target||e.pointerId!==hudDrag.pointerId)return;
+    hudDrag.target.classList.remove('dragging-window');hudDrag.target=null;hudDrag.pointerId=null;
+  }
+
+  function cardVisualHTML(card,played=false){
+    const[lab,cls]=typeLabel(card);
+    const art=card.art?`<div class="card-art"><img src="${card.art}" alt="" loading="lazy"></div>`:'';
+    return `<div class="card-top"><div class="card-name">${card.name}</div><span class="type ${cls}">${lab}</span></div>${art}<div class="card-desc">${card.desc}</div>${played?'<div class="played-stamp">使用</div>':''}`;
+  }
+  function showCardPlay(card,playerName){
+    if(!card)return;
+    playSE('card');
+    const fx=$('#cardPlayFx'),box=$('#playedCard');
+    const[,cls]=typeLabel(card);
+    if(cardFxTimer)clearTimeout(cardFxTimer);
+    fx.classList.remove('show');
+    void fx.offsetWidth;
+    $('#playedBy').textContent=`${playerName} が使用`;
+    box.className=`played-card ${cls}`;
+    box.innerHTML=cardVisualHTML(card,true);
+    fx.setAttribute('aria-hidden','false');
+    fx.classList.add('show');
+    cardFxTimer=setTimeout(()=>{fx.classList.remove('show');fx.setAttribute('aria-hidden','true')},1640);
+  }
+
+  function buildDeck(){let cards=[];for(let i=0;i<3;i++)cards.push(...cardTemplates.map(c=>({...c,id:uid()})));return shuffle(cards)}
+  function totalStateTroops(name){return game.borders.reduce((sum,b)=>sum+(b.a===name?b.aTroops+b.aFatigue:0)+(b.b===name?b.bTroops+b.bFatigue:0),0)}
+  function readyStateTroops(name){return game.borders.reduce((sum,b)=>sum+(b.a===name?b.aTroops:0)+(b.b===name?b.bTroops:0),0)}
+  function totalFatigue(){return game.borders.reduce((n,b)=>n+b.aFatigue+b.bFatigue,0)}
+  function stateBorders(name){return game.borders.filter(b=>b.a===name||b.b===name)}
+  function prestigeBuff(name,troops=1){if(troops<=0)return 0;const p=game.states[name].prestige;return p>=10?2:p>=5?1:0}
+
+  function missionAchieved(m){
+    if(m.type==='statePrestige')return game.states[m.state].prestige>=m.target;
+    if(m.type==='sumPrestige')return m.states.reduce((a,s)=>a+game.states[s].prestige,0)>=m.target;
+    if(m.type==='rankQin'){const q=game.states['秦'].prestige;return stateNames.filter(s=>s!=='秦').every(s=>q>game.states[s].prestige)}
+    if(m.type==='peace')return game.borders.filter(b=>b.threat===0).length>=m.target;
+    if(m.type==='fatigue')return totalFatigue()>=m.target;
+    if(m.type==='balance'){const v=['趙','魏','韓'].map(s=>game.states[s].prestige);return Math.min(...v)>=4&&Math.max(...v)-Math.min(...v)<=4}
+    if(m.type==='wars')return game.totalWars>=m.target;
+    return false;
+  }
+
+  function missionProgress(m){
+    if(m.type==='statePrestige')return clamp(game.states[m.state].prestige/m.target,0,1);
+    if(m.type==='sumPrestige')return clamp(m.states.reduce((a,s)=>a+game.states[s].prestige,0)/m.target,0,1);
+    if(m.type==='rankQin'){
+      const q=game.states['秦'].prestige;const higher=stateNames.filter(s=>s!=='秦'&&game.states[s].prestige>=q).length;return clamp(1-higher/6,0,1);
+    }
+    if(m.type==='peace')return clamp(game.borders.filter(b=>b.threat===0).length/m.target,0,1);
+    if(m.type==='fatigue'){
+      const future=game.borders.reduce((n,b)=>n+(b.threat>=4?Math.min(b.aTroops,b.bTroops)*.2:0),0);return clamp((totalFatigue()+future)/m.target,0,1);
+    }
+    if(m.type==='balance'){
+      const v=['趙','魏','韓'].map(s=>game.states[s].prestige);const floor=clamp(Math.min(...v)/4,0,1);const diff=Math.max(...v)-Math.min(...v);return .65*floor+.35*clamp(1-diff/9,0,1);
+    }
+    if(m.type==='wars'){
+      const heat=game.borders.reduce((n,b)=>n+b.threat/5,0)*.18;return clamp((game.totalWars+heat)/m.target,0,1);
+    }
+    return 0;
+  }
+
+  function stateAffinity(m,state){
+    if(m.type==='statePrestige')return m.state===state?1.6:0;
+    if(m.type==='sumPrestige')return m.states.includes(state)?.65:-.2;
+    if(m.type==='rankQin')return state==='秦'?1.5:-.2;
+    if(m.type==='balance')return ['趙','魏','韓'].includes(state)?1:0;
+    return 0;
+  }
+
+  function log(msg){game.logs.unshift(msg);game.logs=game.logs.slice(0,120);$('#log').innerHTML=game.logs.map(x=>`<p>${x}</p>`).join('')}
+  function drawCard(){if(game.deck.length===0){game.deck=shuffle(game.discard.splice(0));log('山札切れ：捨て札を混ぜ直しました。')}return game.deck.pop()||null}
+
+  function renderLocalPlayerSetup(){
+    const count=+$('#playerCount').value;
+    const schools=Object.keys(schoolDefs);
+    const wrap=$('#localPlayers');
+    wrap.innerHTML=Array.from({length:count},(_,i)=>`<div class="local-player-row"><div class="row-title">プレイヤー${i+1}</div><div class="field"><label>名前</label><input data-local-name="${i}" value="説客${i+1}"></div><div class="field"><label>学派</label><select data-local-school="${i}">${schools.map((sc,j)=>`<option value="${sc}" ${j===i?'selected':''}>${sc}</option>`).join('')}</select></div></div>`).join('');
+  }
+
+  function updateSetupMode(){
+    const local=$('#gameMode').value==='local';
+    $('#botSchoolField').classList.toggle('hidden-ui',local);
+    $('#botNameField').classList.toggle('hidden-ui',local);
+    $('#localPlayers').classList.toggle('hidden-ui',!local);
+    $('#playerCountLabel').textContent=local?'参加人数':'参加人数（あなた＋BOT）';
+    $('#startBtn').textContent=local?'ローカル対人戦を始める':'BOT戦を始める';
+    $('#setupHint').textContent=local?'2～4人で同じ端末を順番に使います。使命選択と各手番の前に受け渡し画面を挟み、非公開使命と手札を隠します。学派は重複不可です。':'あなたがP1、残りはBOTです。使命は2枚配られ、ゲーム開始時に1枚を公開、もう1枚を非公開にします。達成した使命の得点合計で勝敗を決めます。各ラウンドのスタートプレイヤーは順番に交代します。';
+    if(local)renderLocalPlayerSetup();
+  }
+
+  function showPass(title,text,action){
+    pendingPassAction=action;
+    $('#passTitle').textContent=title;
+    $('#passText').textContent=text;
+    $('#passOverlay').classList.add('show');
+  }
+
+  function clearSensitiveView(){
+    $('#humanMissions').style.visibility='hidden';
+    $('#cards').innerHTML='<div class="hint">手番開始後に手札を表示します。</div>';
+    $('#cancelCard').disabled=true;
+    $('#endTurn').disabled=true;
+    $('#actionBox').textContent='端末を次のプレイヤーへ渡してください。';
+    const p=game?.players?.[game.currentPlayer];
+    $('#turnWho').textContent=p?`次の手番：${p.name}`:'';
+    $('#turnSchool').textContent='';
+  }
+
+  function startGame(){
+    ensureAudio();startBGM();playSE('round');
+    const count=+$('#playerCount').value,mode=$('#gameMode').value;
+    let players=[];
+    if(mode==='bot'){
+      const humanSchool=$('#humanSchool').value;
+      const remaining=shuffle(Object.keys(schoolDefs).filter(s=>s!==humanSchool));
+      players=[{name:$('#humanName').value.trim()||'説客',school:humanSchool,isBot:false}];
+      for(let i=1;i<count;i++)players.push({name:`BOT${i}`,school:remaining[i-1],isBot:true});
+    }else{
+      const schools=$$('[data-local-school]').map(x=>x.value);
+      if(new Set(schools).size!==schools.length){alert('ローカル対人戦では学派を重複させずに選んでください。');return}
+      players=Array.from({length:count},(_,i)=>({name:$(`[data-local-name="${i}"]`).value.trim()||`説客${i+1}`,school:$(`[data-local-school="${i}"]`).value,isBot:false}));
+    }
+    const missionDeck=shuffle(missionDefs);
+    players.forEach((p,i)=>{p.missions=[missionDeck[i*2],missionDeck[i*2+1]];p.publicMission=null;p.secretMission=null;p.hand=[];p.usedSchoolThisRound=false;p.daoBonusDraw=false;p.cardsPlayedThisTurn=0});
+    const states={};stateNames.forEach(n=>states[n]={power:4,prestige:0,milestones:[]});
+    const borders=borderPairs.map(([a,b],i)=>({id:i,a,b,threat:Math.random()<.45?0:1,aTroops:1,bTroops:1,aFatigue:0,bFatigue:0}));
+    game={mode,players,states,borders,deck:buildDeck(),discard:[],round:1,roundLimit:12,currentPlayer:0,turnOrder:[],turnPos:0,startPlayer:0,totalWars:0,logs:[],started:false};
+    $('#setup').style.display='none';$('#game').style.display='block';document.body.classList.add('game-running');requestAnimationFrame(()=>{resetHudLayout();prepareHudWindows();resetMapView();});renderAll();
+    missionChoicePlayerIndex=0;
+    showMissionChoiceFor(0);
+  }
+
+  function showMissionChoiceFor(playerIndex){
+    missionChoicePlayerIndex=playerIndex;
+    const p=game.players[playerIndex];
+    $('#missionChoiceTitle').textContent=`${p.name}：公開する使命を選ぶ`;
+    $('#missionChoices').innerHTML=p.missions.map((m,i)=>`<div class="mission-choice" data-mchoice="${i}"><h3>${m.name}<span class="pts">${m.points}点</span></h3><div>${m.desc}</div><div class="hint" style="margin-top:8px">この使命を公開する</div></div>`).join('');
+    $('#missionOverlay').classList.add('show');
+    $$('[data-mchoice]').forEach(el=>el.onclick=()=>choosePublicMission(+el.dataset.mchoice));
+  }
+
+  function choosePublicMission(index){
+    playSE('mission');
+    const p=game.players[missionChoicePlayerIndex];
+    p.publicMission=p.missions[index];p.secretMission=p.missions[1-index];
+    $('#missionOverlay').classList.remove('show');
+    if(game.mode==='bot'){
+      game.players.slice(1).forEach(bp=>{
+        const [a,b]=bp.missions;
+        if(a.points>b.points&&Math.random()<.72){bp.secretMission=a;bp.publicMission=b}
+        else if(b.points>a.points&&Math.random()<.72){bp.secretMission=b;bp.publicMission=a}
+        else if(Math.random()<.5){bp.publicMission=a;bp.secretMission=b}else{bp.publicMission=b;bp.secretMission=a}
+      });
+      game.started=true;log('ゲーム開始。BOTの公開使命も公開されました。');startRound();return;
+    }
+    const next=missionChoicePlayerIndex+1;
+    if(next<game.players.length){
+      showPass(`${game.players[next].name}へ`,`端末を${game.players[next].name}へ渡してください。前のプレイヤーの使命選択を見ないようにしてから「準備できた」を押します。`,()=>showMissionChoiceFor(next));
+    }else{
+      game.started=true;log('ゲーム開始。全員の公開使命が公開されました。');startRound();
+    }
+  }
+
+  function startRound(){
+    const changed=[];
+    game.borders.forEach(b=>{if(b.threat>=1&&b.threat<5){const old=b.threat;b.threat++;changed.push(`${b.a}─${b.b} ${old}→${b.threat}`)}});
+    if(changed.length)log(`ラウンド${game.round}開始：緊張自動上昇／${changed.join('、')}`);
+    else log(`ラウンド${game.round}開始：自動上昇する国境なし。`);
+    game.startPlayer=(game.round-1)%game.players.length;
+    game.turnOrder=game.players.map((_,i)=>(game.startPlayer+i)%game.players.length);
+    game.turnPos=0;
+    game.currentPlayer=game.turnOrder[0];
+    game.players.forEach(p=>p.usedSchoolThisRound=false);
+    log(`ラウンド${game.round}のスタート：${game.players[game.startPlayer].name}`);
+    beginTurn();
+  }
+
+  function beginTurn(){
+    const p=game.players[game.currentPlayer];
+    if(game.mode==='local'&&!p.isBot){
+      clearSensitiveView();
+      renderStatus();renderStates();renderBorders();renderPublicMissions();
+      showPass(`${p.name}の手番`,`端末を${p.name}へ渡してください。準備ができたら手番を開始します。`,actualBeginTurn);
+      return;
+    }
+    actualBeginTurn();
+  }
+
+  function actualBeginTurn(){
+    selectedCardIndex=null;diplomacyChoiceSign=null;militaryMode=null;redeploySource=null;pendingLegalist=null;
+    const p=game.players[game.currentPlayer];
+    p.cardsPlayedThisTurn=0;
+    const drawCount=p.daoBonusDraw?5:3;
+    if(p.daoBonusDraw){log(`${p.name}：道家「無為」――この手番は5枚ドロー。`);p.daoBonusDraw=false}
+    for(let i=0;i<drawCount;i++){const c=drawCard();if(c)p.hand.push(c)}
+    while(p.hand.length>7){const c=p.hand.shift();game.discard.push(c)}
+    $('#humanMissions').style.visibility='';
+    $('#secretBox').classList.add('hidden');$('#secretToggle').textContent='見る';
+    log(`―― ${p.name}（${p.school}）の手番 ――`);renderAll();
+    if(p.isBot)runBotTurn();
+  }
+
+  function renderAll(){if(!game)return;renderStatus();renderStates();renderBorders();applyLayerVisibility();renderTurn();renderPublicMissions();renderHumanMissions();renderHand();renderSelection()}
+  function renderStatus(){$('#roundStat').textContent=`${game.round} / ${game.roundLimit}`;const p=game.players[game.currentPlayer];$('#turnStat').textContent=p?`${p.name}${game.currentPlayer===game.startPlayer?' ★':''}`:'-';$('#deckStat').textContent=game.deck.length;$('#warStat').textContent=game.borders.filter(b=>b.threat>=5).length;$('#totalWarStat').textContent=game.totalWars}
+  function renderStates(){$$('.state').forEach(el=>{const s=el.dataset.state,st=game.states[s],buff=prestigeBuff(s,1);el.innerHTML=`<div class="state-name">${s}</div><div class="state-stats"><span>国力 ${st.power}</span><span>威信 ${st.prestige}</span></div><div class="state-troops">稼働 ${readyStateTroops(s)} / 総 ${totalStateTroops(s)}</div><div class="buff">戦争補正 ${buff?`+${buff}`:'なし'}</div>`;el.onclick=()=>onStateClick(s)})}
+  function applyLayerVisibility(){
+    $$('.state').forEach(el=>el.classList.toggle('layer-hidden',!layerVisibility.states));
+    const borderLayer=$('#mapBorders');if(borderLayer)borderLayer.classList.toggle('layer-hidden',!layerVisibility.borders);
+    const stateBtn=$('#toggleStatesBtn');if(stateBtn){stateBtn.classList.toggle('off',!layerVisibility.states);stateBtn.textContent=layerVisibility.states?'国':'国×';}
+    const borderBtn=$('#toggleBordersBtn');if(borderBtn){borderBtn.classList.toggle('off',!layerVisibility.borders);borderBtn.textContent=layerVisibility.borders?'境':'境×';}
+  }
+
+  function sideCountHTML(name,ready,fatigue){
+    return `<small>${name}</small><span class="side-num">${ready}</span><span class="fatigue-num">疲 ${fatigue}</span>`;
+  }
+
+  const troopAnchorOverrides={
+    '0:趙':{x:49.8,y:18.8},'0:燕':{x:55.8,y:18.9},
+    '1:趙':{x:39.8,y:27.0},'1:魏':{x:40.5,y:35.2},
+    '2:趙':{x:24.6,y:25.4},'2:秦':{x:18.0,y:32.0},
+    '3:燕':{x:68.7,y:27.4},'3:斉':{x:68.8,y:35.4},
+    '4:秦':{x:21.8,y:43.8},'4:魏':{x:32.1,y:40.1},
+    '5:魏':{x:49.8,y:45.7},'5:斉':{x:59.6,y:48.2},
+    '6:秦':{x:18.0,y:67.0},'6:韓':{x:30.0,y:62.8},
+    '7:魏':{x:42.0,y:50.7},'7:韓':{x:42.6,y:58.5},
+    '8:秦':{x:11.2,y:72.6},'8:楚':{x:22.8,y:78.6},
+    '9:韓':{x:41.6,y:69.8},'9:楚':{x:45.8,y:78.8},
+    '10:斉':{x:63.8,y:63.7},'10:楚':{x:58.2,y:76.9}
+  };
+
+  function troopAnchor(borderPos,borderIndex,stateName){
+    const sp=troopAnchorOverrides[`${borderIndex}:${stateName}`]||stateLayout[stateName];
+    const vx=(sp.x-borderPos.x)*MAP_W/100,vy=(sp.y-borderPos.y)*MAP_H/100,len=Math.hypot(vx,vy)||1;
+    const dx=vx/len,dy=vy/len,px=-dy,py=dx;
+    return {x:sp.x,y:sp.y,dx,dy,px,py};
+  }
+
+
+  const troopSpriteMap={
+    '秦':{stand:'assets/troops/秦_stand.png',fatigue:'assets/troops/秦_fatigue.png'},
+    '趙':{stand:'assets/troops/趙_stand.png',fatigue:'assets/troops/趙_fatigue.png'},
+    '魏':{stand:'assets/troops/魏_stand.png',fatigue:'assets/troops/魏_fatigue.png'},
+    '韓':{stand:'assets/troops/韓_stand.png',fatigue:'assets/troops/韓_fatigue.png'},
+    '燕':{stand:'assets/troops/燕_stand.png',fatigue:'assets/troops/燕_fatigue.png'},
+    '斉':{stand:'assets/troops/斉_stand.png',fatigue:'assets/troops/斉_fatigue.png'},
+    '楚':{stand:'assets/troops/楚_stand.png',fatigue:'assets/troops/楚_fatigue.png'}
+  };
+
+  function soldierHTML(stateName,isFatigue){
+    const src=troopSpriteMap[stateName] ? (isFatigue?troopSpriteMap[stateName].fatigue:troopSpriteMap[stateName].stand) : '';
+    return `<img src="${src}" alt="" draggable="false">`;
+  }
+
+
+  function troopPiecesHTML(borderPos,borderIndex,stateName,ready,fatigue){
+    const a=troopAnchor(borderPos,borderIndex,stateName),html=[];
+    const make=(isFatigue,idx)=>{
+      const col=idx%2,row=Math.floor(idx/2),spread=(col-.5)*(isFatigue?30:28),back=row*(isFatigue?20:28)+(isFatigue?8:0);
+      const x=a.x+(a.px*spread-a.dx*back)/MAP_W*100,y=a.y+(a.py*spread-a.dy*back)/MAP_H*100;
+      return `<div class="troop-piece ${isFatigue?'fatigue':''}" data-state="${stateName}" style="left:${x}%;top:${y}%">${soldierHTML(stateName,isFatigue)}</div>`;
+    };
+    for(let i=0;i<ready;i++)html.push(make(false,i));
+    for(let i=0;i<fatigue;i++)html.push(make(true,i));
+    return html.join('');
+  }
+
+  function renderTroops(){
+    const layer=$('#mapTroops');if(!layer)return;
+    layer.innerHTML=game.borders.map((b,i)=>{const pos=borderLayout[i];return troopPiecesHTML(pos,i,b.a,b.aTroops,b.aFatigue)+troopPiecesHTML(pos,i,b.b,b.bTroops,b.bFatigue)}).join('');
+  }
+
+  function leaderHTML(pos){
+    const dx=(pos.px-pos.x)*MAP_W/100,dy=(pos.py-pos.y)*MAP_H/100,len=Math.hypot(dx,dy),angle=Math.atan2(dy,dx)*180/Math.PI;
+    return `<div class="border-leader" style="left:${pos.x}%;top:${pos.y}%;width:${len}px;transform:rotate(${angle}deg)"></div>`;
+  }
+
+  function renderBorders(){
+    $('#mapBorders').innerHTML=game.borders.map((b,i)=>{
+      const pos=borderLayout[i],hot=b.threat>=5?' hot':'',war=b.threat>=5?' war':'';
+      return `<div class="border-node${war}" data-border="${i}" style="left:${pos.px}%;top:${pos.py}%"><div class="border-node-top"><span class="border-node-name">${b.a}─${b.b}</span><span class="threat${hot}">${b.threat}</span></div><div class="border-node-sides"><button class="border-side-btn" data-side="a" data-border-side="${i}">${sideCountHTML(b.a,b.aTroops,b.aFatigue)}</button><button class="border-side-btn" data-side="b" data-border-side="${i}">${sideCountHTML(b.b,b.bTroops,b.bFatigue)}</button></div></div>`;
+    }).join('');
+    renderTroops();
+    $$('.border-node').forEach(el=>el.onclick=e=>{if(e.target.closest('.border-side-btn'))return;onBorderClick(+el.dataset.border)});
+    $$('.border-side-btn').forEach(btn=>btn.onclick=e=>{e.stopPropagation();onBorderSideClick(+btn.dataset.borderSide,btn.dataset.side)});
+  }
+  function renderTurn(){const p=game.players[game.currentPlayer];const role=p?.isBot?'BOT':(game.mode==='local'?'プレイヤー':'あなた');$('#turnWho').textContent=p?`${role}：${p.name}`:'';$('#turnSchool').textContent=p?`${p.school}｜${schoolDefs[p.school]}`:'';$('#turnHead').classList.toggle('bot',!!p?.isBot)}
+  function missionProgressText(m){if(!m)return'';if(m.type==='wars')return`<br><span class="tiny"><b>進捗：戦争 ${game.totalWars} / ${m.target}回</b></span>`;return''}
+  function renderPublicMissions(){$('#publicMissions').innerHTML=game.players.map((p,i)=>p.publicMission?`<div class="public-row ${i===game.currentPlayer?'me':''}">${p.name}（${p.school}）：<b>${p.publicMission.name}</b> <span class="pts">${p.publicMission.points}点</span><br>${p.publicMission.desc}${missionProgressText(p.publicMission)}</div>`:'').join('')}
+  function renderHumanMissions(){const h=game.mode==='local'?game.players[game.currentPlayer]:game.players[0];if(!h?.publicMission)return;$('#myPublicLabel').textContent=`${h.name}の公開使命`;$('#mySecretLabel').textContent=`${h.name}の非公開使命`;$('#myPublicMission').innerHTML=`<b>${h.publicMission.name}</b><span class="pts">${h.publicMission.points}点</span><br>${h.publicMission.desc}${missionProgressText(h.publicMission)}`;$('#mySecretMission').innerHTML=`<b>${h.secretMission.name}</b><span class="pts">${h.secretMission.points}点</span><br>${h.secretMission.desc}${missionProgressText(h.secretMission)}`}
+  function typeLabel(c){if(c.type==='internal')return['内政','internal'];if(c.type.startsWith('diplomacy'))return['外交','diplomacy'];return['軍事','military']}
+  function renderHand(){
+    const p=game.players[game.currentPlayer],humanTurn=p&&!p.isBot&&!botBusy;
+    if(!humanTurn){$('#cards').innerHTML=`<div class="hint">${p?.isBot?'BOTが行動中です。':'手札はあなたの手番に表示されます。'}</div>`;$('#cancelCard').disabled=true;$('#endTurn').disabled=true;return}
+    $('#cancelCard').disabled=false;$('#endTurn').disabled=false;
+    const n=p.hand.length;
+    $('#cards').innerHTML=p.hand.map((c,i)=>{
+      const offset=i-(n-1)/2;
+      const step=n>=7?28:n===6?31:n===5?34:38;
+      const x=Math.round(offset*step),angle=(offset*5.2).toFixed(1),y=Math.round(Math.abs(offset)*4.5);
+      return `<button type="button" class="card ${selectedCardIndex===i?'selected':''}" data-card="${i}" aria-label="${c.name}：${c.desc}" style="--fan-x:${x}px;--fan-y:${y}px;--fan-angle:${angle}deg;--fan-z:${i+1}">${cardVisualHTML(c,false)}</button>`;
+    }).join('')||'<div class="hint">手札がありません。</div>';
+    $$('[data-card]').forEach(el=>{const i=+el.dataset.card;bindCardInteraction(el,i,p.hand[i])});
+  }
+
+  function selectCard(i){if(game.players[game.currentPlayer].isBot||pendingLegalist)return;closeMilitaryChoice();selectedCardIndex=i;diplomacyChoiceSign=null;militaryMode=null;redeploySource=null;renderHand();renderSelection()}
+  function clearHighlights(){$$('.state,.border-node,.border-side-btn').forEach(el=>el.classList.remove('valid','source'))}
+  function bindChoice(){const plus=$('#plusThreat'),minus=$('#minusThreat');if(plus)plus.onclick=()=>{diplomacyChoiceSign=1;renderSelection()};if(minus)minus.onclick=()=>{diplomacyChoiceSign=-1;renderSelection()}}
+  function closeMilitaryChoice(){const ov=$('#militaryChoiceOverlay');if(ov)ov.classList.remove('show')}
+  function openMilitaryChoice(card){
+    const ov=$('#militaryChoiceOverlay');if(!ov||!card)return;
+    $('#militaryChoiceCard').textContent=`${card.name}（最大${card.delta}${game?.players?.[game.currentPlayer]?.school==='兵家'&&!game.players[game.currentPlayer].schoolUsed?'＋兵家1':''}）`;
+    ov.classList.add('show');
+  }
+  function chooseMilitaryMode(mode){
+    if(selectedCardIndex===null)return closeMilitaryChoice();
+    const p=game?.players?.[game.currentPlayer],card=p?.hand?.[selectedCardIndex];
+    if(!card||card.target!=='borderSide')return closeMilitaryChoice();
+    militaryMode=mode;redeploySource=null;closeMilitaryChoice();playSE('click');renderSelection();
+  }
+  function bindMilitaryChoice(){
+    // 旧インライン選択UIとの互換用。現在は中央モーダルを使用する。
+    const add=$('#milAdd'),move=$('#milMove');
+    if(add)add.onclick=()=>chooseMilitaryMode('add');
+    if(move)move.onclick=()=>chooseMilitaryMode('move');
+  }
+  function renderSelection(){
+    clearHighlights();const p=game.players[game.currentPlayer];
+    if(pendingLegalist&&p&&!p.isBot){
+      $$('.border-node').forEach(el=>{const b=game.borders[+el.dataset.border];if(b.a===pendingLegalist.state||b.b===pendingLegalist.state)el.classList.add('valid')});
+      $('#actionBox').innerHTML=`<strong>法家「富国強兵」</strong>：${pendingLegalist.state}に接する国境を1つ選び、脅威を+1してください。`;
+      return;
+    }
+    if(!p||p.isBot||selectedCardIndex===null){$('#actionBox').textContent=p?.isBot?'BOTがカードを選択しています。':'カードを選ぶと、マップ上の対象候補が光ります。';return}
+    const card=p.hand[selectedCardIndex];if(!card)return;
+    if(card.target==='state'){$$('.state').forEach(el=>{const st=game.states[el.dataset.state];if(!card.minPrestige||st.prestige>=card.minPrestige)el.classList.add('valid')});$('#actionBox').innerHTML=`<strong>${card.name}</strong>：${card.minPrestige?`威信${card.minPrestige}以上の国を選択。`:'対象の国を選択。'}`}
+    else if(card.target==='border'){$$('.border-node').forEach(el=>el.classList.add('valid'));if(card.type==='diplomacyChoice'&&diplomacyChoiceSign===null){$('#actionBox').innerHTML=`<strong>${card.name}</strong>：脅威を <button id="plusThreat" class="btn ghost" style="padding:4px 8px">上げる</button> <button id="minusThreat" class="btn ghost" style="padding:4px 8px">下げる</button>`;setTimeout(bindChoice,0)}else $('#actionBox').innerHTML=`<strong>${card.name}</strong>：対象国境を選択。`}
+    else if(card.target==='borderSide'){
+      if(!militaryMode){$('#actionBox').innerHTML=`<strong>${card.name}</strong>：中央のウインドウで「増兵」か「再配置」を選んでください。`;openMilitaryChoice(card);return}
+      if(militaryMode==='add'){$$('.border-side-btn').forEach(btn=>{const b=game.borders[+btn.dataset.borderSide],st=btn.dataset.side==='a'?b.a:b.b;if(totalStateTroops(st)<game.states[st].power)btn.classList.add('valid')});$('#actionBox').innerHTML=`<strong>${card.name}</strong>：増兵する国境側を選択。`}
+      else if(!redeploySource){$$('.border-side-btn').forEach(btn=>{const b=game.borders[+btn.dataset.borderSide],key=btn.dataset.side==='a'?'aTroops':'bTroops';if(b[key]>0)btn.classList.add('valid')});$('#actionBox').innerHTML=`<strong>${card.name}</strong>：移動元の稼働戦力を選択。最大${card.delta}個を移動できます。`}
+      else{const srcB=game.borders[redeploySource.border],state=redeploySource.side==='a'?srcB.a:srcB.b;$$('.border-side-btn').forEach(btn=>{const b=game.borders[+btn.dataset.borderSide],st=btn.dataset.side==='a'?b.a:b.b;if(st===state&&+btn.dataset.borderSide!==redeploySource.border)btn.classList.add('valid');if(+btn.dataset.borderSide===redeploySource.border&&btn.dataset.side===redeploySource.side)btn.classList.add('source')});$('#actionBox').innerHTML=`<strong>${card.name}</strong>：${state}軍の移動先を選択。`}
+    }
+  }
+
+  function checkMilestones(state){
+    const st=game.states[state];let gained=0;[6,8,10].forEach(t=>{if(st.power>=t&&!st.milestones.includes(t)){st.milestones.push(t);st.prestige++;gained++}});if(gained)log(`${state}：国力到達ボーナスで威信+${gained}。`);return gained;
+  }
+  function consumeCard(index){closeMilitaryChoice();const p=game.players[game.currentPlayer];const[c]=p.hand.splice(index,1);if(c){showCardPlay(c,p.name);game.discard.push(c);p.cardsPlayedThisTurn++}selectedCardIndex=null;diplomacyChoiceSign=null;militaryMode=null;redeploySource=null}
+  function botLegalistBorder(p,state){
+    let best=null;game.borders.forEach((b,i)=>{if(b.a!==state&&b.b!==state)return;let score=missionStyle(p,'wars')*.7+missionStyle(p,'fatigue')*.45-missionStyle(p,'peace')*.75+borderOppValue(b)*.25-borderOwnValue(p,b)*.12+(4-b.threat)*.06+Math.random()*.15;if(!best||score>best.score)best={score,border:i}});return best?.border??game.borders.findIndex(b=>b.a===state||b.b===state)
+  }
+  function applyLegalistThreat(p,state,borderIndex){const b=game.borders[borderIndex];if(!b||(b.a!==state&&b.b!==state))return false;const old=b.threat;b.threat=clamp(b.threat+1,0,5);log(`${p.name}：法家の副作用 → ${b.a}─${b.b} 脅威 ${old}→${b.threat}`);return true}
+  function applyInternal(p,card,state,fromBot=false){
+    let powerGain=card.delta||0,extra='',legalistTriggered=false;
+    if(p.school==='法家'&&!p.usedSchoolThisRound){powerGain+=1;p.usedSchoolThisRound=true;legalistTriggered=true;extra='／法家 国力さらに+1'}
+    game.states[state].power+=powerGain;
+    const prestigeChange=card.prestige||0;
+    if(prestigeChange)game.states[state].prestige=Math.max(0,game.states[state].prestige+prestigeChange);
+    if(p.school==='儒家'&&!p.usedSchoolThisRound){game.states[state].prestige++;p.usedSchoolThisRound=true;extra='／儒家 威信+1'}
+    const parts=[];
+    if(powerGain)parts.push(`国力${powerGain>0?'+':''}${powerGain}`);
+    if(prestigeChange)parts.push(`威信${prestigeChange>0?'+':''}${prestigeChange}`);
+    log(`${p.name}：「${card.name}」→ ${state} ${parts.join('・')||'変化なし'}${extra}`);
+    checkMilestones(state);
+    if(legalistTriggered){
+      if(fromBot){const bi=botLegalistBorder(p,state);if(bi>=0)applyLegalistThreat(p,state,bi)}else pendingLegalist={state};
+    }
+  }
+  function applyStateEffect(p,card,state){
+    const st=game.states[state];
+    if(card.minPrestige&&st.prestige<card.minPrestige)return false;
+    const before=st.prestige;
+    st.prestige=Math.max(0,st.prestige+(card.prestige||0));
+    log(`${p.name}：「${card.name}」→ ${state} 威信 ${before}→${st.prestige}`);
+    return true;
+  }
+  function diplomacyDelta(card,p,sign){let d=card.type==='diplomacyChoice'?sign:card.delta;if(p.school==='縦横家'&&d>0&&!p.usedSchoolThisRound){d+=1;p.usedSchoolThisRound=true}if(p.school==='墨家'&&d<0&&!p.usedSchoolThisRound){d-=1;p.usedSchoolThisRound=true}return d}
+  function applyDiplomacy(p,card,borderIndex,sign){const b=game.borders[borderIndex],d=diplomacyDelta(card,p,sign),old=b.threat;b.threat=clamp(b.threat+d,0,5);log(`${p.name}：「${card.name}」→ ${b.a}─${b.b} 脅威 ${old}→${b.threat}`)}
+  function applyMilitary(p,card,borderIndex,side){const b=game.borders[borderIndex],state=side==='a'?b.a:b.b,key=side==='a'?'aTroops':'bTroops',room=game.states[state].power-totalStateTroops(state);if(room<=0)return false;let amount=Math.min(card.delta,room);if(p.school==='兵家'&&!p.usedSchoolThisRound){amount=Math.min(amount+1,room);p.usedSchoolThisRound=true}if(amount<=0)return false;b[key]+=amount;log(`${p.name}：「${card.name}」→ ${state}の${b.a}─${b.b}国境に戦力+${amount}`);return true}
+  function applyRedeploy(p,card,srcIndex,srcSide,dstIndex,dstSide){const src=game.borders[srcIndex],dst=game.borders[dstIndex],state=srcSide==='a'?src.a:src.b,dstState=dstSide==='a'?dst.a:dst.b;if(state!==dstState||srcIndex===dstIndex)return false;const srcKey=srcSide==='a'?'aTroops':'bTroops',dstKey=dstSide==='a'?'aTroops':'bTroops';let max=card.delta;if(p.school==='兵家'&&!p.usedSchoolThisRound){max+=1;p.usedSchoolThisRound=true}const amount=Math.min(max,src[srcKey]);if(amount<=0)return false;src[srcKey]-=amount;dst[dstKey]+=amount;log(`${p.name}：「${card.name}」→ ${state}軍を${src.a}─${src.b}から${dst.a}─${dst.b}へ${amount}再配置`);return true}
+
+  function onStateClick(state){const p=game.players[game.currentPlayer];if(p.isBot||selectedCardIndex===null)return;const card=p.hand[selectedCardIndex];if(card?.target!=='state')return;const ok=card.type==='internal'?applyInternal(p,card,state):applyStateEffect(p,card,state);if(ok===false){$('#actionBox').textContent=`${card.name}の対象条件を満たしていません。`;return}consumeCard(selectedCardIndex);renderAll()}
+  function onBorderClick(i){const p=game.players[game.currentPlayer];if(p.isBot)return;if(pendingLegalist){if(applyLegalistThreat(p,pendingLegalist.state,i)){pendingLegalist=null;renderAll()}return}if(selectedCardIndex===null)return;const card=p.hand[selectedCardIndex];if(card?.target!=='border')return;if(card.type==='diplomacyChoice'&&diplomacyChoiceSign===null){$('#actionBox').textContent='先に上げる／下げるを選んでください。';return}applyDiplomacy(p,card,i,diplomacyChoiceSign);consumeCard(selectedCardIndex);renderAll()}
+  function onBorderSideClick(i,side){const p=game.players[game.currentPlayer];if(p.isBot||selectedCardIndex===null)return;const card=p.hand[selectedCardIndex];if(card?.target!=='borderSide')return;if(!militaryMode){$('#actionBox').textContent='先に「増兵」か「再配置」を選んでください。';return}if(militaryMode==='add'){if(!applyMilitary(p,card,i,side)){$('#actionBox').textContent='その国は国力上限まで戦力を保有しています。';return}consumeCard(selectedCardIndex);renderAll();return}if(!redeploySource){const b=game.borders[i],key=side==='a'?'aTroops':'bTroops';if(b[key]<=0){$('#actionBox').textContent='移動できる稼働戦力がありません。';return}redeploySource={border:i,side};renderSelection();return}if(!applyRedeploy(p,card,redeploySource.border,redeploySource.side,i,side)){$('#actionBox').textContent='同じ国の別国境を選んでください。';return}consumeCard(selectedCardIndex);renderAll()}
+
+  function publicOpponentPressure(state){return game.players.slice(0).reduce((score,p,idx)=>{if(idx===game.currentPlayer||!p.publicMission)return score;return score+stateAffinity(p.publicMission,state)},0)}
+  function ownAffinity(p,state){return stateAffinity(p.publicMission,state)*p.publicMission.points+stateAffinity(p.secretMission,state)*p.secretMission.points*1.25}
+  function missionStyle(p,type){const ms=[p.publicMission,p.secretMission];return ms.reduce((v,m)=>v+(m.type===type?m.points:0),0)}
+
+  function botBestStateEffect(p,card){
+    let best=null;
+    stateNames.forEach(state=>{
+      const st=game.states[state];
+      if(card.minPrestige&&st.prestige<card.minPrestige)return;
+      const own=ownAffinity(p,state),opp=publicOpponentPressure(state);
+      let score=opp*1.4-own*.85+st.prestige*.12;
+      if((card.prestige||0)<0)score+=Math.abs(card.prestige)*.7;
+      score+=Math.random()*.18;
+      if(!best||score>best.score)best={score,state};
+    });
+    return best;
+  }
+  function botBestInternal(p,card){let best=null;stateNames.forEach(state=>{const st=game.states[state];const affinity=ownAffinity(p,state)-publicOpponentPressure(state)*.35;let score=affinity*2;const next=st.power+(card.delta||0);if([6,8,10].some(t=>st.power<t&&next>=t))score+=3;score+=Math.max(0,10-st.power)*.08*(card.delta||0);score+=(card.prestige||0)*(.55+Math.max(0,affinity)*.2);if((card.prestige||0)<0)score-=.8;score+=Math.random()*.15;if(!best||score>best.score)best={score,state}});return best}
+  function borderOwnValue(p,b){return ownAffinity(p,b.a)+ownAffinity(p,b.b)}
+  function borderOppValue(b){return publicOpponentPressure(b.a)+publicOpponentPressure(b.b)}
+  function botBestDiplomacy(p,card){
+    let best=null;const signs=card.type==='diplomacyChoice'?[1,-1]:[Math.sign(card.delta)];
+    game.borders.forEach((b,i)=>signs.forEach(sign=>{
+      let score=0;const warWant=missionStyle(p,'wars')+missionStyle(p,'fatigue')*.7,peaceWant=missionStyle(p,'peace');
+      if(sign>0){score+=warWant*1.15-peaceWant*1.05;score+=(4-b.threat)*.08;score+=borderOppValue(b)*.45;score-=borderOwnValue(p,b)*.25}
+      else{score+=peaceWant*1.15-warWant*.7;score+=b.threat===1?3:Math.min(b.threat,3)*.35;score+=borderOwnValue(p,b)*.45;score-=borderOppValue(b)*.2}
+      if(card.type!=='diplomacyChoice')score+=Math.abs(card.delta)*.12;
+      score+=Math.random()*.25;
+      if(!best||score>best.score)best={score,border:i,sign};
+    }));return best
+  }
+  function botBestMilitary(p,card){
+    let best=null;game.borders.forEach((b,i)=>['a','b'].forEach(side=>{const state=side==='a'?b.a:b.b;if(totalStateTroops(state)>=game.states[state].power)return;let score=ownAffinity(p,state)*1.3-publicOpponentPressure(state)*.25;score+=b.threat*.55;const own=side==='a'?b.aTroops:b.bTroops,opp=side==='a'?b.bTroops:b.aTroops;score+=(opp-own)*.35;score+=missionStyle(p,'wars')*.15+missionStyle(p,'fatigue')*.12+Math.random()*.2;if(!best||score>best.score)best={score,border:i,side}}));return best
+  }
+  function botBestRedeploy(p,card){
+    let best=null;game.borders.forEach((src,si)=>['a','b'].forEach(ss=>{const state=ss==='a'?src.a:src.b,srcTroops=ss==='a'?src.aTroops:src.bTroops;if(srcTroops<=0)return;game.borders.forEach((dst,di)=>{if(di===si)return;['a','b'].forEach(ds=>{const dstState=ds==='a'?dst.a:dst.b;if(dstState!==state)return;const srcOpp=ss==='a'?src.bTroops:src.aTroops,dstOwn=ds==='a'?dst.aTroops:dst.bTroops,dstOpp=ds==='a'?dst.bTroops:dst.aTroops;let score=(dst.threat-src.threat)*.85+(dstOpp-dstOwn)*.5-(srcOpp-srcTroops)*.15+ownAffinity(p,state)*.25+missionStyle(p,'wars')*.08+Math.random()*.15;if(!best||score>best.score)best={score,src:si,srcSide:ss,dst:di,dstSide:ds}})})}));return best
+  }
+  function botCardPlan(p,card,index){if(card.target==='state'){const x=card.type==='internal'?botBestInternal(p,card):botBestStateEffect(p,card);return x&&{score:x.score,index,kind:card.type==='internal'?'state':'stateEffect',state:x.state}}if(card.target==='border'){const x=botBestDiplomacy(p,card);return x&&{score:x.score,index,kind:'border',border:x.border,sign:x.sign}}if(card.target==='borderSide'){const add=botBestMilitary(p,card),move=botBestRedeploy(p,card);if(move&&(!add||move.score>add.score+.35))return{score:move.score,index,kind:'redeploy',...move};return add&&{score:add.score,index,kind:'military',border:add.border,side:add.side}}return null}
+
+  async function runBotTurn(){
+    if(botBusy)return;botBusy=true;renderAll();const p=game.players[game.currentPlayer];let actions=0;
+    await sleep(420);
+    if(p.school==='道家'){
+      const openingPlans=p.hand.map((c,i)=>botCardPlan(p,c,i)).filter(Boolean).sort((a,b)=>b.score-a.score);
+      if(!openingPlans.length||(openingPlans[0].score<2.0&&Math.random()<.7)){
+        p.daoBonusDraw=true;log(`${p.name}：道家「無為」――あえて何もせず、次手番の5枚ドローを選択。`);botBusy=false;renderAll();await sleep(300);advanceTurn();return;
+      }
+    }
+    while(actions<3&&p.hand.length){
+      const plans=p.hand.map((c,i)=>botCardPlan(p,c,i)).filter(Boolean).sort((a,b)=>b.score-a.score);if(!plans.length)break;
+      const plan=plans[0];if(actions>=2&&plan.score<1.4)break;const card=p.hand[plan.index];
+      if(plan.kind==='state')applyInternal(p,card,plan.state,true);else if(plan.kind==='stateEffect')applyStateEffect(p,card,plan.state);else if(plan.kind==='border')applyDiplomacy(p,card,plan.border,plan.sign);else if(plan.kind==='military'&&!applyMilitary(p,card,plan.border,plan.side))break;else if(plan.kind==='redeploy'&&!applyRedeploy(p,card,plan.src,plan.srcSide,plan.dst,plan.dstSide))break;
+      const[c]=p.hand.splice(plan.index,1);if(c){showCardPlay(c,p.name);game.discard.push(c);p.cardsPlayedThisTurn++}actions++;renderAll();await sleep(840);
+    }
+    if(p.school==='道家'&&p.cardsPlayedThisTurn===0){p.daoBonusDraw=true;log(`${p.name}：道家「無為」発動。次の自分の手番は5枚ドロー。`)}
+    log(`${p.name}：${actions}枚使用して手番終了。`);botBusy=false;renderAll();await sleep(300);advanceTurn();
+  }
+
+  function endHumanTurn(){const p=game.players[game.currentPlayer];if(!p||p.isBot||botBusy)return;if(pendingLegalist){$('#actionBox').textContent='法家の副作用として、先に脅威を上げる国境を選んでください。';return}selectedCardIndex=null;diplomacyChoiceSign=null;if(p.school==='道家'&&p.cardsPlayedThisTurn===0){p.daoBonusDraw=true;log(`${p.name}：道家「無為」発動。次の自分の手番は5枚ドロー。`)}advanceTurn()}
+  function advanceTurn(){game.turnPos++;if(game.turnPos>=game.turnOrder.length){processRound();return}game.currentPlayer=game.turnOrder[game.turnPos];beginTurn()}
+
+  function applyDefeatPenalty(state){
+    const st=game.states[state];
+    if(st.prestige>0){st.prestige--;return '威信-1'}
+    const before=st.power;st.power=Math.max(1,st.power-1);
+    return before!==st.power?'威信0のため国力-1':'威信0・国力1のため追加低下なし';
+  }
+
+  function processRound(){
+    const lines=[],oldFatigue=game.borders.map(b=>({a:b.aFatigue,b:b.bFatigue}));
+    const peaceful=[];stateNames.forEach(s=>{const touching=stateBorders(s);if(touching.length&&touching.every(b=>b.threat===0)){game.states[s].prestige++;peaceful.push(s)}});lines.push(`<b>平和威信</b><br>${peaceful.length?peaceful.join('・')+'：各+1':'該当国なし'}`);
+    const wars=game.borders.filter(b=>b.threat>=5),warLines=[];
+    playSE(wars.length?'war':'round');
+    wars.forEach(b=>{
+      game.totalWars++;const aReal=b.aTroops,cReal=b.bTroops,aEff=aReal+prestigeBuff(b.a,aReal),cEff=cReal+prestigeBuff(b.b,cReal),clash=Math.min(aReal,cReal);
+      b.aTroops-=clash;b.bTroops-=clash;b.aFatigue+=clash;b.bFatigue+=clash;
+      if(aEff>cEff){
+        const gain=Math.max(0,aReal-cReal);game.states[b.a].prestige+=gain;const penalty=applyDefeatPenalty(b.b);
+        warLines.push(`${b.a} ${aReal}${aEff!==aReal?`(+${aEff-aReal})`:''} vs ${b.b} ${cReal}${cEff!==cReal?`(+${cEff-cReal})`:''} → ${b.a}勝利${gain?`・威信+${gain}`:''}／${b.b} ${penalty}`)
+      }
+      else if(cEff>aEff){
+        const gain=Math.max(0,cReal-aReal);game.states[b.b].prestige+=gain;const penalty=applyDefeatPenalty(b.a);
+        warLines.push(`${b.a} ${aReal}${aEff!==aReal?`(+${aEff-aReal})`:''} vs ${b.b} ${cReal}${cEff!==cReal?`(+${cEff-cReal})`:''} → ${b.b}勝利${gain?`・威信+${gain}`:''}／${b.a} ${penalty}`)
+      }
+      else warLines.push(`${b.a} ${aReal} vs ${b.b} ${cReal} → 引き分け`);
+      b.threat=1;
+    });lines.push(`<b>戦争</b><br>${warLines.length?warLines.join('<br>'):'このラウンドは戦争なし。'}`);
+    let recovered=0;game.borders.forEach((b,i)=>{const oa=oldFatigue[i].a,ob=oldFatigue[i].b;if(oa){b.aTroops+=oa;b.aFatigue-=oa;recovered+=oa}if(ob){b.bTroops+=ob;b.bFatigue-=ob;recovered+=ob}});if(recovered)lines.push(`<b>疲弊回復</b><br>前ラウンドから疲弊していた戦力${recovered}個が回復。`);
+    $('#roundSummary').innerHTML=lines.join('<hr style="border:0;border-top:1px solid #d8c9ad">');$('#nextRoundBtn').textContent=game.round>=game.roundLimit?'結果を見る':'次のラウンドへ';$('#roundOverlay').classList.add('show');renderAll();
+  }
+
+  function nextRound(){
+    $('#roundOverlay').classList.remove('show');
+    if(game.round>=game.roundLimit){showResults();return}
+    game.round++;
+    $('#nextRoundBtn').textContent='次のラウンドへ';
+    startRound();
+  }
+
+  function scorePlayer(p){const pub=missionAchieved(p.publicMission)?p.publicMission.points:0,sec=missionAchieved(p.secretMission)?p.secretMission.points:0;return{pub,sec,total:pub+sec}}
+  function showResults(){
+    playSE('success');
+    const ranked=game.players.map((p,i)=>({p,i,...scorePlayer(p)})).sort((a,b)=>b.total-a.total||b.sec-a.sec);
+    const top=ranked[0];
+    $('#resultList').innerHTML=ranked.map((r,rank)=>`<div class="result-item ${rank===0?'winner':''}"><b>${rank+1}位　${r.p.name}（${r.p.school}）　${r.total}点</b><br>公開「${r.p.publicMission.name}」${missionAchieved(r.p.publicMission)?`<span class="ok">達成 +${r.pub}</span>`:`<span class="ng">未達成</span>`}<br>非公開「${r.p.secretMission.name}」${missionAchieved(r.p.secretMission)?`<span class="ok">達成 +${r.sec}</span>`:`<span class="ng">未達成</span>`}</div>`).join('')+`<div class="result-item"><b>最終盤面</b><br>${stateNames.map(s=>`${s} 威信${game.states[s].prestige}/国力${game.states[s].power}`).join('　')}<br>総戦争回数：${game.totalWars}</div>`;
+    $('#resultOverlay').classList.add('show');
+  }
+
+  function resetToSetup(){
+    game=null;
+    selectedCardIndex=null;
+    diplomacyChoiceSign=null;
+    botBusy=false;
+    militaryMode=null;
+    redeploySource=null;
+    pendingLegalist=null;
+    if(cardFxTimer){clearTimeout(cardFxTimer);cardFxTimer=null}
+    const cardFx=$('#cardPlayFx');if(cardFx){cardFx.classList.remove('show');cardFx.setAttribute('aria-hidden','true')}
+    $('#resultOverlay').classList.remove('show');
+    closeMilitaryChoice();
+    $('#rulesOverlay').classList.remove('show');
+    stopBGM(true);
+    $('#roundOverlay').classList.remove('show');
+    const missionOverlay=$('#missionOverlay');
+    if(missionOverlay) missionOverlay.classList.remove('show');
+    $('#passOverlay').classList.remove('show');
+    missionChoicePlayerIndex=0;pendingPassAction=null;
+    $('#game').style.display='none';
+    $('#setup').style.display='block';
+    document.body.classList.remove('game-running');
+    $('#nextRoundBtn').textContent='次のラウンドへ';
+    $('#log').innerHTML='';
+    window.scrollTo({top:0,behavior:'auto'});
+  }
+
+
+  $('#militaryAddBtn').onclick=()=>chooseMilitaryMode('add');
+  $('#militaryMoveBtn').onclick=()=>chooseMilitaryMode('move');
+  $('#militaryChoiceCancel').onclick=()=>{playSE('click');closeMilitaryChoice();selectedCardIndex=null;militaryMode=null;redeploySource=null;renderHand();renderSelection()};
+  $('#cardStudyCloseBtn')?.addEventListener('click',closeCardStudy);
+  $('#cardStudyOverlay')?.addEventListener('click',e=>{if(e.target.id==='cardStudyOverlay')closeCardStudy()});
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#cardStudyOverlay')?.classList.contains('show'))closeCardStudy()});
+
+  $('#gameMode').onchange=updateSetupMode;$('#playerCount').onchange=()=>{if($('#gameMode').value==='local')renderLocalPlayerSetup()};
+  $('#passBtn').onclick=()=>{playSE('click');const action=pendingPassAction;pendingPassAction=null;$('#passOverlay').classList.remove('show');if(action)action()};
+  $('#rulesBtnSetup').onclick=openRules;$('#rulesBtnGame').onclick=openRules;$('#rulesCloseBtn').onclick=closeRules;
+  $('#rulesOverlay').addEventListener('click',e=>{if(e.target===$('#rulesOverlay'))closeRules()});
+  $('#soundBtnSetup').onclick=toggleSound;$('#soundBtnGame').onclick=toggleSound;
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#rulesOverlay').classList.contains('show'))closeRules()});
+  $('#startBtn').onclick=startGame;$('#secretToggle').onclick=()=>{playSE('click');$('#secretBox').classList.toggle('hidden');$('#secretToggle').textContent=$('#secretBox').classList.contains('hidden')?'見る':'隠す'};
+  $('#cancelCard').onclick=()=>{playSE('click');if(pendingLegalist){$('#actionBox').textContent='法家の副作用として、先に脅威を上げる国境を選んでください。';return}closeMilitaryChoice();selectedCardIndex=null;diplomacyChoiceSign=null;militaryMode=null;redeploySource=null;renderHand();renderSelection()};$('#endTurn').onclick=()=>{playSE('click');endHumanTurn()};$('#nextRoundBtn').onclick=()=>{playSE('click');nextRound()};$('#restartBtn').onclick=()=>{playSE('click');resetToSetup()};
+  updateSoundButtons();
+  initMapControls();
+  updateSetupMode();
+})();
+</script>
+</body>
+</html>
