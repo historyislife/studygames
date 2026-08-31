@@ -295,7 +295,7 @@ body.game-running{overflow:hidden;background:#151811}
 
 
 /* ===== Military action choice modal / readable hand ===== */
-#militaryChoiceOverlay{z-index:74}
+#militaryChoiceOverlay,#diplomacyChoiceOverlay{z-index:74}
 .military-choice-modal{max-width:520px!important;text-align:left!important;border:2px solid #8f6b3e;background:linear-gradient(180deg,#fffaf0,#f2e3c5)!important}
 .military-choice-modal h2{text-align:center;margin-bottom:6px}
 .military-choice-card{text-align:center;font-weight:900;font-family:serif;font-size:20px;color:#5e3824;margin:2px 0 12px}
@@ -306,6 +306,14 @@ body.game-running{overflow:hidden;background:#151811}
 .military-choice-btn strong{display:block;font:900 20px/1.2 serif;margin-bottom:7px;color:#6f3d2f}
 .military-choice-btn span{display:block;font-size:12px;line-height:1.55;color:#5f5548}
 .military-choice-cancel{display:block;margin:13px auto 0}
+.diplomacy-up strong{color:#8b2f27}.diplomacy-down strong{color:#315f78}
+.mission-hud-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 28px 7px 0;padding-bottom:6px;border-bottom:1px solid rgba(219,193,140,.18);font-family:serif;font-weight:900;color:#f1d897}
+.mission-min-btn{appearance:none;border:1px solid rgba(222,193,133,.35);border-radius:6px;background:rgba(31,31,25,.78);color:#f1d897;width:28px;height:26px;font-weight:900;cursor:pointer;line-height:1}
+#missionHud.minimized{width:126px!important;max-height:none!important;overflow:hidden!important;padding-bottom:7px!important}
+#missionHud.minimized #missionHudBody{display:none!important}
+#missionHud.minimized .mission-hud-head{margin-bottom:0;border-bottom:0;padding-bottom:0}
+#missionHud.minimized .mission-hud-head>strong{font-size:11px;white-space:nowrap}
+#missionHud.minimized .mission-min-btn{width:30px}
 
 /* カード効果がカード内部で切れない高さを確保 */
 #game .cards{height:248px;min-height:248px}
@@ -463,10 +471,13 @@ body.game-running .music-credit{color:#d8caab}
     <div id="messageHud" class="message-hud hud draggable"><div id="actionBox" class="action-box">カードを選ぶと対象候補が光ります。</div></div>
 
     <aside id="missionHud" class="mission-hud hud draggable">
-      <div class="public-board"><h3>公開使命</h3><div id="publicMissions"></div></div>
-      <div id="humanMissions" class="missions">
-        <div class="mission"><div class="mission-title"><span id="myPublicLabel">自分の公開使命</span></div><div id="myPublicMission" class="mission-body"></div></div>
-        <div id="secretBox" class="mission secret hidden"><div class="mission-title"><span id="mySecretLabel">自分の非公開使命</span><button id="secretToggle" class="btn ghost" style="padding:4px 8px">見る</button></div><div id="mySecretMission" class="secret-body"></div></div>
+      <div class="mission-hud-head"><strong>使命一覧</strong><button id="missionMinBtn" class="mission-min-btn" type="button" aria-expanded="true" title="使命一覧を最小化">－</button></div>
+      <div id="missionHudBody">
+        <div class="public-board"><h3>公開使命</h3><div id="publicMissions"></div></div>
+        <div id="humanMissions" class="missions">
+          <div class="mission"><div class="mission-title"><span id="myPublicLabel">自分の公開使命</span></div><div id="myPublicMission" class="mission-body"></div></div>
+          <div id="secretBox" class="mission secret hidden"><div class="mission-title"><span id="mySecretLabel">自分の非公開使命</span><button id="secretToggle" class="btn ghost" style="padding:4px 8px">見る</button></div><div id="mySecretMission" class="secret-body"></div></div>
+        </div>
       </div>
     </aside>
 
@@ -557,6 +568,19 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
   </div>
 </div>
 
+<div id="diplomacyChoiceOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="diplomacyChoiceTitle">
+  <div class="modal military-choice-modal">
+    <h2 id="diplomacyChoiceTitle">外交カードの使い方</h2>
+    <div id="diplomacyChoiceCard" class="military-choice-card"></div>
+    <p class="military-choice-help">この国境の緊張をどう動かすか選んでください。選択後、対象にできる国境が光ります。</p>
+    <div class="military-choice-grid">
+      <button id="diplomacyUpBtn" class="military-choice-btn diplomacy-up" type="button"><strong>脅威を上げる</strong><span>指定した国境の脅威を上げ、戦争へ近づけます。</span></button>
+      <button id="diplomacyDownBtn" class="military-choice-btn diplomacy-down" type="button"><strong>脅威を下げる</strong><span>指定した国境の脅威を下げ、戦争から遠ざけます。</span></button>
+    </div>
+    <button id="diplomacyChoiceCancel" class="btn ghost military-choice-cancel" type="button">カード選択に戻る</button>
+  </div>
+</div>
+
 <div id="rulesOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
   <div class="modal rules-modal">
     <div class="rules-head"><h2 id="rulesTitle">遊説遊戯　ルール解説</h2><button id="rulesCloseBtn" class="btn ghost" type="button">閉じる</button></div>
@@ -636,17 +660,25 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
   };
 
   const missionDefs=[
-    {id:'qin12',name:'虎狼の国',desc:'ゲーム終了時、秦の威信が12以上。',points:4,type:'statePrestige',state:'秦',target:12},
+    {id:'qin16',name:'虎狼の国',desc:'ゲーム終了時、秦の威信が16以上。',points:4,type:'statePrestige',state:'秦',target:16},
     {id:'han7',name:'存韓',desc:'ゲーム終了時、韓の威信が7以上。',points:3,type:'statePrestige',state:'韓',target:7},
-    {id:'hezong30',name:'合従',desc:'ゲーム終了時、秦以外6国の威信合計が30以上。',points:2,type:'sumPrestige',states:['趙','魏','韓','燕','斉','楚'],target:30},
+    {id:'hezong',name:'合従',desc:'ゲーム終了時、秦以外6国の威信合計が規定値以上。',points:2,type:'sumPrestige',states:['趙','魏','韓','燕','斉','楚'],targetByPlayers:{2:30,3:35,4:40}},
     {id:'lianheng',name:'連衡',desc:'ゲーム終了時、秦の威信が単独1位。',points:4,type:'rankQin'},
-    {id:'peace8',name:'天下太平',desc:'ゲーム終了時、脅威0の国境が8本以上。',points:4,type:'peace',target:8},
-    {id:'fatigue16',name:'天下疲弊',desc:'ゲーム終了時、疲弊兵が合計16個以上。',points:4,type:'fatigue',target:16},
+    {id:'peace6',name:'天下太平',desc:'ゲーム終了時、脅威0の国境が6本以上。',points:4,type:'peace',target:6},
+    {id:'fatigue12',name:'天下疲弊',desc:'ゲーム終了時、疲弊兵が合計12個以上。',points:4,type:'fatigue',target:12},
     {id:'qi9',name:'東方の雄',desc:'ゲーム終了時、斉の威信が9以上。',points:3,type:'statePrestige',state:'斉',target:9},
-    {id:'chu10',name:'楚の隆盛',desc:'ゲーム終了時、楚の威信が10以上。',points:4,type:'statePrestige',state:'楚',target:10},
-    {id:'sanjin12',name:'三晋均衡',desc:'趙・魏・韓が全て威信4以上、かつ最大差4以内。',points:5,type:'balance'},
-    {id:'war18',name:'乱世を望む者',desc:'ゲーム中の戦争回数が18回以上。',points:4,type:'wars',target:18}
+    {id:'chu12',name:'楚の隆盛',desc:'ゲーム終了時、楚の威信が12以上。',points:4,type:'statePrestige',state:'楚',target:12},
+    {id:'sanjin',name:'三晋均衡',desc:'趙・魏・韓が全て威信3以上、かつ最大差8以内。',points:5,type:'balance',minPrestige:3,maxDiff:8},
+    {id:'war',name:'乱世を望む者',desc:'ゲーム中の戦争回数が規定値以上。',points:4,type:'wars',targetByPlayers:{2:18,3:16,4:14}}
   ];
+
+  function resolveMissionDef(def,playerCount){
+    const m={...def};
+    if(m.targetByPlayers)m.target=m.targetByPlayers[playerCount]??m.targetByPlayers[4];
+    if(m.id==='hezong')m.desc=`ゲーム終了時、秦以外6国の威信合計が${m.target}以上。`;
+    if(m.id==='war')m.desc=`ゲーム中の戦争回数が${m.target}回以上。`;
+    return m;
+  }
 
   const cardTemplates=[
     {name:'徙木立信',type:'internal',target:'state',delta:1,prestige:0,desc:'指定した国の国力を+1。',art:'assets/cards/01_shimoku.png'},
@@ -952,7 +984,7 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
     if(m.type==='rankQin'){const q=game.states['秦'].prestige;return stateNames.filter(s=>s!=='秦').every(s=>q>game.states[s].prestige)}
     if(m.type==='peace')return game.borders.filter(b=>b.threat===0).length>=m.target;
     if(m.type==='fatigue')return totalFatigue()>=m.target;
-    if(m.type==='balance'){const v=['趙','魏','韓'].map(s=>game.states[s].prestige);return Math.min(...v)>=4&&Math.max(...v)-Math.min(...v)<=4}
+    if(m.type==='balance'){const v=['趙','魏','韓'].map(s=>game.states[s].prestige);return Math.min(...v)>=(m.minPrestige??3)&&Math.max(...v)-Math.min(...v)<=(m.maxDiff??8)}
     if(m.type==='wars')return game.totalWars>=m.target;
     return false;
   }
@@ -968,7 +1000,7 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
       const future=game.borders.reduce((n,b)=>n+(b.threat>=4?Math.min(b.aTroops,b.bTroops)*.2:0),0);return clamp((totalFatigue()+future)/m.target,0,1);
     }
     if(m.type==='balance'){
-      const v=['趙','魏','韓'].map(s=>game.states[s].prestige);const floor=clamp(Math.min(...v)/4,0,1);const diff=Math.max(...v)-Math.min(...v);return .65*floor+.35*clamp(1-diff/9,0,1);
+      const v=['趙','魏','韓'].map(s=>game.states[s].prestige),minReq=m.minPrestige??3,maxDiff=m.maxDiff??8;const floor=clamp(Math.min(...v)/minReq,0,1);const diff=Math.max(...v)-Math.min(...v);return .65*floor+.35*clamp(1-diff/(maxDiff+1),0,1);
     }
     if(m.type==='wars'){
       const heat=game.borders.reduce((n,b)=>n+b.threat/5,0)*.18;return clamp((game.totalWars+heat)/m.target,0,1);
@@ -1037,7 +1069,7 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
       if(new Set(schools).size!==schools.length){alert('ローカル対人戦では学派を重複させずに選んでください。');return}
       players=Array.from({length:count},(_,i)=>({name:$(`[data-local-name="${i}"]`).value.trim()||`説客${i+1}`,school:$(`[data-local-school="${i}"]`).value,isBot:false}));
     }
-    const missionDeck=shuffle(missionDefs);
+    const missionDeck=shuffle(missionDefs.map(m=>resolveMissionDef(m,count)));
     players.forEach((p,i)=>{p.missions=[missionDeck[i*2],missionDeck[i*2+1]];p.publicMission=null;p.secretMission=null;p.hand=[];p.usedSchoolThisRound=false;p.daoBonusDraw=false;p.cardsPlayedThisTurn=0});
     const states={};stateNames.forEach(n=>states[n]={power:4,prestige:0,milestones:[]});
     const borders=borderPairs.map(([a,b],i)=>({id:i,a,b,threat:Math.random()<.45?0:1,aTroops:1,bTroops:1,aFatigue:0,bFatigue:0}));
@@ -1252,9 +1284,21 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
     $$('[data-card]').forEach(el=>{const i=+el.dataset.card;bindCardInteraction(el,i,p.hand[i])});
   }
 
-  function selectCard(i){if(game.players[game.currentPlayer].isBot||pendingLegalist)return;closeMilitaryChoice();selectedCardIndex=i;diplomacyChoiceSign=null;militaryMode=null;redeploySource=null;renderHand();renderSelection()}
+  function selectCard(i){if(game.players[game.currentPlayer].isBot||pendingLegalist)return;closeMilitaryChoice();closeDiplomacyChoice();selectedCardIndex=i;diplomacyChoiceSign=null;militaryMode=null;redeploySource=null;renderHand();renderSelection()}
   function clearHighlights(){$$('.state,.border-node,.border-side-btn').forEach(el=>el.classList.remove('valid','source'))}
-  function bindChoice(){const plus=$('#plusThreat'),minus=$('#minusThreat');if(plus)plus.onclick=()=>{diplomacyChoiceSign=1;renderSelection()};if(minus)minus.onclick=()=>{diplomacyChoiceSign=-1;renderSelection()}}
+  function closeDiplomacyChoice(){const ov=$('#diplomacyChoiceOverlay');if(ov)ov.classList.remove('show')}
+  function openDiplomacyChoice(card){
+    const ov=$('#diplomacyChoiceOverlay');if(!ov||!card)return;
+    $('#diplomacyChoiceCard').textContent=card.name;
+    ov.classList.add('show');
+  }
+  function chooseDiplomacySign(sign){
+    if(selectedCardIndex===null)return closeDiplomacyChoice();
+    const p=game?.players?.[game.currentPlayer],card=p?.hand?.[selectedCardIndex];
+    if(!card||card.type!=='diplomacyChoice')return closeDiplomacyChoice();
+    diplomacyChoiceSign=sign;closeDiplomacyChoice();playSE('click');renderSelection();
+  }
+  function bindChoice(){/* 旧インライン選択UIとの互換用。中央モーダルを使用。 */}
   function closeMilitaryChoice(){const ov=$('#militaryChoiceOverlay');if(ov)ov.classList.remove('show')}
   function openMilitaryChoice(card){
     const ov=$('#militaryChoiceOverlay');if(!ov||!card)return;
@@ -1283,7 +1327,10 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
     if(!p||p.isBot||selectedCardIndex===null){$('#actionBox').textContent=p?.isBot?'BOTがカードを選択しています。':'カードを選ぶと、マップ上の対象候補が光ります。';return}
     const card=p.hand[selectedCardIndex];if(!card)return;
     if(card.target==='state'){$$('.state').forEach(el=>{const st=game.states[el.dataset.state];if(!card.minPrestige||st.prestige>=card.minPrestige)el.classList.add('valid')});$('#actionBox').innerHTML=`<strong>${card.name}</strong>：${card.minPrestige?`威信${card.minPrestige}以上の国を選択。`:'対象の国を選択。'}`}
-    else if(card.target==='border'){$$('.border-node').forEach(el=>el.classList.add('valid'));if(card.type==='diplomacyChoice'&&diplomacyChoiceSign===null){$('#actionBox').innerHTML=`<strong>${card.name}</strong>：脅威を <button id="plusThreat" class="btn ghost" style="padding:4px 8px">上げる</button> <button id="minusThreat" class="btn ghost" style="padding:4px 8px">下げる</button>`;setTimeout(bindChoice,0)}else $('#actionBox').innerHTML=`<strong>${card.name}</strong>：対象国境を選択。`}
+    else if(card.target==='border'){
+      if(card.type==='diplomacyChoice'&&diplomacyChoiceSign===null){$('#actionBox').innerHTML=`<strong>${card.name}</strong>：中央のウインドウで脅威を上げるか下げるか選んでください。`;openDiplomacyChoice(card);return}
+      $$('.border-node').forEach(el=>el.classList.add('valid'));$('#actionBox').innerHTML=`<strong>${card.name}</strong>：${card.type==='diplomacyChoice'?(diplomacyChoiceSign>0?'脅威を上げる国境':'脅威を下げる国境'):'対象国境'}を選択。`
+    }
     else if(card.target==='borderSide'){
       if(!militaryMode){$('#actionBox').innerHTML=`<strong>${card.name}</strong>：中央のウインドウで「増兵」か「再配置」を選んでください。`;openMilitaryChoice(card);return}
       if(militaryMode==='add'){$$('.border-side-btn').forEach(btn=>{const b=game.borders[+btn.dataset.borderSide],st=btn.dataset.side==='a'?b.a:b.b;if(totalStateTroops(st)<game.states[st].power)btn.classList.add('valid')});$('#actionBox').innerHTML=`<strong>${card.name}</strong>：増兵する国境側を選択。`}
@@ -1295,7 +1342,7 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
   function checkMilestones(state){
     const st=game.states[state];let gained=0;[6,8,10].forEach(t=>{if(st.power>=t&&!st.milestones.includes(t)){st.milestones.push(t);st.prestige++;gained++}});if(gained)log(`${state}：国力到達ボーナスで威信+${gained}。`);return gained;
   }
-  function consumeCard(index){closeMilitaryChoice();const p=game.players[game.currentPlayer];const[c]=p.hand.splice(index,1);if(c){showCardPlay(c,p.name);game.discard.push(c);p.cardsPlayedThisTurn++}selectedCardIndex=null;diplomacyChoiceSign=null;militaryMode=null;redeploySource=null}
+  function consumeCard(index){closeMilitaryChoice();closeDiplomacyChoice();const p=game.players[game.currentPlayer];const[c]=p.hand.splice(index,1);if(c){showCardPlay(c,p.name);game.discard.push(c);p.cardsPlayedThisTurn++}selectedCardIndex=null;diplomacyChoiceSign=null;militaryMode=null;redeploySource=null}
   function botLegalistBorder(p,state){
     let best=null;game.borders.forEach((b,i)=>{if(b.a!==state&&b.b!==state)return;let score=missionStyle(p,'wars')*.7+missionStyle(p,'fatigue')*.45-missionStyle(p,'peace')*.75+borderOppValue(b)*.25-borderOwnValue(p,b)*.12+(4-b.threat)*.06+Math.random()*.15;if(!best||score>best.score)best={score,border:i}});return best?.border??game.borders.findIndex(b=>b.a===state||b.b===state)
   }
@@ -1452,6 +1499,7 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
     if(cardFxTimer){clearTimeout(cardFxTimer);cardFxTimer=null}
     const cardFx=$('#cardPlayFx');if(cardFx){cardFx.classList.remove('show');cardFx.setAttribute('aria-hidden','true')}
     $('#resultOverlay').classList.remove('show');
+    closeDiplomacyChoice();closeMilitaryChoice();
     closeMilitaryChoice();
     $('#rulesOverlay').classList.remove('show');
     stopBGM(true);
@@ -1472,6 +1520,10 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
   $('#militaryAddBtn').onclick=()=>chooseMilitaryMode('add');
   $('#militaryMoveBtn').onclick=()=>chooseMilitaryMode('move');
   $('#militaryChoiceCancel').onclick=()=>{playSE('click');closeMilitaryChoice();selectedCardIndex=null;militaryMode=null;redeploySource=null;renderHand();renderSelection()};
+  $('#diplomacyUpBtn').onclick=()=>chooseDiplomacySign(1);
+  $('#diplomacyDownBtn').onclick=()=>chooseDiplomacySign(-1);
+  $('#diplomacyChoiceCancel').onclick=()=>{playSE('click');closeDiplomacyChoice();selectedCardIndex=null;diplomacyChoiceSign=null;renderHand();renderSelection()};
+  $('#missionMinBtn').onclick=()=>{const hud=$('#missionHud'),btn=$('#missionMinBtn');const minimized=hud.classList.toggle('minimized');btn.textContent=minimized?'＋':'－';btn.setAttribute('aria-expanded',String(!minimized));btn.title=minimized?'使命一覧を開く':'使命一覧を最小化';playSE('click')};
   $('#mapInspectCloseBtn')?.addEventListener('click',closeMapInspect);
   $('#mapInspectOverlay')?.addEventListener('click',e=>{if(e.target.id==='mapInspectOverlay')closeMapInspect()});
   window.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#mapInspectOverlay')?.classList.contains('show'))closeMapInspect()});
@@ -1486,7 +1538,7 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
   $('#soundBtnSetup').onclick=toggleSound;$('#soundBtnGame').onclick=toggleSound;
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#rulesOverlay').classList.contains('show'))closeRules()});
   $('#startBtn').onclick=startGame;$('#secretToggle').onclick=()=>{playSE('click');$('#secretBox').classList.toggle('hidden');$('#secretToggle').textContent=$('#secretBox').classList.contains('hidden')?'見る':'隠す'};
-  $('#cancelCard').onclick=()=>{playSE('click');if(pendingLegalist){$('#actionBox').textContent='法家の副作用として、先に脅威を上げる国境を選んでください。';return}closeMilitaryChoice();selectedCardIndex=null;diplomacyChoiceSign=null;militaryMode=null;redeploySource=null;renderHand();renderSelection()};$('#endTurn').onclick=()=>{playSE('click');endHumanTurn()};$('#nextRoundBtn').onclick=()=>{playSE('click');nextRound()};$('#restartBtn').onclick=()=>{playSE('click');resetToSetup()};
+  $('#cancelCard').onclick=()=>{playSE('click');if(pendingLegalist){$('#actionBox').textContent='法家の副作用として、先に脅威を上げる国境を選んでください。';return}closeMilitaryChoice();closeDiplomacyChoice();selectedCardIndex=null;diplomacyChoiceSign=null;militaryMode=null;redeploySource=null;renderHand();renderSelection()};$('#endTurn').onclick=()=>{playSE('click');endHumanTurn()};$('#nextRoundBtn').onclick=()=>{playSE('click');nextRound()};$('#restartBtn').onclick=()=>{playSE('click');resetToSetup()};
   updateSoundButtons();
   initMapControls();
   updateSetupMode();
