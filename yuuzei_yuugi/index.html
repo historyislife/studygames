@@ -188,10 +188,10 @@ body.game-running{overflow:hidden;background:#151811}
 #game .border-side-btn small{font-size:7px!important;line-height:1}
 #game .border-side-btn .side-num{font-size:14px!important;line-height:1.05}
 #game .border-side-btn .fatigue-num{font-size:7px!important;line-height:1;color:#c6b892!important}
-#game .troop-piece{position:absolute;width:30px;height:48px;transform:translate(-50%,-50%);pointer-events:none;z-index:4;filter:drop-shadow(0 3px 3px rgba(0,0,0,.34))}
-#game .troop-piece img{display:block;width:100%;height:100%;object-fit:contain}
-#game .troop-piece.fatigue{width:40px;height:26px;opacity:.94;filter:drop-shadow(0 2px 2px rgba(0,0,0,.28))}
-@media(max-width:600px){#game .border-node{width:70px}#game .border-node-name{font-size:8px}#game .troop-piece{width:26px;height:40px}#game .troop-piece.fatigue{width:34px;height:22px}}
+#game .troop-piece{position:absolute;width:25px;height:42px;transform:translate(-50%,-50%);pointer-events:none;z-index:4;overflow:visible;filter:drop-shadow(0 3px 3px rgba(0,0,0,.34))}
+#game .troop-piece img{display:block;width:100%;height:100%;max-width:none;object-fit:contain;overflow:visible}
+#game .troop-piece.fatigue{width:34px;height:23px;opacity:.94;filter:drop-shadow(0 2px 2px rgba(0,0,0,.28))}
+@media(max-width:600px){#game .border-node{width:70px}#game .border-node-name{font-size:8px}#game .troop-piece{width:23px;height:38px}#game .troop-piece.fatigue{width:31px;height:21px}}
 
 
 
@@ -245,7 +245,7 @@ body.game-running{overflow:hidden;background:#151811}
   #game .state{width:92px;min-height:64px;padding:5px}
   #game .state-name{font-size:19px}.state-stats{font-size:8px!important}.state-troops,.buff{font-size:8px!important}
   #game .border-node{width:66px!important;padding:3px}.border-node-name{font-size:7px!important}.border-side-btn{min-height:27px!important}.border-side-btn .side-num{font-size:12px!important}
-  #game .troop-piece{width:24px;height:38px}#game .troop-piece.fatigue{width:32px;height:21px}
+  #game .troop-piece{width:22px;height:36px}#game .troop-piece.fatigue{width:30px;height:20px}
   .map-help{display:none!important}
 }
 @media(max-width:380px){
@@ -365,6 +365,28 @@ body.game-running{overflow:hidden;background:#151811}
 }
 
 
+
+/* ===== 国・国境ウインドウ確認拡大 ===== */
+#game .state.valid{scale:1.16;z-index:12}
+#game .border-node.valid,
+#game .border-node:has(.border-side-btn.valid),
+#game .border-node:has(.border-side-btn.source){scale:1.16;z-index:13}
+#game .state.map-inspect-pressing,#game .border-node.map-inspect-pressing{filter:brightness(1.18);outline:3px solid rgba(255,222,135,.75)}
+#mapInspectOverlay{z-index:94}
+.map-inspect-modal{max-width:560px!important;text-align:left!important;background:linear-gradient(180deg,#fffaf0,#ead8ac)!important;border:2px solid #8b7045;padding:16px!important}
+.map-inspect-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.map-inspect-title{font:900 clamp(30px,6vw,44px)/1.05 serif;color:#4a321e;margin:0}
+.map-inspect-sub{font-size:12px;color:#76634b;margin-top:4px;font-weight:800}
+.map-inspect-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:11px}
+.map-inspect-stat{border:1px solid #bca67e;border-radius:12px;background:rgba(255,253,247,.78);padding:10px;text-align:center}
+.map-inspect-stat span{display:block;font-size:11px;color:#75624b;font-weight:800}.map-inspect-stat b{display:block;font-size:23px;line-height:1.2;color:#392b20;margin-top:2px}
+.map-inspect-detail{border:1px solid #c4b189;border-radius:12px;background:rgba(255,253,247,.72);padding:10px 12px;font-size:12px;line-height:1.65;color:#42372c}
+.map-inspect-detail b{color:#5a3b24}.map-inspect-detail .row+ .row{margin-top:5px;padding-top:5px;border-top:1px dashed #cfbd9c}
+.map-inspect-note{margin:9px 0 0;text-align:center;font-size:10px;color:#796b58}
+@media(max-width:600px){
+ .map-inspect-modal{padding:11px!important;max-width:calc(100vw - 14px)!important}.map-inspect-title{font-size:31px}.map-inspect-stats{gap:6px}.map-inspect-stat{padding:8px}.map-inspect-stat b{font-size:20px}.map-inspect-detail{font-size:11px;max-height:38dvh;overflow:auto}
+}
+
 .music-credit{margin:10px 0 0;text-align:center;font-size:11px;line-height:1.6;color:var(--muted)}
 .music-credit a{color:inherit;font-weight:800;text-decoration:underline;text-underline-offset:2px}
 body.game-running .music-credit{color:#d8caab}
@@ -483,6 +505,19 @@ body.game-running .music-credit{color:#d8caab}
 <div id="resultOverlay" class="overlay"><div class="modal"><h2>遊説の結末</h2><div id="resultList" class="result-list"></div><button id="restartBtn" class="btn" style="width:100%">最初から</button></div></div>
 
 
+
+
+<div id="mapInspectOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="mapInspectTitle">
+  <div class="modal map-inspect-modal">
+    <div class="map-inspect-head">
+      <div><h2 id="mapInspectTitle" class="map-inspect-title"></h2><div id="mapInspectSub" class="map-inspect-sub"></div></div>
+      <button id="mapInspectCloseBtn" class="btn ghost" type="button">閉じる</button>
+    </div>
+    <div id="mapInspectStats" class="map-inspect-stats"></div>
+    <div id="mapInspectDetail" class="map-inspect-detail"></div>
+    <p class="map-inspect-note">国・国境ウインドウは長押し（PCは右クリックでも可）で大きく確認できます。</p>
+  </div>
+</div>
 
 <div id="cardStudyOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="cardStudyTitle">
   <div class="modal card-study-modal">
@@ -1084,7 +1119,7 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
 
   function renderAll(){if(!game)return;renderStatus();renderStates();renderBorders();applyLayerVisibility();renderTurn();renderPublicMissions();renderHumanMissions();renderHand();renderSelection()}
   function renderStatus(){$('#roundStat').textContent=`${game.round} / ${game.roundLimit}`;const p=game.players[game.currentPlayer];$('#turnStat').textContent=p?`${p.name}${game.currentPlayer===game.startPlayer?' ★':''}`:'-';$('#deckStat').textContent=game.deck.length;$('#warStat').textContent=game.borders.filter(b=>b.threat>=5).length;$('#totalWarStat').textContent=game.totalWars}
-  function renderStates(){$$('.state').forEach(el=>{const s=el.dataset.state,st=game.states[s],buff=prestigeBuff(s,1);el.innerHTML=`<div class="state-name">${s}</div><div class="state-stats"><span>国力 ${st.power}</span><span>威信 ${st.prestige}</span></div><div class="state-troops">稼働 ${readyStateTroops(s)} / 総 ${totalStateTroops(s)}</div><div class="buff">戦争補正 ${buff?`+${buff}`:'なし'}</div>`;el.onclick=()=>onStateClick(s)})}
+  function renderStates(){$$('.state').forEach(el=>{const s=el.dataset.state,st=game.states[s],buff=prestigeBuff(s,1);el.innerHTML=`<div class="state-name">${s}</div><div class="state-stats"><span>国力 ${st.power}</span><span>威信 ${st.prestige}</span></div><div class="state-troops">稼働 ${readyStateTroops(s)} / 総 ${totalStateTroops(s)}</div><div class="buff">戦争補正 ${buff?`+${buff}`:'なし'}</div>`;el.onclick=()=>{if(Date.now()<mapInspectSuppressClickUntil)return;onStateClick(s)};bindMapInspect(el,()=>openStateInspect(s))})}
   function applyLayerVisibility(){
     $$('.state').forEach(el=>el.classList.toggle('layer-hidden',!layerVisibility.states));
     const borderLayer=$('#mapBorders');if(borderLayer)borderLayer.classList.toggle('layer-hidden',!layerVisibility.borders);
@@ -1094,6 +1129,39 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
 
   function sideCountHTML(name,ready,fatigue){
     return `<small>${name}</small><span class="side-num">${ready}</span><span class="fatigue-num">疲 ${fatigue}</span>`;
+  }
+
+
+  let mapInspectTimer=null,mapInspectStart=null,mapInspectSuppressClickUntil=0;
+  const MAP_INSPECT_HOLD_MS=500;
+  function closeMapInspect(){const ov=$('#mapInspectOverlay');if(ov)ov.classList.remove('show')}
+  function openStateInspect(stateName){
+    if(!game||!game.states[stateName])return;
+    const st=game.states[stateName],buff=prestigeBuff(stateName,1),touching=stateBorders(stateName);
+    $('#mapInspectTitle').textContent=stateName;$('#mapInspectSub').textContent='国の状態';
+    $('#mapInspectStats').innerHTML=`<div class="map-inspect-stat"><span>国力</span><b>${st.power}</b></div><div class="map-inspect-stat"><span>威信</span><b>${st.prestige}</b></div><div class="map-inspect-stat"><span>稼働兵</span><b>${readyStateTroops(stateName)}</b></div><div class="map-inspect-stat"><span>総兵力</span><b>${totalStateTroops(stateName)}</b></div>`;
+    $('#mapInspectDetail').innerHTML=`<div class="row"><b>戦争補正：</b>${buff?`+${buff}`:'なし'}</div>`+touching.map(b=>{const mine=b.a===stateName?{ready:b.aTroops,fat:b.aFatigue}:{ready:b.bTroops,fat:b.bFatigue};const other=b.a===stateName?b.b:b.a;return `<div class="row"><b>${stateName}―${other}</b>　脅威 ${b.threat} ／ 配置 ${mine.ready} ／ 疲弊 ${mine.fat}</div>`}).join('');
+    $('#mapInspectOverlay').classList.add('show');try{playSE('click')}catch(e){}
+  }
+  function openBorderInspect(index){
+    if(!game||!game.borders[index])return;
+    const b=game.borders[index];
+    $('#mapInspectTitle').textContent=`${b.a}―${b.b}`;$('#mapInspectSub').textContent='国境の状態';
+    $('#mapInspectStats').innerHTML=`<div class="map-inspect-stat"><span>脅威</span><b>${b.threat}</b></div><div class="map-inspect-stat"><span>開戦</span><b>${b.threat>=5?'目前':'まだ'}</b></div><div class="map-inspect-stat"><span>${b.a} 稼働</span><b>${b.aTroops}</b></div><div class="map-inspect-stat"><span>${b.b} 稼働</span><b>${b.bTroops}</b></div>`;
+    $('#mapInspectDetail').innerHTML=`<div class="row"><b>${b.a}</b>　疲弊 ${b.aFatigue} ／ 国力 ${game.states[b.a].power} ／ 威信 ${game.states[b.a].prestige}</div><div class="row"><b>${b.b}</b>　疲弊 ${b.bFatigue} ／ 国力 ${game.states[b.b].power} ／ 威信 ${game.states[b.b].prestige}</div><div class="row"><b>開戦条件：</b>脅威5でラウンド終了時に戦争</div>`;
+    $('#mapInspectOverlay').classList.add('show');try{playSE('click')}catch(e){}
+  }
+  function cancelMapInspectHold(el){if(mapInspectTimer){clearTimeout(mapInspectTimer);mapInspectTimer=null}mapInspectStart=null;if(el)el.classList.remove('map-inspect-pressing')}
+  function bindMapInspect(el,openFn){
+    if(!el)return;
+    el.onpointerdown=e=>{
+      if(e.pointerType==='mouse'&&e.button!==0)return;
+      cancelMapInspectHold(el);mapInspectStart={x:e.clientX,y:e.clientY,id:e.pointerId};el.classList.add('map-inspect-pressing');
+      mapInspectTimer=setTimeout(()=>{mapInspectTimer=null;mapInspectSuppressClickUntil=Date.now()+750;el.classList.remove('map-inspect-pressing');openFn()},MAP_INSPECT_HOLD_MS);
+    };
+    el.onpointermove=e=>{if(!mapInspectStart||e.pointerId!==mapInspectStart.id)return;if(Math.hypot(e.clientX-mapInspectStart.x,e.clientY-mapInspectStart.y)>12)cancelMapInspectHold(el)};
+    el.onpointerup=()=>cancelMapInspectHold(el);el.onpointercancel=()=>cancelMapInspectHold(el);el.onpointerleave=e=>{if(e.pointerType==='mouse')cancelMapInspectHold(el)};
+    el.oncontextmenu=e=>{e.preventDefault();mapInspectSuppressClickUntil=Date.now()+450;cancelMapInspectHold(el);openFn()};
   }
 
   const troopAnchorOverrides={
@@ -1137,7 +1205,7 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
   function troopPiecesHTML(borderPos,borderIndex,stateName,ready,fatigue){
     const a=troopAnchor(borderPos,borderIndex,stateName),html=[];
     const make=(isFatigue,idx)=>{
-      const col=idx%2,row=Math.floor(idx/2),spread=(col-.5)*(isFatigue?30:28),back=row*(isFatigue?20:28)+(isFatigue?8:0);
+      const col=idx%2,row=Math.floor(idx/2),spread=(col-.5)*(isFatigue?36:32),back=row*(isFatigue?28:46)+(isFatigue?10:0);
       const x=a.x+(a.px*spread-a.dx*back)/MAP_W*100,y=a.y+(a.py*spread-a.dy*back)/MAP_H*100;
       return `<div class="troop-piece ${isFatigue?'fatigue':''}" data-state="${stateName}" style="left:${x}%;top:${y}%">${soldierHTML(stateName,isFatigue)}</div>`;
     };
@@ -1162,8 +1230,8 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
       return `<div class="border-node${war}" data-border="${i}" style="left:${pos.px}%;top:${pos.py}%"><div class="border-node-top"><span class="border-node-name">${b.a}─${b.b}</span><span class="threat${hot}">${b.threat}</span></div><div class="border-node-sides"><button class="border-side-btn" data-side="a" data-border-side="${i}">${sideCountHTML(b.a,b.aTroops,b.aFatigue)}</button><button class="border-side-btn" data-side="b" data-border-side="${i}">${sideCountHTML(b.b,b.bTroops,b.bFatigue)}</button></div></div>`;
     }).join('');
     renderTroops();
-    $$('.border-node').forEach(el=>el.onclick=e=>{if(e.target.closest('.border-side-btn'))return;onBorderClick(+el.dataset.border)});
-    $$('.border-side-btn').forEach(btn=>btn.onclick=e=>{e.stopPropagation();onBorderSideClick(+btn.dataset.borderSide,btn.dataset.side)});
+    $$('.border-node').forEach(el=>{const i=+el.dataset.border;el.onclick=e=>{if(Date.now()<mapInspectSuppressClickUntil)return;if(e.target.closest('.border-side-btn'))return;onBorderClick(i)};bindMapInspect(el,()=>openBorderInspect(i))});
+    $$('.border-side-btn').forEach(btn=>btn.onclick=e=>{e.stopPropagation();if(Date.now()<mapInspectSuppressClickUntil)return;onBorderSideClick(+btn.dataset.borderSide,btn.dataset.side)});
   }
   function renderTurn(){const p=game.players[game.currentPlayer];const role=p?.isBot?'BOT':(game.mode==='local'?'プレイヤー':'あなた');$('#turnWho').textContent=p?`${role}：${p.name}`:'';$('#turnSchool').textContent=p?`${p.school}｜${schoolDefs[p.school]}`:'';$('#turnHead').classList.toggle('bot',!!p?.isBot)}
   function missionProgressText(m){if(!m)return'';if(m.type==='wars')return`<br><span class="tiny"><b>進捗：戦争 ${game.totalWars} / ${m.target}回</b></span>`;return''}
@@ -1404,6 +1472,9 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
   $('#militaryAddBtn').onclick=()=>chooseMilitaryMode('add');
   $('#militaryMoveBtn').onclick=()=>chooseMilitaryMode('move');
   $('#militaryChoiceCancel').onclick=()=>{playSE('click');closeMilitaryChoice();selectedCardIndex=null;militaryMode=null;redeploySource=null;renderHand();renderSelection()};
+  $('#mapInspectCloseBtn')?.addEventListener('click',closeMapInspect);
+  $('#mapInspectOverlay')?.addEventListener('click',e=>{if(e.target.id==='mapInspectOverlay')closeMapInspect()});
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#mapInspectOverlay')?.classList.contains('show'))closeMapInspect()});
   $('#cardStudyCloseBtn')?.addEventListener('click',closeCardStudy);
   $('#cardStudyOverlay')?.addEventListener('click',e=>{if(e.target.id==='cardStudyOverlay')closeCardStudy()});
   window.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#cardStudyOverlay')?.classList.contains('show'))closeCardStudy()});
