@@ -16,13 +16,13 @@ button,select,input{font:inherit} select{border:1px solid #c9dce8;border-radius:
 .controls{margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.field{background:#f7fbfe;border:1px solid var(--line);padding:9px;border-radius:12px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}.field input{width:100%;border:1px solid #c9dce8;border-radius:10px;padding:8px;font-size:18px;font-weight:800;background:#fff}.field.fixed input{background:#edf2f5;color:#687783}.field.variable{border-color:#8dbbf6;box-shadow:inset 0 0 0 1px #bcd7fa}.field.variable label::after{content:"（動かせる）";color:#2f80ed;margin-left:4px}
 .status{margin-top:12px;padding:12px;border-radius:14px;text-align:center;font-weight:900;background:#eef6ff;color:#245f9f}.status.ok{background:#e9f9ef;color:#147a41}.status.near{background:#fff6df;color:#9a6500}.help{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;line-height:1.7;font-size:14px}.small{font-size:12px;color:var(--muted)}
 .handle{fill:#fff;stroke:#2f80ed;stroke-width:4;cursor:ew-resize}.shape{fill:rgba(47,128,237,.22);stroke:#2f80ed;stroke-width:3}.targetShape{fill:rgba(24,165,88,.17);stroke:#18a558;stroke-width:3}.measure{font-size:14px;font-weight:800;fill:#304050}.arcHandle{cursor:pointer}.goalBanner{text-align:center;font-weight:900;margin:0 0 12px;color:#31516b}.goalBanner b{color:#147a41}
-.completion{display:none;position:fixed;z-index:10000;left:50%;top:50%;width:min(390px,calc(100% - 20px));max-height:calc(100dvh - 20px);overflow-y:auto;margin:0;padding:14px;border:1px solid #b9d9c5;border-radius:18px;background:#fff;box-shadow:0 0 0 100vmax rgba(25,48,35,.48),var(--shadow);text-align:center;transform:translate(-50%,-50%)}.completion.show{display:block}.completion h2{margin:0 0 8px;color:#147a41;font-size:20px}.completion-action{width:100%;margin-bottom:20px;padding:11px 14px;background:var(--accent);color:#fff}.affiliate-pr{padding-top:12px;overflow-x:auto;border-top:1px solid var(--line)}.affiliate-pr-head{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:5px;font-size:14px;font-weight:900}.affiliate-pr-label{border:1px solid #9aabb6;border-radius:999px;padding:1px 7px;color:var(--muted);font-size:10px;line-height:1.4}
-@media(max-width:720px){.grid{grid-template-columns:1fr}.wrap{padding-left:10px;padding-right:10px}.svgbox{aspect-ratio:16/11}.controls{grid-template-columns:1fr 1fr}.toolbar{justify-content:stretch}.pick{flex:1;min-width:130px}.pick select{width:100%}.completion{padding:12px 10px}.completion-action{margin-bottom:16px}.affiliate-pr{padding-top:10px}}
+.completion{display:none;position:fixed;z-index:10000;left:50%;top:50%;width:min(390px,calc(100% - 20px));max-height:calc(100dvh - 20px);overflow-y:auto;margin:0;padding:14px;border:1px solid #b9d9c5;border-radius:18px;background:#fff;box-shadow:0 0 0 100vmax rgba(25,48,35,.48),var(--shadow);text-align:center;transform:translate(-50%,-50%)}.completion.show{display:block}.completion h2{margin:0 0 8px;color:#147a41;font-size:20px}.completion-action{width:100%;margin-bottom:20px;padding:11px 14px;background:var(--accent);color:#fff}.affiliate-area{width:302px;max-width:100%;margin:0 auto;padding:12px 0 0;border-top:1px solid var(--line);border-radius:0;text-align:center;position:relative;z-index:10001;pointer-events:auto}.affiliate-label{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;font-size:14px;font-weight:900}.affiliate-label span{border:1px solid #9aabb6;border-radius:999px;padding:1px 7px;color:var(--muted);font-size:10px;line-height:1.4}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.wrap{padding-left:10px;padding-right:10px}.svgbox{aspect-ratio:16/11}.controls{grid-template-columns:1fr 1fr}.toolbar{justify-content:stretch}.pick{flex:1;min-width:130px}.pick select{width:100%}.completion{width:min(390px,calc(100% - 4px));padding:12px 6px}.completion-action{margin-bottom:16px}.affiliate-area{padding-top:10px}}
 @media(max-width:340px){.completion{width:calc(100% - 4px);padding:10px 1px}.completion-action{width:calc(100% - 18px)}}
 </style>
 </head>
 <body>
-<a href="/" class="home-back-btn" aria-label="まなびゲームズのトップへ戻る">← まなびゲームズ</a>
+<a href="/" class="home-back-btn" aria-label="ガクハコのトップへ戻る">← ガクハコ</a>
 <div class="wrap">
 <h1>ぴったり面積</h1>
 <div class="sub">ちがう形でも、面積は同じにできる！ 図形をスワイプするか数字を入力して、ぴったり同じ面積を作ろう。</div>
@@ -40,11 +40,11 @@ button,select,input{font:inherit} select{border:1px solid #c9dce8;border-radius:
 <section id="completion" class="completion" aria-live="polite">
   <h2>🎉 ぴったり！</h2>
   <button id="againBtn" class="completion-action">もう一度遊ぶ</button>
-  <div class="affiliate-pr" aria-label="保護者向けPR">
-    <div class="affiliate-pr-head"><span>保護者の方へ</span><span class="affiliate-pr-label">PR</span></div>
+  <div class="affiliate-area">
+    <div class="affiliate-label">保護者の方へ <span>PR</span></div>
 <a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www26.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www18.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
+<img border="0" width="300" height="250" alt="" src="https://www27.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
   </div>
 </section>
 </div>
@@ -113,11 +113,8 @@ function makeProblem(){
  let t=targetSelect.value,s=playSelect.value;
  if(t===s){s=keys[(keys.indexOf(t)+1)%keys.length];playSelect.value=s}
  let target,tA,made;
- // 円 → 扇形は、中心角または半径のどちらかをランダムで変数にする。
- // どちらの場合も、正解が整数・切りのいい角度になる組み合わせだけを使う。
  if(t==='circle'&&s==='sector'){
   const mode=Math.random()<0.5?'angle':'radius';
-  // 半径比2なら90°、半径比3なら40°で円と同面積になる。
   const scale=pick([2,3]);
   const answerAngle=scale===2?90:40;
   const maxTargetR=scale===2?4:3;
@@ -133,8 +130,6 @@ function makeProblem(){
   }
   return{targetType:t,playType:s,target,play:made.p,varKey:made.varKey};
  }
- // 扇形 → 円も、正解半径が最初から整数になる問題だけを作る。
- // 90°の扇形なら、半径を2倍にすると面積は同じになる。
  if(t==='sector'&&s==='circle'){
   const answer=pick([2,3,4]);
   target={radius:answer*2,angle:90};
@@ -142,7 +137,6 @@ function makeProblem(){
   made={p:{radius:start},varKey:'radius',answer};
   return{targetType:t,playType:s,target,play:made.p,varKey:made.varKey};
  }
- // 円・扇形が絡まない問題は、固定値も正解値も整数になるものだけ採用する。
  if(polygonTypes.has(t)&&polygonTypes.has(s)){
   for(let tries=0;tries<500;tries++){
    target=targetParams(t);tA=area(t,target);made=makePlayableInteger(s,tA);
@@ -155,7 +149,6 @@ function makeProblem(){
 function limits(key){return key==='angle'?[15,345]:[1,14]}
 function setVar(v,fromInput=false){
  let[mn,mx]=limits(problem.varKey);v=clamp(v,mn,mx);
- // ドラッグ時は操作しやすい刻みに吸着。数値入力時は細かい値をそのまま使える。
  if(!fromInput){
   if(problem.varKey==='angle') v=Math.round(v/5)*5;
   else if(roundKeys.has(problem.playType)) v=Math.round(v*10)/10;
@@ -184,7 +177,6 @@ function randomizeShapePair(){
   const previous=problem?`${problem.targetType}|${problem.playType}`:'';
   let t,s,pair,tries=0;
   do{
-    // 円と扇形は専用ペア。それ以外は5種類の多角形どうしで出題。
     if(Math.random()<0.2){
       if(Math.random()<0.5){t='circle';s='sector'}else{t='sector';s='circle'}
     }else{

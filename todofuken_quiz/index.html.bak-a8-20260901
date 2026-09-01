@@ -55,7 +55,7 @@ button{font:inherit}
 .result p{font-size:11px;margin:6px 0}
 .restart{width:100%;min-height:38px;border:0;border-radius:10px;background:var(--blue);color:white;font-size:13px;font-weight:900}
 .advanced .restart{background:var(--purple)}
-.dekitas-pr{width:min(100%,326px);margin:18px auto 0;padding:9px 8px 0;border-top:1px solid var(--line);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.dekitas-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:3px;font-size:11px;font-weight:800}.dekitas-pr-label{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:9px}.dekitas-pr-copy{margin:0 0 6px;font-size:12px;line-height:1.35}
+.dekitas-pr{width:min(100%,326px);margin:18px auto 0;padding:9px 8px 0;border-top:1px solid var(--line);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.dekitas-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:3px;font-size:11px;font-weight:800}.dekitas-pr-label{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:9px}.dekitas-pr-copy{margin:0 0 6px;font-size:12px;line-height:1.35}.dekitas-pr a{display:block;line-height:0}.dekitas-pr-banner{display:block;width:100%;max-width:300px;height:auto;margin:auto}
 @media(max-width:600px){.header h1{margin-left:118px}}@media(max-height:680px){
   .header h1{font-size:14px}.subtitle{display:none}.level{min-height:32px;padding:3px}.level small{display:none}
   .settings{min-height:22px}.question{font-size:16px;margin-bottom:4px}.option{min-height:40px;font-size:13px}
@@ -326,9 +326,7 @@ function showResult() {
   $("#game").innerHTML=`<div class="result"><div style="font-weight:800;color:#667085">${level==="basic"?"基礎編":"応用編"} 10問終了</div>
     <div class="big">${score} / ${TOTAL}</div>
     <p>${score>=9?"都道府県博士級！":score>=7?"かなり詳しいです！":score>=5?"いい調子です！":"もう一度挑戦して覚えよう！"}</p>
-    <button class="restart" id="again">もう一度</button><aside class="dekitas-pr" aria-label="保護者向けPR"><div class="dekitas-pr-head"><span>保護者の方へ</span><span class="dekitas-pr-label">PR</span></div><p class="dekitas-pr-copy">小中学生向け通信教育<br>「デキタス」</p><a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt=""></aside></div>`;
+    <button class="restart" id="again">もう一度</button><aside class="dekitas-pr" aria-label="保護者向けPR"><div class="dekitas-pr-head"><span>保護者の方へ</span><span class="dekitas-pr-label">PR</span></div><p class="dekitas-pr-copy">小中学生向け通信教育<br>「デキタス」</p><a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow"><img class="dekitas-pr-banner" border="0" width="300" height="250" alt="" src="https://www24.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a><img border="0" width="1" height="1" src="https://www14.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt=""></aside></div>`;
   $("#again").onclick=()=>{qNo=0;score=0;resetGameDOM();render();};
 }
 

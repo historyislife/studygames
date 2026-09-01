@@ -235,24 +235,6 @@
     footer{padding-top:4px}
     button{padding-top:6px;padding-bottom:6px}
   }
-/* DEKITAS_A8_EXACT_YOJI */
-.dekitas-clear-overlay{
-  display:none;position:fixed;inset:0;z-index:60;
-  align-items:center;justify-content:center;
-  padding:10px;background:rgba(15,23,42,.72);overflow-y:auto;
-}
-.dekitas-clear-overlay.show{display:flex}
-.dekitas-clear-panel{
-  width:min(340px,calc(100vw - 12px));max-height:calc(100dvh - 12px);
-  overflow-y:auto;padding:16px 14px;background:#fff;border-radius:18px;
-  box-shadow:0 18px 54px rgba(0,0,0,.35);text-align:center;
-}
-.dekitas-clear-panel h2{margin:0 0 8px;font-size:24px;color:#047857}
-.dekitas-clear-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 0 16px}
-.dekitas-clear-actions button{min-height:44px}
-.dekitas-pr{width:302px;max-width:100%;margin:0 auto;padding-top:12px;border-top:1px solid rgba(15,23,42,.14);text-align:center}
-.dekitas-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;font-weight:800}
-.dekitas-pr-label{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:10px}
 </style>
 </head>
 <body>
@@ -302,22 +284,6 @@
   </footer>
 </div>
 
-<!-- DEKITAS_A8_EXACT_YOJI -->
-<div id="dekitasClear" class="dekitas-clear-overlay" aria-hidden="true">
-  <div class="dekitas-clear-panel">
-    <h2>6面完成！</h2>
-    <div class="dekitas-clear-actions">
-      <button id="dekitasClearClose" type="button">ゲーム画面に戻る</button>
-      <button id="dekitasClearNew" class="primary" type="button">新しい問題</button>
-    </div>
-    <aside class="dekitas-pr" aria-label="保護者向けPR">
-      <div class="dekitas-pr-head"><span>保護者の方へ</span><span class="dekitas-pr-label">PR</span></div>
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
-    </aside>
-  </div>
-</div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js';
 
@@ -331,21 +297,6 @@ const meaningCard = document.getElementById('meaningCard');
 const meaningTitle = document.getElementById('meaningTitle');
 const meaningText = document.getElementById('meaningText');
 const meaningClose = document.getElementById('meaningClose');
-const dekitasClear = document.getElementById('dekitasClear');
-const dekitasClearClose = document.getElementById('dekitasClearClose');
-const dekitasClearNew = document.getElementById('dekitasClearNew');
-let dekitasClearDismissed = false;
-dekitasClearClose?.addEventListener('click',()=>{
-  dekitasClearDismissed = true;
-  dekitasClear?.classList.remove('show');
-  dekitasClear?.setAttribute('aria-hidden','true');
-});
-dekitasClearNew?.addEventListener('click',()=>{
-  dekitasClearDismissed = true;
-  dekitasClear?.classList.remove('show');
-  dekitasClear?.setAttribute('aria-hidden','true');
-  document.getElementById('newBtn')?.click();
-});
 
 const IDIOM_POOL = [
   ['一石二鳥','温故知新','起死回生','電光石火','七転八起','一期一会'],
@@ -666,19 +617,8 @@ function detectFaces(){
     showToast(`${currentIdioms[newly[0]]} 完成！`);
     showMeaning(currentIdioms[newly[0]],true);
   }
-  if(count===6){
-    clearPill.classList.add('show');
-    showToast('6面すべて完成！');
-    if(!dekitasClearDismissed){
-      dekitasClear?.classList.add('show');
-      dekitasClear?.setAttribute('aria-hidden','false');
-    }
-  }else{
-    clearPill.classList.remove('show');
-    dekitasClear?.classList.remove('show');
-    dekitasClear?.setAttribute('aria-hidden','true');
-    dekitasClearDismissed=false;
-  }
+  if(count===6){ clearPill.classList.add('show'); showToast('6面すべて完成！'); }
+  else clearPill.classList.remove('show');
 }
 
 function showToast(text){

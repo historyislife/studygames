@@ -399,11 +399,6 @@ body.game-running{overflow:hidden;background:#151811}
 .music-credit a{color:inherit;font-weight:800;text-decoration:underline;text-underline-offset:2px}
 body.game-running .music-credit{color:#d8caab}
 @media(max-width:600px){.music-credit{font-size:9.5px;margin-top:7px}}
-/* DEKITAS_A8_EXACT_YUUZEI */
-#resultOverlay .modal{max-height:calc(100dvh - 20px);overflow-y:auto}
-#resultOverlay .dekitas-pr{width:302px;max-width:100%;margin:18px auto 0;padding-top:12px;border-top:1px solid #cdbb9e;text-align:center}
-#resultOverlay .dekitas-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;font-weight:800}
-#resultOverlay .dekitas-pr-label{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:10px}
 </style>
 </head>
 <body>
@@ -518,11 +513,7 @@ body.game-running .music-credit{color:#d8caab}
 
 <div id="passOverlay" class="overlay"><div class="modal"><h2 id="passTitle">次のプレイヤーへ</h2><p id="passText" class="pass-note"></p><button id="passBtn" class="btn" style="width:100%">準備できた</button></div></div>
 <div id="roundOverlay" class="overlay"><div class="modal"><h2>ラウンド処理</h2><div id="roundSummary" style="text-align:left;line-height:1.65;font-size:13px"></div><button id="nextRoundBtn" class="btn gold" style="width:100%;margin-top:12px">次のラウンドへ</button></div></div>
-<div id="resultOverlay" class="overlay"><div class="modal"><h2>遊説の結末</h2><div id="resultList" class="result-list"></div><button id="restartBtn" class="btn" style="width:100%">最初から</button><aside class="dekitas-pr" aria-label="保護者向けPR"><div class="dekitas-pr-head"><span>保護者の方へ</span><span class="dekitas-pr-label">PR</span></div>
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
-</aside></div></div>
+<div id="resultOverlay" class="overlay"><div class="modal"><h2>遊説の結末</h2><div id="resultList" class="result-list"></div><button id="restartBtn" class="btn" style="width:100%">最初から</button></div></div>
 
 
 
