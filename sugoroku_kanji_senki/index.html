@@ -17,8 +17,7 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
 #roll{border:0;border-radius:25px;padding:9px 20px;background:#e6ad2d;box-shadow:0 4px #815918;font-weight:900}#roll:disabled{opacity:.5}
 #below{width:min(94vw,720px);margin:10px auto 30px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.panel{background:#fffbdcdd;border:2px solid #8d6632;border-radius:10px;padding:9px}.panel h2{font-size:15px;margin:0 0 5px}
 .k{display:inline-block;background:#fff;border:2px solid #74522b;border-radius:6px;padding:4px 7px;margin:2px;font:900 21px serif}.idiom{font-size:12px;padding:4px;border-bottom:1px solid #0002}
-.modal{display:none;position:fixed;inset:0;background:#0008;z-index:100;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.dialog{background:#fff2c8;border:5px double #805820;border-radius:16px;padding:18px;text-align:center;max-width:520px;max-height:calc(100dvh - 30px);overflow-y:auto}.choices{display:flex;flex-wrap:wrap;justify-content:center;gap:7px}.choice{font:900 28px serif;background:#fff;border:3px solid #a67a39;border-radius:10px;padding:8px 13px}
-.dekitas-pr{display:none;width:min(100%,326px);margin:22px auto 0;padding:10px 12px 0;border-top:1px solid #a67a39;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.dekitas-pr.show{display:block}.dekitas-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:4px;font-size:12px;font-weight:800}.dekitas-pr-label{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:10px}.dekitas-pr-copy{margin:0 0 8px;font-size:13px;line-height:1.45}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:100;align-items:center;justify-content:center;padding:15px}.modal.show{display:flex}.dialog{background:#fff2c8;border:5px double #805820;border-radius:16px;padding:18px;text-align:center;max-width:520px}.choices{display:flex;flex-wrap:wrap;justify-content:center;gap:7px}.choice{font:900 28px serif;background:#fff;border:3px solid #a67a39;border-radius:10px;padding:8px 13px}
 @media(max-width:600px){h1{margin-top:50px}#hud{grid-template-columns:1fr 1fr}#below{grid-template-columns:1fr}.stage{transform:scale(.78);margin:-12px}#msg{font-size:11px}}
 
 /* 熟語札・能力はたらくの強調表示 */
@@ -483,6 +482,201 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
   }
 }
 
+
+/* v29: 端末別レイアウト */
+#playLayout{
+  width:min(94vw,720px);
+  margin:0 auto;
+}
+#boardCol,#sideCol{
+  min-width:0;
+}
+#sideCol{
+  min-width:0;
+}
+#below{
+  width:100%;
+}
+
+@media(min-width:961px){
+  #turnBanner,#hud,#viewNotice{
+    width:min(96vw,1240px);
+  }
+  #playLayout{
+    width:min(96vw,1240px);
+    display:grid;
+    grid-template-columns:minmax(460px,700px) minmax(320px,1fr);
+    gap:16px;
+    align-items:start;
+  }
+  #boardCol{
+    min-width:0;
+  }
+  #wrap{
+    width:100%;
+    max-width:700px;
+    margin:8px 0 0;
+  }
+  #sideCol{
+    min-width:0;
+  }
+  #below{
+    margin:8px 0 0;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  #below .panel{
+    padding:10px!important;
+  }
+  #handTitle,#idiomTitle{
+    position:sticky;
+    top:0;
+    background:inherit;
+  }
+  /* 横長PCではページ全体の縦スクロールを減らすため、右側を内部スクロールに */
+  #sideCol{
+    max-height:calc(100vh - 190px);
+    overflow:auto;
+    padding-right:4px;
+  }
+  .music-credit{
+    width:min(96vw,1240px);
+    margin:10px auto 18px;
+  }
+}
+
+/* 中間サイズのタブレット/小型PC */
+@media(min-width:601px) and (max-width:960px){
+  #playLayout{
+    width:min(94vw,860px);
+  }
+  #wrap{
+    width:min(94vw,720px);
+  }
+  #below{
+    width:min(94vw,860px);
+    margin:10px auto 30px;
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+
+@media(min-width:961px){
+  #hand{
+    gap:4px!important;
+  }
+  #hand .k{
+    min-width:34px;
+    min-height:34px;
+    font-size:22px;
+  }
+  #idioms{
+    gap:4px!important;
+  }
+  .idiom{
+    padding:5px 6px!important;
+    line-height:1.2;
+  }
+  .idiom .idiom-owned{
+    margin-left:4px;
+    white-space:nowrap;
+  }
+  .small{
+    line-height:1.25;
+  }
+}
+
+
+/* v30: 四字熟語 長押し詳細 */
+.idiom[data-idiom-word],
+.progress-row[data-idiom-word]{
+  cursor:pointer;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+.idiom[data-idiom-word] > b,
+.progress-row[data-idiom-word] .progress-word{
+  text-decoration-thickness:1px;
+  text-underline-offset:3px;
+}
+@media(hover:hover) and (pointer:fine){
+  .idiom[data-idiom-word]:hover > b,
+  .progress-row[data-idiom-word]:hover .progress-word{
+    text-decoration:underline dotted;
+  }
+}
+
+.idiom-detail-overlay{
+  position:fixed;
+  inset:0;
+  z-index:52000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  background:rgba(20,14,8,.68);
+}
+.idiom-detail-overlay.show{display:flex}
+.idiom-detail-card{
+  width:min(92vw,560px);
+  max-height:min(86vh,720px);
+  overflow:auto;
+  border:5px double #8d6632;
+  border-radius:18px;
+  background:#fff7d9;
+  box-shadow:0 18px 60px #0008;
+  padding:18px;
+  text-align:center;
+}
+.idiom-detail-word{
+  font:1000 clamp(34px,8vw,54px) serif;
+  line-height:1.1;
+  letter-spacing:.06em;
+}
+.idiom-detail-reading{
+  margin-top:5px;
+  font-size:16px;
+  font-weight:900;
+}
+.idiom-detail-section{
+  margin-top:14px;
+  padding:11px 12px;
+  border:2px solid #c79a55;
+  border-radius:12px;
+  background:#fffdf5;
+  text-align:left;
+  line-height:1.55;
+}
+.idiom-detail-section b{
+  display:block;
+  margin-bottom:4px;
+  color:#704719;
+}
+.idiom-detail-close{
+  margin-top:14px;
+  min-width:120px;
+  min-height:44px;
+  padding:8px 18px;
+  border:2px solid #8d6632;
+  border-radius:10px;
+  background:#fff;
+  color:#2b2118;
+  font-weight:1000;
+  font-size:16px;
+  cursor:pointer;
+}
+.idiom-longpress-hint{
+  margin-top:3px;
+  font-size:10px;
+  opacity:.62;
+}
+@media(max-width:600px){
+  .idiom-detail-card{padding:14px}
+  .idiom-detail-section{margin-top:10px;padding:9px 10px}
+}
+
 </style></head><body>
 <div id="setupOverlay" class="setup-overlay" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
   <div class="setup-card">
@@ -515,7 +709,7 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
       <div class="manual-note">漢字は、四字熟語を作ったり、築城や城強化をしたり、市場で入れかえたりするときに使います。使いすぎないように考えましょう。</div>
 
       <h3>ゲーム開始</h3><p><b>この対局では5種類の熟語</b>が選ばれ、その5熟語に使う漢字だけが登場します。</p>
-      <ul><li>ゲーム開始時に遊ぶ人を1～4人から選び、残りの勢力はコンピューターが動かします。</li><li>1台のスマホやPCを、番が来るたびに次の人へわたして遊べます。</li><li>全員が四隅の本陣からスタート。</li><li>初期手札は<b>5字</b>。</li><li>開始時に四字熟語が<b>5種類</b>選ばれ、その5熟語に使われる漢字だけが登場します。</li></ul>
+      <ul><li>ゲーム開始時に遊ぶ人を1～4人から選び、残りの勢力はコンピューターが動かします。</li><li>1台のスマホやPCを、番が来るたびに次の人へわたして遊べます。PCでは横長画面に合わせて、盤面と情報欄の配置が変わります。</li><li>全員が四隅の本陣からスタート。</li><li>初期手札は<b>5字</b>。</li><li>開始時に四字熟語が<b>5種類</b>選ばれ、その5熟語に使われる漢字だけが登場します。</li></ul>
 
       <h3>遊ぶ人数と、みんなのようす</h3><p>遊ぶ人は紅→蒼→翠→紫の順です。画面の上にある勢力パネルを押すと、今の番ではない人の手札・四字熟語のそろい具合・城の数も見られます。番がかわると、表示も次の人に自動で切りかわります。</p><h3>四字熟語のそろい具合を見る</h3>
       <p>相手から漢字をうばうときは、<b>自分と相手の四字熟語を左右にスワイプして見くらべられます</b>。自分にほしい漢字や、相手に残したくない漢字を考えてえらびましょう。</p>
@@ -545,6 +739,8 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
       <table class="manual-table"><thead><tr><th>城</th><th>例</th><th>相手からうばう漢字</th></tr></thead><tbody><tr><td>1文字城</td><td>山城</td><td>1字</td></tr><tr><td>2文字城</td><td>山海城</td><td>2字</td></tr><tr><td>3文字城</td><td>山海風城</td><td>3字</td></tr></tbody></table>
       <p>敵が自分の城に止まると、城の文字数と同じだけ相手の漢字をうばいます。</p>
 
+      <h3>四字熟語をくわしく見る</h3>
+      <p>プレイ中の四字熟語を<b>長押し</b>すると、熟語が大きく表示され、<b>読み・意味・ゲームでの能力</b>を確認できます。スマホでは指で、PCではマウスで長押ししてください。</p>
       <h3>四字熟語札</h3>
       <ul><li>必要な4字がそろうと、その四字熟語を作れます。</li><li>同じ人は、<b>同じ四字熟語を2回作れません</b>。</li><li>ほかの人は、同じ四字熟語を作ってもかまいません。</li><li>作ったあとに手札が0字になる四字熟語は作れません。</li><li>取得済みは<b>「✓ 手に入れた」</b>と表示。</li></ul>
       <p>できあがったときには<b>読み・意味・特殊能力</b>が表示されます。</p>
@@ -580,18 +776,39 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
   </div>
 </div>
 <a class="home" href="/">← ガクハコ</a><button class="sound-toggle" id="bgmToggle" type="button" aria-label="BGMのオンオフ">🎵 BGM</button><button class="sound-toggle" id="soundToggle" type="button" aria-label="効果音のオンオフ">🔊 SE</button><h1>すごろく漢字戦記</h1><div class="lead">漢字を集め、城を築き、四字熟語で天下統一！</div>
-<div id="turnBanner">遊ぶ人数を選んでゲームを始めてください</div><div id="hud"></div><div id="viewNotice"></div><div id="wrap"><div class="board" id="board"><div class="center"><div id="msg">あなたの番です。サイコロを振ろう！</div>
-<div class="stage"><div class="die" id="die"><div class="face f1">1</div><div class="face f2">2</div><div class="face f3">3</div><div class="face f4">4</div><div class="face f5">5</div><div class="face f6">6</div></div></div>
-<button id="roll">🎲 サイコロを振る</button><button id="progressQuickBtn" class="progress-quick-btn" type="button">📜 熟語のそろい具合</button></div></div></div>
-<div id="below"><div class="panel"><h2 id="handTitle">🀄 漢字</h2><div id="hand"></div><small>空地では1字を城に使います。熟語作成後に最低1字残る必要があります。</small></div><div class="panel"><h2 id="idiomTitle">📜 四字熟語札</h2><div class="small">この対局で使う5熟語</div><div id="idioms"></div></div></div>
+<div id="turnBanner">遊ぶ人数を選んでゲームを始めてください</div><div id="hud"></div><div id="viewNotice"></div>
+<div id="playLayout">
+  <div id="boardCol">
+    <div id="wrap"><div class="board" id="board"><div class="center"><div id="msg">あなたの番です。サイコロを振ろう！</div>
+    <div class="stage"><div class="die" id="die"><div class="face f1">1</div><div class="face f2">2</div><div class="face f3">3</div><div class="face f4">4</div><div class="face f5">5</div><div class="face f6">6</div></div></div>
+    <button id="roll">🎲 サイコロを振る</button><button id="progressQuickBtn" class="progress-quick-btn" type="button">📜 熟語のそろい具合</button></div></div></div>
+  </div>
+  <div id="sideCol">
+    <div id="below"><div class="panel"><h2 id="handTitle">🀄 漢字</h2><div id="hand"></div><small>空地では1字を城に使います。熟語作成後に最低1字残る必要があります。</small></div><div class="panel"><h2 id="idiomTitle">📜 四字熟語札</h2><div class="small">この対局で使う5熟語</div><div class="idiom-longpress-hint">熟語を長押しすると、意味と能力を見られます</div><div id="idioms"></div></div></div>
+  </div>
+</div>
 
 <div class="music-credit">
   BGM：<a href="https://amachamusic.chagasi.com/" target="_blank" rel="noopener">甘茶の音楽工房</a>（作曲：甘茶）
   ／「イカロスの墜落」「残業戦士」
 </div>
-<div class="modal" id="modal"><div class="dialog"><h2 id="mt"></h2><div id="mb"></div><div class="choices" id="choices"></div><aside id="dekitasPr" class="dekitas-pr" aria-label="保護者向けPR"><div class="dekitas-pr-head"><span>保護者の方へ</span><span class="dekitas-pr-label">PR</span></div><p class="dekitas-pr-copy">小中学生向け通信教育<br>「デキタス」</p><a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt=""></aside></div></div>
+
+<div id="idiomDetailOverlay" class="idiom-detail-overlay" role="dialog" aria-modal="true" aria-labelledby="idiomDetailWord">
+  <div class="idiom-detail-card">
+    <div id="idiomDetailWord" class="idiom-detail-word"></div>
+    <div id="idiomDetailReading" class="idiom-detail-reading"></div>
+    <div class="idiom-detail-section">
+      <b>意味</b>
+      <div id="idiomDetailMeaning"></div>
+    </div>
+    <div class="idiom-detail-section">
+      <b>⚡ ゲームでの能力</b>
+      <div id="idiomDetailEffect"></div>
+    </div>
+    <button id="idiomDetailClose" class="idiom-detail-close" type="button">閉じる</button>
+  </div>
+</div>
+<div class="modal" id="modal"><div class="dialog"><h2 id="mt"></h2><div id="mb"></div><div class="choices" id="choices"></div></div></div>
 <script>
 // ===== Background music: 甘茶の音楽工房 =====
 // 「イカロスの墜落」→ 誰かが熟語札2枚で「残業戦士」へ
@@ -762,7 +979,7 @@ Object.keys(SE).forEach(getSEPool);
 const MASTER_WORDS=["一石二鳥", "電光石火", "起死回生", "七転八起", "四面楚歌", "一期一会", "一心不乱", "天下無双", "百発百中", "温故知新", "一日千秋", "一朝一夕", "一喜一憂", "一進一退", "一長一短", "以心伝心", "異口同音", "我田引水", "画竜点睛", "危機一髪", "起承転結", "疑心暗鬼", "空前絶後", "言行一致", "公明正大", "五里霧中", "三日坊主", "自画自賛", "自業自得", "十人十色", "心機一転", "森羅万象", "千差万別", "大器晩成", "単刀直入", "天真爛漫", "東奔西走", "日進月歩", "八方美人", "半信半疑", "百戦錬磨", "不言実行", "無我夢中", "有名無実", "臨機応変"];
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 const words=shuffle([...new Set(MASTER_WORDS)]).slice(0,5);
-// The draw pool is made by concatenating the 10 selected idioms.
+// The draw pool is made by concatenating the 5 selected idioms.
 // Therefore a kanji occurring multiple times is proportionally more likely to be drawn.
 const pool=words.flatMap(w=>[...w]);
 
@@ -839,7 +1056,7 @@ function render(){
     let owned=vp.w.includes(w);
     let prog=fog&&!owned?"？？？？":progress(vp,w);
     let make=gameStarted&&viewPlayer===turn&&isHuman(turn)&&!fog&&!wordMadeThisTurn&&!owned&&can(vp,w)&&!busy;
-    return `<div class="idiom ${owned?"acquired":""}">
+    return `<div class="idiom ${owned?"acquired":""}" data-idiom-word="${w}" title="長押しで意味と能力を見る">
       <b>${w}</b><span class="idiom-progress">　${owned?"●●●●":prog}</span>
       ${owned?`<span class="idiom-owned">✓ 手に入れた</span>`:""}
       ${make?`<button onclick="makeWord('${w}')">作る</button>`:""}
@@ -858,7 +1075,72 @@ function render(){
 }
 function progress(p,w){let h=[...p.h];return [...w].map(x=>{let i=h.indexOf(x);if(i<0)return"○";h.splice(i,1);return"●"}).join("")}
 function can(p,w){return p.h.length>4&&!progress(p,w).includes("○")}function consume(p,w){for(let x of w)p.h.splice(p.h.indexOf(x),1)}
-function show(t,b,opts){mt.textContent=t;mb.innerHTML=b;choices.innerHTML="";document.getElementById("dekitasPr").classList.remove("show");opts.forEach(o=>{let q=document.createElement("button");q.className="choice";q.innerHTML=o[0];q.onclick=()=>{modal.classList.remove("show");o[1]()};choices.appendChild(q)});modal.classList.add("show")}
+function show(t,b,opts){mt.textContent=t;mb.innerHTML=b;choices.innerHTML="";opts.forEach(o=>{let q=document.createElement("button");q.className="choice";q.innerHTML=o[0];q.onclick=()=>{modal.classList.remove("show");o[1]()};choices.appendChild(q)});modal.classList.add("show")}
+function openIdiomDetail(word){
+  const info=idiomInfo[word];
+  if(!info)return;
+  idiomDetailWord.textContent=word;
+  idiomDetailReading.textContent=`（${info.reading}）`;
+  idiomDetailMeaning.textContent=info.meaning;
+  idiomDetailEffect.textContent=effects[word]||"";
+  idiomDetailOverlay.classList.add("show");
+}
+function closeIdiomDetail(){
+  idiomDetailOverlay.classList.remove("show");
+}
+idiomDetailClose.addEventListener("click",closeIdiomDetail);
+idiomDetailOverlay.addEventListener("click",e=>{
+  if(e.target===idiomDetailOverlay)closeIdiomDetail();
+});
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"&&idiomDetailOverlay.classList.contains("show"))closeIdiomDetail();
+});
+
+let idiomLongPressTimer=null;
+let idiomLongPressTarget=null;
+let idiomLongPressStartX=0;
+let idiomLongPressStartY=0;
+let idiomLongPressTriggered=false;
+const IDIOM_LONGPRESS_MS=550;
+const IDIOM_LONGPRESS_MOVE=12;
+
+function clearIdiomLongPress(){
+  if(idiomLongPressTimer){
+    clearTimeout(idiomLongPressTimer);
+    idiomLongPressTimer=null;
+  }
+  idiomLongPressTarget=null;
+}
+document.addEventListener("pointerdown",e=>{
+  if(e.button!==undefined&&e.button!==0)return;
+  if(e.target.closest("button,a,input,select,textarea"))return;
+  const target=e.target.closest(".idiom[data-idiom-word],.progress-row[data-idiom-word]");
+  if(!target)return;
+  idiomLongPressTarget=target;
+  idiomLongPressStartX=e.clientX;
+  idiomLongPressStartY=e.clientY;
+  idiomLongPressTriggered=false;
+  idiomLongPressTimer=setTimeout(()=>{
+    if(!idiomLongPressTarget)return;
+    idiomLongPressTriggered=true;
+    openIdiomDetail(idiomLongPressTarget.dataset.idiomWord);
+    clearIdiomLongPress();
+  },IDIOM_LONGPRESS_MS);
+},{passive:true});
+document.addEventListener("pointermove",e=>{
+  if(!idiomLongPressTarget)return;
+  const dx=e.clientX-idiomLongPressStartX;
+  const dy=e.clientY-idiomLongPressStartY;
+  if(Math.hypot(dx,dy)>IDIOM_LONGPRESS_MOVE)clearIdiomLongPress();
+},{passive:true});
+["pointerup","pointercancel"].forEach(type=>{
+  document.addEventListener(type,clearIdiomLongPress,{passive:true});
+});
+document.addEventListener("contextmenu",e=>{
+  const target=e.target.closest(".idiom[data-idiom-word],.progress-row[data-idiom-word]");
+  if(target&&idiomLongPressTriggered)e.preventDefault();
+});
+
 function idiomCharacterStates(p,w){
   let hand=[...p.h];
   return [...w].map(ch=>{
@@ -873,7 +1155,7 @@ function progressPanelHTML(p){
   let rows=words.map(w=>{
     let owned=p.w.includes(w);
     if(p.fogActive&&!owned){
-      return `<div class="progress-row">
+      return `<div class="progress-row" data-idiom-word="${w}" title="長押しで意味と能力を見る">
         <span class="progress-word">${w}</span>
         <span class="progress-fog">？？？？</span>
         <span class="progress-state">🌫️ 霧</span>
@@ -882,7 +1164,7 @@ function progressPanelHTML(p){
     let states=idiomCharacterStates(p,w);
     let have=states.filter(x=>x[1]).length;
     let ready=!owned&&have===4&&p.h.length>4;
-    return `<div class="progress-row ${owned?"owned":""}">
+    return `<div class="progress-row ${owned?"owned":""}" data-idiom-word="${w}" title="長押しで意味と能力を見る">
       <span class="progress-word">${w}</span>
       <span class="progress-chars">${states.map(([ch,ok])=>`<span class="progress-char ${ok?"have":"miss"}">${ch}</span>`).join("")}</span>
       <span class="progress-state ${owned?"done":ready?"ready":""}">${owned?"✓ 手に入れた":ready?"今作れる":`${have}/4`}</span>
@@ -1670,7 +1952,7 @@ async function cpu(){
   }
   await doRoll();
 }
-function win(i){busy=true;roll.disabled=true;stopBGM();playSE("victory");show("天下統一！",`<h2>${ps[i].n}の勝利！</h2><p>四字熟語3枚完成、または最後まで生き残り、天下を統一しました。</p>`,[["再戦",()=>location.reload()]]);document.getElementById("dekitasPr").classList.add("show")}
+function win(i){busy=true;roll.disabled=true;stopBGM();playSE("victory");show("天下統一！",`<h2>${ps[i].n}の勝利！</h2><p>四字熟語3枚完成、または最後まで生き残り、天下を統一しました。</p>`,[["再戦",()=>location.reload()]])}
 render();
 
 const manualBtn=document.getElementById("manualBtn");
