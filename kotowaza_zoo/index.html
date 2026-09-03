@@ -45,7 +45,7 @@ a{text-decoration:none;color:inherit}
 .mark{font-size:42px}.title{font-size:26px;font-weight:900;line-height:1.25}.meaning{margin-top:9px;line-height:1.65;color:#52605d;font-size:15px}
 .end-only{display:none}.popup.is-end .end-only{display:block}
 .replay{width:min(100%,300px);min-height:48px;margin:14px auto 12px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-size:18px;font-weight:900;box-shadow:0 3px 0 rgba(0,0,0,.14);cursor:pointer}
-.result-pr{width:300px;max-width:100%;margin:0 auto;text-align:center}.result-pr-head{display:flex;justify-content:center;align-items:center;gap:7px;margin:0 0 7px;font-size:11px;font-weight:800;color:#718087}.result-pr-head span{padding:1px 6px;border:1px solid currentColor;border-radius:999px;font-size:9px}
+.ad-wrap{width:300px;max-width:100%;margin:0 auto}.ad-label{margin:0 0 5px;font-size:11px;font-weight:800;color:#718087}.ad-wrap a{display:block;width:300px;max-width:100%;margin:auto}.ad-wrap a img{display:block;width:300px;max-width:100%;height:auto;margin:auto}
 .help{padding:10px 4px 0;font-size:13px;color:#5f6f74;line-height:1.6}.legend{font-weight:800;color:#3e5257}
 @media (max-width:560px){
   html,body{height:100%;overflow:hidden}
@@ -94,7 +94,7 @@ a{text-decoration:none;color:inherit}
   .popup.is-end .title{font-size:21px}
   .popup.is-end .meaning{margin-top:4px;font-size:13px;line-height:1.4}
   .popup.is-end .replay{min-height:44px;margin:8px auto;font-size:16px}
-  .popup.is-end .result-pr-head{margin-bottom:3px;font-size:10px}
+  .popup.is-end .ad-label{margin-bottom:3px;font-size:10px}
 }
 @media (max-width:380px){
   .app{padding-left:6px;padding-right:6px}
@@ -133,7 +133,7 @@ a{text-decoration:none;color:inherit}
       </div>
     </div>
     <div class="stats">
-      <span class="pill"><b id="round">1</b> / <span id="total">40</span>問</span>
+      <span class="pill"><b id="round">1</b> / <span id="total">10</span>問</span>
       <span class="pill">ミス <b id="miss">0</b></span>
       <button id="bgmToggle" class="sound" type="button">BGM: 読込中</button>
       <button id="seToggle" class="sound" type="button">SE: ON</button>
@@ -157,9 +157,12 @@ a{text-decoration:none;color:inherit}
           <div id="meaning" class="meaning"></div>
           <div id="endArea" class="end-only">
             <button id="replay" class="replay" type="button">もう一度あそぶ</button>
-            <div class="result-pr" aria-label="保護者向けPR">
-              <div class="result-pr-head">保護者の方へ <span>PR</span></div>
-              <div class="a8-rotation-slot"></div>
+            <div class="ad-wrap" aria-label="広告">
+              <div class="ad-label">広告</div>
+              <a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
+                <img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1">
+              </a>
+              <img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
             </div>
           </div>
         </div>
@@ -178,39 +181,8 @@ a{text-decoration:none;color:inherit}
     <small>BGM：甘茶の音楽工房「夏休みの探検」／作曲：甘茶</small>
   </div>
 </main>
-<!-- RESULT_AD_TEMPLATES -->
-<template id="result-ad-1">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
-</template>
-<template id="result-ad-2">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
-</template>
-<template id="result-ad-3">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1ELV76+5VQS+61Z81" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www20.a8.net/svt/bgt?aid=260901444085&wid=001&eno=01&mid=s00000027442001017000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1ELV76+5VQS+61Z81" alt="">
-</template>
-<template id="result-ad-4">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444068&wid=001&eno=01&mid=s00000020322001097000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" alt="">
-</template>
-<template id="result-ad-5">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1F7ASY+56OA+601S1" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www28.a8.net/svt/bgt?aid=260901444086&wid=001&eno=01&mid=s00000024193001008000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1F7ASY+56OA+601S1" alt="">
-</template>
-<template id="result-ad-6">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GE60I+4N0I+614CX" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444088&wid=001&eno=01&mid=s00000021645001013000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GE60I+4N0I+614CX" alt="">
-</template>
 <script>
-function showRandomResultAd(slot){const ads=["result-ad-1","result-ad-2","result-ad-3","result-ad-4","result-ad-5","result-ad-6"];slot.replaceChildren();const selected=ads[Math.floor(Math.random() * ads.length)];slot.append(document.getElementById(selected).content.cloneNode(true))}
+const GAME_LENGTH = 10;
 const QUESTIONS = [
   {q:"○に真珠",a:"pig",f:"豚に真珠",m:"価値の分からない人に、貴重なものを与えても役に立たないこと。"},
   {q:"○もおだてりゃ木に登る",a:"pig",f:"豚もおだてりゃ木に登る",m:"ほめられると、その気になって行動すること。"},
@@ -296,7 +268,7 @@ document.addEventListener('keydown', unlockAudio, {once:true});
 els.bgmToggle.addEventListener('click',()=>{ if(bgmAvailable===false) return; bgmEnabled=!bgmEnabled; if(bgmEnabled){ AUDIO.bgm.play().catch(()=>{}); } else AUDIO.bgm.pause(); updateAudioButtons(); });
 els.seToggle.addEventListener('click',()=>{ seEnabled=!seEnabled; updateAudioButtons(); });
 updateAudioButtons();
-els.total.textContent = String(QUESTIONS.length);
+els.total.textContent = String(GAME_LENGTH);
 
 function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
 function choose(answer, count){ return shuffle([answer, ...shuffle(Object.keys(ANIMALS).filter(x=>x!==answer)).slice(0, Math.max(0, count - 1))]); }
@@ -408,7 +380,7 @@ function loadQuestion(){
   hidePopup();
   els.net.classList.remove('show');
   els.net.style.display = 'none';
-  if(idx >= QUESTIONS.length){ endGame(); return; }
+  if(idx >= GAME_LENGTH){ endGame(); return; }
   current = QUESTIONS[order[idx]];
   setQuestion(current.q);
   els.round.textContent = String(idx + 1);
@@ -449,15 +421,13 @@ function shoot(){
 }
 function endGame(){
   playing = false; busy = true; cancelAnimationFrame(raf); els.fire.disabled = true; clearSelection();
-  showRandomResultAd(document.querySelector('#endArea .a8-rotation-slot'));
   showPopup('🏆', '全問終了！', `スコア ${score}点　ミス ${miss}回`, true);
 }
 function start(){
   cancelAnimationFrame(raf);
-  order = shuffle(QUESTIONS.map((_,i)=>i));
+  order = shuffle(QUESTIONS.map((_,i)=>i)).slice(0, GAME_LENGTH);
   idx = 0; score = 0; miss = 0; playing = true; busy = false; last = 0;
   els.score.textContent = '0'; els.miss.textContent = '0';
-  document.querySelector('#endArea .a8-rotation-slot').replaceChildren();
   loadQuestion();
   raf = requestAnimationFrame(animate);
 }
