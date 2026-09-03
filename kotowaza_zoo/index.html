@@ -30,6 +30,8 @@ a{text-decoration:none;color:inherit}
 .animal img{width:100%;height:100%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 3px 2px rgba(0,0,0,.15))}
 .animal:focus-visible{outline:3px solid #23424b;outline-offset:2px;border-radius:14px}
 .animal[aria-pressed="true"]{transform:scale(1.05)}
+.animal.dragon-caught{animation:dragonCaught .16s ease-in-out 0s 3 alternate}
+@keyframes dragonCaught{from{transform:translateY(0) rotate(-2deg) scale(1.04)}to{transform:translateY(-5px) rotate(2deg) scale(1.07)}}
 .animal[aria-pressed="true"] img{filter:drop-shadow(0 0 0 rgba(0,0,0,0)) drop-shadow(0 0 0 rgba(0,0,0,0)) drop-shadow(0 0 10px rgba(255,248,130,.95)) drop-shadow(0 4px 3px rgba(0,0,0,.18))}
 .shadow{position:absolute;width:56px;height:14px;border-radius:50%;background:rgba(0,0,0,.15);filter:blur(2px);pointer-events:none;z-index:4}
 .cross{position:absolute;width:82px;height:82px;border:4px solid #173036;border-radius:50%;z-index:12;pointer-events:none;transform:translate(-50%,-50%);display:none;box-shadow:0 0 0 2px rgba(255,255,255,.55) inset}.cross:before,.cross:after{content:"";position:absolute;left:50%;top:50%;background:#173036;transform:translate(-50%,-50%)}
@@ -122,7 +124,7 @@ a{text-decoration:none;color:inherit}
   <section class="top">
     <div class="head">
       <div>
-        <div class="sub">ことわざに合う動物をつかまえよう！</div>
+        <div class="sub">ことわざ・ことばに合う動物をつかまえよう！</div>
         <div id="q" class="q">○に真珠</div>
       </div>
       <div class="score">
@@ -131,7 +133,7 @@ a{text-decoration:none;color:inherit}
       </div>
     </div>
     <div class="stats">
-      <span class="pill"><b id="round">1</b> / 10問</span>
+      <span class="pill"><b id="round">1</b> / <span id="total">40</span>問</span>
       <span class="pill">ミス <b id="miss">0</b></span>
       <button id="bgmToggle" class="sound" type="button">BGM: 読込中</button>
       <button id="seToggle" class="sound" type="button">SE: ON</button>
@@ -174,7 +176,7 @@ a{text-decoration:none;color:inherit}
 
   <div class="help">
     <span class="legend">あそび方：</span>
-    動物を1回タップすると照準が付きます。ことわざに合う動物をえらんで「網を発射！」を押してください。<br>
+    動物を1回タップすると照準が付きます。ことわざやことばに合う動物をえらんで「網を発射！」を押してください。<br>
     正解の動物は毎問必ず出てきます。動物は進む向きに合わせて左右を向き、捕まるとびっくり顔になります。<br>
     <small>BGM：甘茶の音楽工房「夏休みの探検」／作曲：甘茶</small>
   </div>
@@ -182,25 +184,55 @@ a{text-decoration:none;color:inherit}
 <script>
 const QUESTIONS = [
   {q:"○に真珠",a:"pig",f:"豚に真珠",m:"価値の分からない人に、貴重なものを与えても役に立たないこと。"},
+  {q:"○もおだてりゃ木に登る",a:"pig",f:"豚もおだてりゃ木に登る",m:"ほめられると、その気になって行動すること。"},
   {q:"○の手も借りたい",a:"cat",f:"猫の手も借りたい",m:"とても忙しくて、だれでもいいから手伝ってほしいほどのようす。"},
+  {q:"○に小判",a:"cat",f:"猫に小判",m:"価値が分からない人に立派なものを与えても意味がないこと。"},
+  {q:"○をかぶる",a:"cat",f:"猫をかぶる",m:"おとなしく、すなおそうに見せかけること。"},
+  {q:"○の額",a:"cat",f:"猫の額",m:"とてもせまい場所や土地のたとえ。"},
   {q:"○も歩けば棒に当たる",a:"dog",f:"犬も歩けば棒に当たる",m:"行動すると、思いがけないことに出会うこと。"},
   {q:"○の耳に念仏",a:"horse",f:"馬の耳に念仏",m:"いくらよいことを言っても、聞く気がない人には役に立たないこと。"},
+  {q:"○が合う",a:"horse",f:"馬が合う",m:"気持ちや相性がぴったり合うこと。"},
+  {q:"○子にも衣装",a:"horse",f:"馬子にも衣装",m:"身なりを整えると、ふつうの人でも立派に見えること。"},
+  {q:"○脚を現す",a:"horse",f:"馬脚を現す",m:"かくしていた本性やたくらみを表してしまうこと。"},
+  {q:"犬○の労",a:"horse",f:"犬馬の労",m:"人のために力をつくして働くこと。"},
   {q:"○も木から落ちる",a:"monkey",f:"猿も木から落ちる",m:"その道の名人でも、ときには失敗すること。"},
+  {q:"犬○の仲",a:"monkey",f:"犬猿の仲",m:"とても仲が悪いこと。"},
+  {q:"○の尻笑い",a:"monkey",f:"猿の尻笑い",m:"自分の欠点に気づかず、ほかの人を笑うこと。"},
   {q:"泣きっ面に○",a:"bee",f:"泣きっ面に蜂",m:"困っているところに、さらに悪いことが重なること。"},
+  {q:"○の一刺し",a:"bee",f:"蜂の一刺し",m:"弱そうに見える人の、思いがけない反撃のこと。"},
   {q:"○の子は○",a:"frog",f:"蛙の子は蛙",m:"子どもの性質や才能は、親に似ることが多いということ。"},
+  {q:"○の面に水",a:"frog",f:"蛙の面に水",m:"何を言われても平気な顔をしていること。"},
   {q:"○百まで踊り忘れず",a:"sparrow",f:"雀百まで踊り忘れず",m:"若いころの習慣は、年をとってもなかなか変わらないこと。"},
-  {q:"○に小判",a:"cat",f:"猫に小判",m:"価値が分からない人に立派なものを与えても意味がないこと。"},
-  {q:"○の威を借る狐",a:"tiger",f:"虎の威を借る狐",m:"強い人の力を利用して、いばる人のたとえ。"}
+  {q:"○の涙",a:"sparrow",f:"雀の涙",m:"ほんの少ししかないことのたとえ。"},
+  {q:"○の威を借る狐",a:"tiger",f:"虎の威を借る狐",m:"強い人の力を利用して、いばる人のたとえ。"},
+  {q:"○に翼",a:"tiger",f:"虎に翼",m:"もともと強いものに、さらに力が加わること。"},
+  {q:"窮○猫を噛む",a:"mouse",f:"窮鼠猫を噛む",m:"追いつめられた弱い者が、必死に反撃すること。"},
+  {q:"○に経文",a:"cow",f:"牛に経文",m:"ありがたい教えを聞かせても、意味が分からない相手にはむだなこと。"},
+  {q:"○は牛連れ馬は馬連れ",a:"cow",f:"牛は牛連れ馬は馬連れ",m:"似たもの同士が自然と集まること。"},
+  {q:"○につままれる",a:"fox",f:"狐につままれる",m:"何が起こったのか分からず、ぽかんとしてしまうこと。"},
+  {q:"○の嫁入り",a:"fox",f:"狐の嫁入り",m:"晴れているのに雨が降る、ふしぎな天気のこと。"},
+  {q:"二○を追う者は一○をも得ず",a:"rabbit",f:"二兎を追う者は一兎をも得ず",m:"二つを同時にねらうと、どちらも手に入らないこと。"},
+  {q:"○の上り坂",a:"rabbit",f:"兎の上り坂",m:"得意なことや、自分に向いている場面のたとえ。"},
+  {q:"画○点睛",a:"dragon",f:"画竜点睛",m:"仕上げの大切なひと手間のこと。"},
+  {q:"登○門",a:"dragon",f:"登竜門",m:"成功への入り口や、立身出世の関門のこと。"},
+  {q:"○の甲より年の功",a:"turtle",f:"亀の甲より年の功",m:"長い経験からくる知恵や力は大切だということ。"},
+  {q:"鶴は千年○は万年",a:"turtle",f:"鶴は千年亀は万年",m:"長生きしてめでたいことのたとえ。"},
+  {q:"○の一声",a:"crane",f:"鶴の一声",m:"有力な人のひとことで、物事が決まること。"},
+  {q:"掃きだめに○",a:"crane",f:"掃きだめに鶴",m:"つまらない所に、すぐれた人や美しいものがまじること。"},
+  {q:"○の行水",a:"crow",f:"烏の行水",m:"おふろに入っている時間がとても短いこと。"},
+  {q:"○合の衆",a:"crow",f:"烏合の衆",m:"まとまりがなく、ただ集まっているだけの人々のこと。"},
+  {q:"藪をつついて○を出す",a:"snake",f:"藪をつついて蛇を出す",m:"余計なことをして、かえって悪い結果を招くこと。"},
+  {q:"蛇の道は○",a:"snake",f:"蛇の道は蛇",m:"同じ仲間のことは、その仲間がよく知っているということ。"}
 ];
 const ANIMALS = {
-  pig:{name:"ブタ"}, cat:{name:"ネコ"}, dog:{name:"イヌ"}, horse:{name:"ウマ"}, monkey:{name:"サル"}, bee:{name:"ハチ"}, frog:{name:"カエル"}, sparrow:{name:"スズメ"}, tiger:{name:"トラ"}, mouse:{name:"ネズミ"}, rabbit:{name:"ウサギ"}, cow:{name:"ウシ"}, fox:{name:"キツネ"}, bear:{name:"クマ"}
+  pig:{name:"ブタ"}, cat:{name:"ネコ"}, dog:{name:"イヌ"}, horse:{name:"ウマ"}, monkey:{name:"サル"}, bee:{name:"ハチ"}, frog:{name:"カエル"}, sparrow:{name:"スズメ"}, tiger:{name:"トラ"}, mouse:{name:"ネズミ"}, rabbit:{name:"ウサギ"}, cow:{name:"ウシ"}, fox:{name:"キツネ"}, bear:{name:"クマ"}, dragon:{name:"リュウ"}, turtle:{name:"カメ"}, crane:{name:"ツル"}, crow:{name:"カラス"}, snake:{name:"ヘビ"}
 };
 for (const id of Object.keys(ANIMALS)) {
   ANIMALS[id].right = `assets/animals/${id}_right.png`;
   ANIMALS[id].surprised = `assets/animals/${id}_surprised.png`;
 }
 const els = {
-  q: document.getElementById('q'), miniQ: document.getElementById('miniQ'), score: document.getElementById('score'), round: document.getElementById('round'), miss: document.getElementById('miss'), reset: document.getElementById('reset'),
+  q: document.getElementById('q'), miniQ: document.getElementById('miniQ'), score: document.getElementById('score'), round: document.getElementById('round'), total: document.getElementById('total'), miss: document.getElementById('miss'), reset: document.getElementById('reset'),
   field: document.getElementById('field'), animals: document.getElementById('animals'), cross: document.getElementById('cross'), net: document.getElementById('net'), popup: document.getElementById('popup'), mark: document.getElementById('mark'), title: document.getElementById('title'), meaning: document.getElementById('meaning'), fire: document.getElementById('fire'), replay: document.getElementById('replay'), bgmToggle: document.getElementById('bgmToggle'), seToggle: document.getElementById('seToggle')
 };
 let order = [], idx = 0, score = 0, miss = 0;
@@ -235,15 +267,17 @@ document.addEventListener('keydown', unlockAudio, {once:true});
 els.bgmToggle.addEventListener('click',()=>{ if(bgmAvailable===false) return; bgmEnabled=!bgmEnabled; if(bgmEnabled){ AUDIO.bgm.play().catch(()=>{}); } else AUDIO.bgm.pause(); updateAudioButtons(); });
 els.seToggle.addEventListener('click',()=>{ seEnabled=!seEnabled; updateAudioButtons(); });
 updateAudioButtons();
+els.total.textContent = String(QUESTIONS.length);
 
 function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
-function choose(answer){ return shuffle([answer, ...shuffle(Object.keys(ANIMALS).filter(x=>x!==answer)).slice(0,5)]); }
+function choose(answer, count){ return shuffle([answer, ...shuffle(Object.keys(ANIMALS).filter(x=>x!==answer)).slice(0, Math.max(0, count - 1))]); }
 function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
 function clearSelection(){ selected = null; els.fire.disabled = true; els.cross.style.display = 'none'; movers.forEach(m => m.btn.setAttribute('aria-pressed','false')); }
 function setQuestion(q){ els.q.textContent = q; els.miniQ.textContent = q; }
 function updateAim(){ if(!selected){ return; } els.cross.style.left = (selected.x + selected.w/2) + 'px'; els.cross.style.top = (selected.y + selected.h/2) + 'px'; }
 function setNormalFacing(m){
   m.state = 'normal';
+  m.btn.classList.remove('dragon-caught');
   const src = ANIMALS[m.id].right;
   if(m.img.getAttribute('src') !== src) m.img.src = src;
   m.img.style.transform = m.vx >= 0 ? 'scaleX(1)' : 'scaleX(-1)';
@@ -253,15 +287,17 @@ function setSurprised(m){
   const src = ANIMALS[m.id].surprised;
   if(m.img.getAttribute('src') !== src) m.img.src = src;
   m.img.style.transform = 'scaleX(1)';
+  m.btn.classList.toggle('dragon-caught', m.id === 'dragon');
 }
 function aim(m){ if(busy || !playing) return; playSE('aim'); selected = m; movers.forEach(x => x.btn.setAttribute('aria-pressed', x===m ? 'true' : 'false')); els.fire.disabled = false; els.cross.style.display = 'block'; updateAim(); }
 function spawn(){
   els.animals.replaceChildren();
   movers = [];
   clearSelection();
-  const ids = choose(current.a);
-  if (!ids.includes(current.a)) throw new Error('正解動物生成失敗');
   const rect = els.field.getBoundingClientRect();
+  const visibleCount = rect.width < 430 ? 7 : 8;
+  const ids = choose(current.a, visibleCount);
+  if (!ids.includes(current.a)) throw new Error('正解動物生成失敗');
   const cols = rect.width < 430 ? 3 : 6;
   const rows = Math.ceil(ids.length / cols);
   const top = 84;
@@ -270,8 +306,9 @@ function spawn(){
     const col = i % cols, row = Math.floor(i / cols);
     const cellW = (rect.width - 16) / cols;
     const cellH = usable / rows;
-    const w = rect.width < 430 ? 86 : 96;
-    const h = w;
+    const baseSize = rect.width < 430 ? 86 : 96;
+    const w = id === 'dragon' ? Math.round(baseSize * 1.30) : baseSize;
+    const h = baseSize;
     let x = 8 + col * cellW + Math.random() * Math.max(1, cellW - w - 8);
     let y = top + row * cellH + Math.random() * Math.max(1, cellH - h - 8);
     x = clamp(x, 4, rect.width - w - 4);
@@ -289,12 +326,14 @@ function spawn(){
     btn.setAttribute('aria-pressed', 'false');
     btn.style.left = x + 'px';
     btn.style.top = y + 'px';
+    btn.style.width = w + 'px';
+    btn.style.height = h + 'px';
     const img = document.createElement('img');
     img.alt = ANIMALS[id].name;
     btn.appendChild(img);
 
     const base = 0.0038;
-    const factor = id === 'horse' ? 1.14 : id === 'bee' ? 1.18 : id === 'frog' ? 0.86 : id === 'sparrow' ? 1.08 : 1;
+    const factor = id === 'horse' ? 1.14 : id === 'bee' ? 1.18 : id === 'frog' ? 0.86 : id === 'sparrow' ? 1.08 : id === 'dragon' ? 1.02 : id === 'turtle' ? 0.76 : id === 'crane' ? 1.06 : id === 'crow' ? 1.1 : id === 'snake' ? 0.9 : 1;
     const mover = {id, btn, img, shadow, x, y, w, h, vx:(Math.random()<.5?-1:1)*base*factor, vy:(Math.random()<.5?-1:1)*base*.42*factor, bob:Math.random()*6.28, bobSpeed: 0.05 + Math.random()*0.04, state:''};
     setNormalFacing(mover);
 
@@ -323,7 +362,7 @@ function animate(ts){
       m.shadow.style.left = (m.x + m.w/2 - 28) + 'px';
       m.shadow.style.top = (m.y + m.h - 8) + 'px';
       m.shadow.style.transform = `scale(${0.95 + (Math.sin(m.bob)*0.03)})`;
-      if(m.id === 'bee' || m.id === 'sparrow'){
+      if(m.id === 'bee' || m.id === 'sparrow' || m.id === 'crane' || m.id === 'crow' || m.id === 'dragon'){
         m.btn.style.transform = `translateY(${Math.sin(m.bob*1.4)*-2}px)${selected===m ? ' scale(1.05)' : ''}`;
       } else {
         m.btn.style.transform = selected===m ? 'scale(1.05)' : '';
