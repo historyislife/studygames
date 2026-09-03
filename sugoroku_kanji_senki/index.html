@@ -677,6 +677,7 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
   .idiom-detail-section{margin-top:10px;padding:9px 10px}
 }
 
+.result-pr{width:300px;max-width:100%;margin:20px auto 0;padding-top:12px;border-top:1px solid #a67a39;text-align:center}.result-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:8px;font:800 12px sans-serif}.result-pr-head span{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:10px}@media(max-width:340px){.modal{padding:2px}.modal .dialog{width:316px;max-width:calc(100vw - 4px);padding-left:6px!important;padding-right:6px!important}}
 </style></head><body>
 <div id="setupOverlay" class="setup-overlay" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
   <div class="setup-card">
@@ -808,8 +809,40 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
     <button id="idiomDetailClose" class="idiom-detail-close" type="button">閉じる</button>
   </div>
 </div>
-<div class="modal" id="modal"><div class="dialog"><h2 id="mt"></h2><div id="mb"></div><div class="choices" id="choices"></div></div></div>
+<div class="modal" id="modal"><div class="dialog"><h2 id="mt"></h2><div id="mb"></div><div class="choices" id="choices"></div><div id="resultAdArea" class="result-pr" aria-label="保護者向けPR" hidden><div class="result-pr-head">保護者の方へ <span>PR</span></div><div class="a8-rotation-slot"></div></div></div></div>
+<!-- RESULT_AD_TEMPLATES -->
+<template id="result-ad-1">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
+</template>
+<template id="result-ad-2">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
+</template>
+<template id="result-ad-3">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1ELV76+5VQS+61Z81" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www20.a8.net/svt/bgt?aid=260901444085&wid=001&eno=01&mid=s00000027442001017000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1ELV76+5VQS+61Z81" alt="">
+</template>
+<template id="result-ad-4">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444068&wid=001&eno=01&mid=s00000020322001097000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" alt="">
+</template>
+<template id="result-ad-5">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1F7ASY+56OA+601S1" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www28.a8.net/svt/bgt?aid=260901444086&wid=001&eno=01&mid=s00000024193001008000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1F7ASY+56OA+601S1" alt="">
+</template>
+<template id="result-ad-6">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GE60I+4N0I+614CX" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444088&wid=001&eno=01&mid=s00000021645001013000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GE60I+4N0I+614CX" alt="">
+</template>
 <script>
+function showRandomResultAd(slot){const ads=["result-ad-1","result-ad-2","result-ad-3","result-ad-4","result-ad-5","result-ad-6"];slot.replaceChildren();const selected=ads[Math.floor(Math.random() * ads.length)];slot.append(document.getElementById(selected).content.cloneNode(true))}
 // ===== Background music: 甘茶の音楽工房 =====
 // 「イカロスの墜落」→ 誰かが熟語札2枚で「残業戦士」へ
 const BGM_TRACKS={
@@ -1075,7 +1108,7 @@ function render(){
 }
 function progress(p,w){let h=[...p.h];return [...w].map(x=>{let i=h.indexOf(x);if(i<0)return"○";h.splice(i,1);return"●"}).join("")}
 function can(p,w){return p.h.length>4&&!progress(p,w).includes("○")}function consume(p,w){for(let x of w)p.h.splice(p.h.indexOf(x),1)}
-function show(t,b,opts){mt.textContent=t;mb.innerHTML=b;choices.innerHTML="";opts.forEach(o=>{let q=document.createElement("button");q.className="choice";q.innerHTML=o[0];q.onclick=()=>{modal.classList.remove("show");o[1]()};choices.appendChild(q)});modal.classList.add("show")}
+function show(t,b,opts){mt.textContent=t;mb.innerHTML=b;choices.innerHTML="";const resultAdArea=document.getElementById("resultAdArea");resultAdArea.hidden=true;resultAdArea.querySelector(".a8-rotation-slot").replaceChildren();opts.forEach(o=>{let q=document.createElement("button");q.className="choice";q.innerHTML=o[0];q.onclick=()=>{modal.classList.remove("show");o[1]()};choices.appendChild(q)});modal.classList.add("show")}
 function openIdiomDetail(word){
   const info=idiomInfo[word];
   if(!info)return;
@@ -1952,7 +1985,7 @@ async function cpu(){
   }
   await doRoll();
 }
-function win(i){busy=true;roll.disabled=true;stopBGM();playSE("victory");show("天下統一！",`<h2>${ps[i].n}の勝利！</h2><p>四字熟語3枚完成、または最後まで生き残り、天下を統一しました。</p>`,[["再戦",()=>location.reload()]])}
+function win(i){busy=true;roll.disabled=true;stopBGM();playSE("victory");show("天下統一！",`<h2>${ps[i].n}の勝利！</h2><p>四字熟語3枚完成、または最後まで生き残り、天下を統一しました。</p>`,[["再戦",()=>location.reload()]]);const resultAdArea=document.getElementById("resultAdArea");resultAdArea.hidden=false;showRandomResultAd(resultAdArea.querySelector(".a8-rotation-slot"))}
 render();
 
 const manualBtn=document.getElementById("manualBtn");

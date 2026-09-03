@@ -399,11 +399,11 @@ body.game-running{overflow:hidden;background:#151811}
 .music-credit a{color:inherit;font-weight:800;text-decoration:underline;text-underline-offset:2px}
 body.game-running .music-credit{color:#d8caab}
 @media(max-width:600px){.music-credit{font-size:9.5px;margin-top:7px}}
-/* DEKITAS_A8_EXACT_YUUZEI */
+/* RESULT_A8_ROTATION */
 #resultOverlay .modal{max-height:calc(100dvh - 20px);overflow-y:auto}
-#resultOverlay .dekitas-pr{width:302px;max-width:100%;margin:18px auto 0;padding-top:12px;border-top:1px solid #cdbb9e;text-align:center}
-#resultOverlay .dekitas-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;font-weight:800}
-#resultOverlay .dekitas-pr-label{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:10px}
+#resultOverlay .result-pr{width:300px;max-width:100%;margin:18px auto 0;padding-top:12px;border-top:1px solid #cdbb9e;text-align:center}
+#resultOverlay .result-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;font-weight:800}
+#resultOverlay .result-pr-head span{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:10px}
 </style>
 </head>
 <body>
@@ -518,14 +518,41 @@ body.game-running .music-credit{color:#d8caab}
 
 <div id="passOverlay" class="overlay"><div class="modal"><h2 id="passTitle">次のプレイヤーへ</h2><p id="passText" class="pass-note"></p><button id="passBtn" class="btn" style="width:100%">準備できた</button></div></div>
 <div id="roundOverlay" class="overlay"><div class="modal"><h2>ラウンド処理</h2><div id="roundSummary" style="text-align:left;line-height:1.65;font-size:13px"></div><button id="nextRoundBtn" class="btn gold" style="width:100%;margin-top:12px">次のラウンドへ</button></div></div>
-<div id="resultOverlay" class="overlay"><div class="modal"><h2>遊説の結末</h2><div id="resultList" class="result-list"></div><button id="restartBtn" class="btn" style="width:100%">最初から</button><aside class="dekitas-pr" aria-label="保護者向けPR"><div class="dekitas-pr-head"><span>保護者の方へ</span><span class="dekitas-pr-label">PR</span></div>
+<div id="resultOverlay" class="overlay"><div class="modal"><h2>遊説の結末</h2><div id="resultList" class="result-list"></div><button id="restartBtn" class="btn" style="width:100%">最初から</button><aside class="result-pr" aria-label="保護者向けPR"><div class="result-pr-head">保護者の方へ <span>PR</span></div><div class="a8-rotation-slot"></div></aside></div></div>
+
+
+
+
+<template id="result-ad-1">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
+</template>
+<template id="result-ad-2">
 <a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
 <img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
-</aside></div></div>
-
-
-
+<img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
+</template>
+<template id="result-ad-3">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1ELV76+5VQS+61Z81" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www20.a8.net/svt/bgt?aid=260901444085&wid=001&eno=01&mid=s00000027442001017000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1ELV76+5VQS+61Z81" alt="">
+</template>
+<template id="result-ad-4">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444068&wid=001&eno=01&mid=s00000020322001097000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" alt="">
+</template>
+<template id="result-ad-5">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1F7ASY+56OA+601S1" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www28.a8.net/svt/bgt?aid=260901444086&wid=001&eno=01&mid=s00000024193001008000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1F7ASY+56OA+601S1" alt="">
+</template>
+<template id="result-ad-6">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GE60I+4N0I+614CX" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444088&wid=001&eno=01&mid=s00000021645001013000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GE60I+4N0I+614CX" alt="">
+</template>
 
 <div id="mapInspectOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="mapInspectTitle">
   <div class="modal map-inspect-modal">
@@ -642,6 +669,7 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
 </div>
 
 <script>
+function showRandomResultAd(slot){const ads=["result-ad-1","result-ad-2","result-ad-3","result-ad-4","result-ad-5","result-ad-6"];slot.replaceChildren();const selected=ads[Math.floor(Math.random() * ads.length)];slot.append(document.getElementById(selected).content.cloneNode(true))}
 (() => {
   const stateNames=['秦','趙','魏','韓','燕','斉','楚'];
   const borderPairs=[['趙','燕'],['趙','魏'],['趙','秦'],['燕','斉'],['秦','魏'],['魏','斉'],['秦','韓'],['魏','韓'],['秦','楚'],['韓','楚'],['斉','楚']];
@@ -1494,6 +1522,7 @@ https://amachamusic.chagasi.com/music_icarusnotsuiraku.html
     const ranked=game.players.map((p,i)=>({p,i,...scorePlayer(p)})).sort((a,b)=>b.total-a.total||b.sec-a.sec);
     const top=ranked[0];
     $('#resultList').innerHTML=ranked.map((r,rank)=>`<div class="result-item ${rank===0?'winner':''}"><b>${rank+1}位　${r.p.name}（${r.p.school}）　${r.total}点</b><br>公開「${r.p.publicMission.name}」${missionAchieved(r.p.publicMission)?`<span class="ok">達成 +${r.pub}</span>`:`<span class="ng">未達成</span>`}<br>非公開「${r.p.secretMission.name}」${missionAchieved(r.p.secretMission)?`<span class="ok">達成 +${r.sec}</span>`:`<span class="ng">未達成</span>`}</div>`).join('')+`<div class="result-item"><b>最終盤面</b><br>${stateNames.map(s=>`${s} 威信${game.states[s].prestige}/国力${game.states[s].power}`).join('　')}<br>総戦争回数：${game.totalWars}</div>`;
+    showRandomResultAd($('#resultOverlay .a8-rotation-slot'));
     $('#resultOverlay').classList.add('show');
   }
 

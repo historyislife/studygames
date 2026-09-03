@@ -15,7 +15,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:8px}.ti
 .memory-card{perspective:800px;min-width:0;min-height:0;touch-action:manipulation}.inner{position:relative;width:100%;height:100%;min-height:112px;transform-style:preserve-3d;transition:transform .42s cubic-bezier(.2,.75,.25,1);border-radius:10px}.memory-card.open .inner,.memory-card.matched .inner{transform:rotateY(180deg)}.face{position:absolute;inset:0;border-radius:10px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;box-shadow:0 2px 5px #0003}.back{background:linear-gradient(135deg,#29485e,#426e89);border:2px solid #d7c083;display:flex;align-items:center;justify-content:center}.back:before{content:"歴";display:grid;place-items:center;width:54%;aspect-ratio:1;border:2px solid #e8d7a3;border-radius:50%;color:#f2e6c5;font-family:serif;font-size:clamp(22px,8vw,42px);font-weight:900}.front{transform:rotateY(180deg);background:#eee;border:2px solid #fff}.front{display:flex;align-items:center;justify-content:center}.front img{width:100%;height:100%;object-fit:contain;object-position:center center;display:block;background:#e9e3d8}.memory-card.matched{opacity:.2;pointer-events:none;transition:opacity .35s}.memory-card.holding .back:after{content:"";position:absolute;inset:4px;border-radius:7px;border:4px solid #f0d26c;animation:hold .55s linear forwards}
 .controls{display:flex;gap:7px}.controls button{flex:1;border:0;border-radius:10px;padding:9px 8px;font-weight:900;font-size:14px;background:#3c342c;color:white}.controls button.secondary{background:#817362}.message{min-height:20px;text-align:center;font-weight:800;font-size:13px;color:#674e34}
 .overlay{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.overlay.show{display:flex}.panel{width:min(94vw,500px);max-height:calc(100dvh - 36px);overflow-y:auto;background:#fffaf0;border-radius:16px;padding:14px;box-shadow:0 15px 40px #0007}.profile{display:grid;grid-template-columns:42% 1fr;gap:12px}.profile img{width:100%;height:190px;object-fit:contain;object-position:center center;border-radius:10px;background:#e9e3d8}.profile h2{margin:0 0 4px;font-size:22px}.reading{font-size:13px;color:#755f4b;font-weight:700;margin-bottom:12px}.desc{font-size:14px;line-height:1.6}.panel button{width:100%;margin-top:12px;border:0;border-radius:10px;padding:11px;background:var(--accent);color:#fff;font-weight:900}.result{text-align:center}.result h2{font-size:26px;margin:4px}.result .big{font-size:42px;font-weight:900;color:var(--accent)}
-.dekitas-pr{width:min(100%,326px);margin:20px auto 0;padding:10px 8px 0;border-top:1px solid #d8ccb6;text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.dekitas-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:4px;font-size:12px;font-weight:800}.dekitas-pr-label{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:10px}.dekitas-pr-copy{margin:0 0 8px;font-size:13px;line-height:1.45}
+.result-pr{width:300px;max-width:100%;margin:18px auto 0;padding-top:12px;border-top:1px solid rgba(100,100,100,.24);text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.result-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;font-weight:800}.result-pr-head span{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:10px}
 @media(max-height:720px){.app{gap:4px;padding-top:5px}.help{font-size:10.5px;padding:4px}.board{gap:4px}.row{gap:4px}.inner{min-height:86px}.controls button{padding:6px}.message{font-size:11px;min-height:15px}.title{font-size:17px}.name-card{padding:3px 1px;font-size:11px}}
 
 /* まなびゲームズへ戻る */
@@ -63,7 +63,38 @@ header{display:flex;align-items:center;justify-content:space-between;gap:8px}.ti
 <div class="controls"><button id="newGame">新しいゲーム</button><button class="secondary" id="how">遊び方</button></div>
 </main>
 <div class="overlay" id="overlay"><div class="panel" id="panel"></div></div>
+<template id="result-ad-1">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
+</template>
+<template id="result-ad-2">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
+</template>
+<template id="result-ad-3">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1ELV76+5VQS+61Z81" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www20.a8.net/svt/bgt?aid=260901444085&wid=001&eno=01&mid=s00000027442001017000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1ELV76+5VQS+61Z81" alt="">
+</template>
+<template id="result-ad-4">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444068&wid=001&eno=01&mid=s00000020322001097000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" alt="">
+</template>
+<template id="result-ad-5">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1F7ASY+56OA+601S1" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www28.a8.net/svt/bgt?aid=260901444086&wid=001&eno=01&mid=s00000024193001008000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1F7ASY+56OA+601S1" alt="">
+</template>
+<template id="result-ad-6">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GE60I+4N0I+614CX" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444088&wid=001&eno=01&mid=s00000021645001013000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GE60I+4N0I+614CX" alt="">
+</template>
 <script>
+function showRandomResultAd(slot){const ads=["result-ad-1","result-ad-2","result-ad-3","result-ad-4","result-ad-5","result-ad-6"];slot.replaceChildren();const selected=ads[Math.floor(Math.random() * ads.length)];slot.append(document.getElementById(selected).content.cloneNode(true))}
 const people=[
 ['聖徳太子','しょうとくたいし','飛鳥時代の政治家。冠位十二階や十七条の憲法を定め、国のしくみを整えました。','images/01_shotoku.jpg'],
 ['聖武天皇','しょうむてんのう','奈良時代の天皇。国ごとに国分寺を建て、奈良の東大寺に大仏を造らせました。','images/02_shomu.jpg'],
@@ -95,9 +126,7 @@ function flip(c,p){if(lock||pending||c.classList.contains('open')||c.classList.c
 function checkPair(){const [a,b]=opened;if(a.p[0]===b.p[0]){pending=a.p;document.querySelectorAll('.name-card').forEach(n=>{if(!n.classList.contains('got'))n.classList.add('ready')});$('#message').textContent='同じ人物！ 上の名前を長押ししよう';lock=false}else{miss++;$('#miss').textContent=miss;$('#message').textContent='ちがう人物。もう一度！';setTimeout(()=>{a.c.classList.remove('open');b.c.classList.remove('open');opened=[];lock=false},700)}}
 function chooseName(p,d){if(!pending||d.classList.contains('got'))return;if(p[0]===pending[0]){score++;$('#score').textContent=score;d.classList.add('got');document.querySelectorAll('.name-card').forEach(n=>n.classList.remove('ready'));opened.forEach(x=>x.c.classList.add('matched'));opened=[];pending=null;showProfile(p)}else{miss++;$('#miss').textContent=miss;d.animate([{transform:'translateX(-3px)'},{transform:'translateX(3px)'},{transform:'translateX(0)'}],{duration:220});$('#message').textContent='名前がちがいます。肖像をよく見よう！'}}
 function showProfile(p){$('#panel').innerHTML=`<div class="profile"><img src="${p[3]}" alt="${p[0]}"><div><h2>${p[0]}</h2><div class="reading">${p[1]}</div><div class="desc">${p[2]}</div></div></div><button id="closeProfile">つづける</button>`;$('#overlay').classList.add('show');$('#closeProfile').onclick=()=>{$('#overlay').classList.remove('show');if(score===5)setTimeout(showResult,250);else $('#message').textContent='次の同じ肖像を探そう！'}}
-function showResult(){let rank=miss===0?'名人！':miss<=2?'すばらしい！':miss<=5?'よくできました！':'クリア！';$('#panel').innerHTML=`<div class="result"><h2>${rank}</h2><div>5人全員を見つけました</div><div class="big">ミス ${miss}回</div><p>もっと少ないミスでクリアできるかな？</p></div><button id="again">もう一度あそぶ</button><aside class="dekitas-pr" aria-label="保護者向けPR"><div class="dekitas-pr-head"><span>保護者の方へ</span><span class="dekitas-pr-label">PR</span></div><p class="dekitas-pr-copy">小中学生向け通信教育<br>「デキタス」</p><a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt=""></aside>`;$('#overlay').classList.add('show');$('#again').onclick=()=>{$('#overlay').classList.remove('show');newGame()}}
+function showResult(){let rank=miss===0?'名人！':miss<=2?'すばらしい！':miss<=5?'よくできました！':'クリア！';$('#panel').innerHTML=`<div class="result"><h2>${rank}</h2><div>5人全員を見つけました</div><div class="big">ミス ${miss}回</div><p>もっと少ないミスでクリアできるかな？</p></div><button id="again">もう一度あそぶ</button><aside class="result-pr" aria-label="保護者向けPR"><div class="result-pr-head">保護者の方へ <span>PR</span></div><div class="a8-rotation-slot"></div></aside>`;$('#overlay').classList.add('show');showRandomResultAd($('#panel .a8-rotation-slot'));$('#again').onclick=()=>{$('#overlay').classList.remove('show');newGame()}}
 $('#newGame').onclick=()=>{if(confirm('新しい5人でやり直しますか？'))newGame()};$('#how').onclick=()=>{$('#panel').innerHTML='<h2>遊び方</h2><div class="desc">① 下の10枚からカードを長押しして2枚めくります。<br>② 同じ肖像がそろったら、上段からその人物の名前を長押しします。<br>③ 正解すると人物を獲得し、紹介が表示されます。<br>④ 5人全員を、できるだけ少ないミスで獲得しましょう。</div><button id="closeHow">とじる</button>';$('#overlay').classList.add('show');$('#closeHow').onclick=()=>$('#overlay').classList.remove('show')};
 newGame();
 </script></body></html>

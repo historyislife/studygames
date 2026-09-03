@@ -18,7 +18,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:8px
 /* ガクハコへ戻る */
 .home-back-btn{position:fixed;top:10px;left:10px;z-index:9999;display:inline-flex;align-items:center;justify-content:center;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.88);color:#263238;border:1px solid rgba(0,0,0,.12);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;font-size:13px;font-weight:700;line-height:1;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.12);-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation}.home-back-btn:hover{background:#fff}.home-back-btn:active{transform:scale(.96)}@media(max-width:600px){.home-back-btn{top:max(8px,env(safe-area-inset-top));left:8px;padding:7px 10px;font-size:12px}header{padding-top:42px}}
 .hard-text-piece{width:100%;min-height:108px;display:grid;place-items:center;text-align:center;padding:8px;font-weight:900;color:var(--ink);line-height:1.15}.hard-text-piece.prefecture{font-size:clamp(25px,8vw,38px)}.hard-text-piece.capital{font-size:clamp(23px,7vw,34px)}
-.finish{padding:10px}.finish-inner{max-height:calc(100dvh - 20px);overflow-y:auto;padding:18px}.finish h2{font-size:28px}.dekitas-pr{margin-top:20px;padding-top:10px;border-top:1px solid #dce6ed}.dekitas-pr-head{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:5px;font-size:14px;font-weight:900}.dekitas-pr-label{border:1px solid #9aaab5;border-radius:999px;padding:1px 7px;color:#617687;font-size:10px}.dekitas-pr-copy{margin:0 0 8px;font-size:12px;color:#617687}.dekitas-pr-copy strong{display:block;color:var(--ink);font-size:14px}
+.finish{padding:10px}.finish-inner{max-height:calc(100dvh - 20px);overflow-y:auto;padding:18px}.finish h2{font-size:28px}.result-pr{width:300px;max-width:100%;margin:18px auto 0;padding-top:12px;border-top:1px solid rgba(100,100,100,.24);text-align:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.result-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;font-weight:800}.result-pr-head span{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:10px}
 </style>
 </head>
 <body>
@@ -29,12 +29,41 @@ header{display:flex;align-items:center;justify-content:space-between;padding:8px
 <section class="bottom"><div class="piece-card"><div class="piece-box"><svg id="piece" viewBox="0 0 100 100"></svg></div><div class="piece-info"><div class="label">この都道府県はどこ？</div><div id="prefName" class="pref-name">---</div><div id="msg" class="msg"></div></div></div><div class="source">地図データ: jpn-atlas（国土地理院「地球地図日本」由来 / BSD-3-Clause）</div></section>
 </div>
 <div id="start" class="start"><div class="start-inner"><h2>難易度を選択</h2><p>遊び方を選んでスタート</p><div class="levels"><button class="level" data-mode="easy"><strong>やさしい</strong><span>県名＋形を表示 ／ 正解する地方を薄くガイド</span></button><button class="level normal" data-mode="normal"><strong>普通</strong><span>県名＋形を表示 ／ 全国から場所を探す</span></button><button class="level" data-mode="hard"><strong>むずかしい</strong><span>形だけ・県名だけ・県庁所在地名だけをランダム出題</span></button></div></div></div>
-<div id="finish" class="finish"><div class="finish-inner"><h2>日本列島 完成！</h2><p>47都道府県をすべてはめ込みました。</p><button id="again">もう一度</button><aside class="dekitas-pr" aria-label="保護者向けPR"><div class="dekitas-pr-head"><span>保護者の方へ</span><span class="dekitas-pr-label">PR</span></div><p class="dekitas-pr-copy">小中学生向け通信教育<strong>「デキタス」</strong></p><a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
+<div id="finish" class="finish"><div class="finish-inner"><h2>日本列島 完成！</h2><p>47都道府県をすべてはめ込みました。</p><button id="again">もう一度</button><aside class="result-pr" aria-label="保護者向けPR"><div class="result-pr-head">保護者の方へ <span>PR</span></div><div class="a8-rotation-slot"></div></aside></div></div>
+<template id="result-ad-1">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
+</template>
+<template id="result-ad-2">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
 <img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt=""></aside></div></div>
+<img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
+</template>
+<template id="result-ad-3">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1ELV76+5VQS+61Z81" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www20.a8.net/svt/bgt?aid=260901444085&wid=001&eno=01&mid=s00000027442001017000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1ELV76+5VQS+61Z81" alt="">
+</template>
+<template id="result-ad-4">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444068&wid=001&eno=01&mid=s00000020322001097000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" alt="">
+</template>
+<template id="result-ad-5">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1F7ASY+56OA+601S1" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www28.a8.net/svt/bgt?aid=260901444086&wid=001&eno=01&mid=s00000024193001008000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1F7ASY+56OA+601S1" alt="">
+</template>
+<template id="result-ad-6">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GE60I+4N0I+614CX" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444088&wid=001&eno=01&mid=s00000021645001013000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GE60I+4N0I+614CX" alt="">
+</template>
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
 <script>
+function showRandomResultAd(slot){const ads=["result-ad-1","result-ad-2","result-ad-3","result-ad-4","result-ad-5","result-ad-6"];slot.replaceChildren();const selected=ads[Math.floor(Math.random() * ads.length)];slot.append(document.getElementById(selected).content.cloneNode(true))}
 const CAPITALS=['札幌市','青森市','盛岡市','仙台市','秋田市','山形市','福島市','水戸市','宇都宮市','前橋市','さいたま市','千葉市','新宿区','横浜市','新潟市','富山市','金沢市','福井市','甲府市','長野市','岐阜市','静岡市','名古屋市','津市','大津市','京都市','大阪市','神戸市','奈良市','和歌山市','鳥取市','松江市','岡山市','広島市','山口市','徳島市','高松市','松山市','高知市','福岡市','佐賀市','長崎市','熊本市','大分市','宮崎市','鹿児島市','那覇市'];
 const NAMES=['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
 const DATA='https://unpkg.com/jpn-atlas@1/japan/japan.json';
@@ -74,7 +103,7 @@ function showHardPrompt(f){
   if(hardPrompt==='shape'){box.style.display='grid';label.textContent='この形の都道府県はどこ？';name.textContent='？？？';drawPiece(f);}
   else {box.innerHTML=`<div class="hard-text-piece ${hardPrompt}">${hardPrompt==='prefecture'?NAMES[current-1]:CAPITALS[current-1]}</div>`;label.textContent=hardPrompt==='prefecture'?'この都道府県はどこ？':'この県庁所在地はどこ？';name.textContent='？？？';}
 }
-function next(){g.selectAll('.pref').classed('hint',false);if(solved.size===47){document.querySelector('#finish').classList.add('show');return}current=order.find(n=>!solved.has(n));const f=features.find(x=>prefNo(x)===current);const label=document.querySelector('.piece-info .label');if(mode==='hard'){showHardPrompt(f)}else{document.querySelector('.piece-box').innerHTML='<svg id="piece" viewBox="0 0 100 100"></svg>';pieceSvg=d3.select('#piece');label.textContent='この都道府県はどこ？';document.querySelector('#prefName').textContent=NAMES[current-1];drawPiece(f)}if(mode==='easy'){const r=REGIONS.find(r=>r.includes(current))||[];g.selectAll('.pref').classed('hint',d=>r.includes(prefNo(d))&&!solved.has(prefNo(d)))}}
+function next(){g.selectAll('.pref').classed('hint',false);if(solved.size===47){showRandomResultAd(document.querySelector('#finish .a8-rotation-slot'));document.querySelector('#finish').classList.add('show');return}current=order.find(n=>!solved.has(n));const f=features.find(x=>prefNo(x)===current);const label=document.querySelector('.piece-info .label');if(mode==='hard'){showHardPrompt(f)}else{document.querySelector('.piece-box').innerHTML='<svg id="piece" viewBox="0 0 100 100"></svg>';pieceSvg=d3.select('#piece');label.textContent='この都道府県はどこ？';document.querySelector('#prefName').textContent=NAMES[current-1];drawPiece(f)}if(mode==='easy'){const r=REGIONS.find(r=>r.includes(current))||[];g.selectAll('.pref').classed('hint',d=>r.includes(prefNo(d))&&!solved.has(prefNo(d)))}}
 function answer(f,node){const n=prefNo(f);if(solved.has(n))return;if(n===current){solved.add(n);d3.select(node).classed('done',true);document.querySelector('#count').textContent=solved.size;setMessage('正解！','ok');setTimeout(next,350)}else{d3.select(node).classed('wrong',true);setTimeout(()=>d3.select(node).classed('wrong',false),380);setMessage('ちがいます','bad');navigator.vibrate?.(45)}}
 function installHold(sel){sel.on('pointerdown.hold',function(e,d){if(e.pointerType==='mouse'&&e.button!==0)return;holdStart={x:e.clientX,y:e.clientY,id:e.pointerId};clearTimeout(holdTimer);holdTimer=setTimeout(()=>{answer(d,this);holdTimer=null},520)}).on('pointermove.hold',function(e){if(!holdStart||e.pointerId!==holdStart.id)return;if(Math.hypot(e.clientX-holdStart.x,e.clientY-holdStart.y)>10){clearTimeout(holdTimer);holdTimer=null}}).on('pointerup.hold pointercancel.hold',()=>{clearTimeout(holdTimer);holdTimer=null;holdStart=null})}
 async function init(){try{const topo=await d3.json(DATA);features=topojson.feature(topo,topo.objects.prefectures).features.filter(f=>{const n=prefNo(f);return n>=1&&n<=47});features.sort((a,b)=>prefNo(a)-prefNo(b));if(features.length!==47)throw new Error('都道府県データ数: '+features.length);document.querySelector('#loading').remove();const p=g.selectAll('path.pref').data(features).join('path').attr('class','pref').attr('d',path).attr('data-pref',d=>prefNo(d));installHold(p);ready=true}catch(err){document.querySelector('#loading').innerHTML='地図データを読み込めませんでした。<br><small>通信環境を確認して再読み込みしてください。</small>';console.error(err)}}
