@@ -31,10 +31,10 @@
   button.action:hover{filter:brightness(1.08)}
   .help{text-align:center;color:#98a6ba;font-size:14px;margin-top:22px;line-height:1.7}
   kbd{background:#0e141e;border:1px solid #43516a;border-bottom-width:3px;border-radius:5px;padding:2px 6px;color:#dce5f2}
-  .affiliate-area{display:none;width:302px;max-width:100%;margin:24px auto 0;padding:14px 0 12px;border:1px solid #526078;border-radius:14px;background:#111824;text-align:center;color:#f4f7fb;position:relative;z-index:2;pointer-events:auto}
-  .game.round-finished .affiliate-area{display:block}
-  .affiliate-label{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;font-size:14px;font-weight:800}
-  .affiliate-label span{border:1px solid #77859a;border-radius:999px;padding:1px 7px;color:#c3ccda;font-size:10px;line-height:1.4}
+  .result-pr{display:none;width:300px;max-width:100%;margin:24px auto 0;padding:14px 0 12px;border:1px solid #526078;border-radius:14px;background:#111824;text-align:center;color:#f4f7fb;position:relative;z-index:2;pointer-events:auto}
+  .game.round-finished .result-pr{display:block}
+  .result-pr-head{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;font-size:14px;font-weight:800}
+  .result-pr-head span{border:1px solid #77859a;border-radius:999px;padding:1px 7px;color:#c3ccda;font-size:10px;line-height:1.4}
 
   @media(max-width:600px){
     body{align-items:flex-start;padding:8px;background:#10141c}
@@ -84,7 +84,7 @@
     .buttons{gap:5px;flex-wrap:nowrap}.buttons button.action{flex:1 1 0;padding:8px 3px;font-size:12px;white-space:nowrap}.buttons button.primary{flex-basis:0}
     .help{font-size:10px;line-height:1.25;margin-top:5px}
     .game.round-finished{overflow-y:auto;padding-left:4px;padding-right:4px}
-    .affiliate-area{margin-top:18px;padding-top:11px;padding-bottom:10px}
+    .result-pr{margin-top:18px;padding-top:11px;padding-bottom:10px}
   }
   @media(max-width:340px){body{padding:0}.game{padding-left:1px;padding-right:1px}}
   @media(max-width:600px) and (max-height:600px){
@@ -167,14 +167,14 @@
     <button class="action" id="newBtn">つぎの問題</button>
   </div>
 
-  <div class="affiliate-area">
-    <div class="affiliate-label">保護者の方へ <span>PR</span></div>
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www27.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
+  <div class="result-pr" aria-label="保護者向けPR">
+    <div class="result-pr-head">保護者の方へ <span>PR</span></div>
+    <div class="a8-rotation-slot"></div>
   </div>
 </main>
+<!-- RESULT_AD_TEMPLATES -->
 <script>
+function showRandomResultAd(slot){const ads=["result-ad-1","result-ad-2","result-ad-3","result-ad-4","result-ad-5","result-ad-6"];slot.replaceChildren();const selected=ads[Math.floor(Math.random() * ads.length)];slot.append(document.getElementById(selected).content.cloneNode(true))}
 const ALL_OPS = ['+','-','*','/'];
 const OP_LABEL = {'+':'＋','-':'−','*':'×','/':'÷'};
 let numbers=[], ops=['+','+','+'], target=0, solution=null, score=0, streak=0, difficulty='normal';
@@ -211,6 +211,7 @@ function allOperatorSets(){
 function generatePuzzle(){
   solved=false;
   document.querySelector('.game').classList.remove('round-finished');
+  document.querySelector('.a8-rotation-slot').replaceChildren();
   $('newBtn').textContent='つぎの問題';
   $('result').className='result info';
   $('result').textContent='記号をタップしてかえよう';
@@ -277,6 +278,7 @@ function check(){
     r.className='result ok'; r.textContent=`正解！  ${expressionText(numbers,ops)} = ${target}`;
     if(!solved){score++;streak++;solved=true;$('score').textContent=score;$('streak').textContent=streak;}
     document.querySelector('.game').classList.add('round-finished');
+    showRandomResultAd(document.querySelector('.a8-rotation-slot'));
     $('newBtn').textContent='もう一度遊ぶ';
   }else{
     r.className='result ng'; r.textContent=`${expressionText(numbers,ops)} = ${shown}　→ めざす数は ${target}`;
@@ -290,6 +292,7 @@ $('answerBtn').onclick=()=>{
   $('result').textContent=`こたえ： ${expressionText(solution.nums,solution.ops)} = ${target}`;
   solved=true; streak=0; $('streak').textContent=streak;
   document.querySelector('.game').classList.add('round-finished');
+  showRandomResultAd(document.querySelector('.a8-rotation-slot'));
   $('newBtn').textContent='もう一度遊ぶ';
 };
 $('newBtn').onclick=generatePuzzle;
