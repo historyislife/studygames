@@ -45,7 +45,7 @@ a{text-decoration:none;color:inherit}
 .mark{font-size:42px}.title{font-size:26px;font-weight:900;line-height:1.25}.meaning{margin-top:9px;line-height:1.65;color:#52605d;font-size:15px}
 .end-only{display:none}.popup.is-end .end-only{display:block}
 .replay{width:min(100%,300px);min-height:48px;margin:14px auto 12px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-size:18px;font-weight:900;box-shadow:0 3px 0 rgba(0,0,0,.14);cursor:pointer}
-.ad-wrap{width:300px;max-width:100%;margin:0 auto}.ad-label{margin:0 0 5px;font-size:11px;font-weight:800;color:#718087}.ad-wrap a{display:block;width:300px;max-width:100%;margin:auto}.ad-wrap a img{display:block;width:300px;max-width:100%;height:auto;margin:auto}
+.ad-wrap{width:300px;max-width:100%;margin:0 auto;text-align:center}.ad-label{margin:0 0 5px;font-size:11px;font-weight:800;color:#718087}.a8-rotation-slot{width:300px;max-width:100%;margin:0 auto;min-height:250px}
 .help{padding:10px 4px 0;font-size:13px;color:#5f6f74;line-height:1.6}.legend{font-weight:800;color:#3e5257}
 @media (max-width:560px){
   html,body{height:100%;overflow:hidden}
@@ -158,11 +158,38 @@ a{text-decoration:none;color:inherit}
           <div id="endArea" class="end-only">
             <button id="replay" class="replay" type="button">もう一度あそぶ</button>
             <div class="ad-wrap" aria-label="広告">
-              <div class="ad-label">広告</div>
-              <a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
-                <img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1">
-              </a>
-              <img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
+              <div class="ad-label">保護者の方へ　PR</div>
+              <div id="a8RotationSlot" class="a8-rotation-slot"></div>
+              <template id="result-ad-1">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
+              </template>
+              <template id="result-ad-2">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
+              </template>
+              <template id="result-ad-3">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1ELV76+5VQS+61Z81" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www20.a8.net/svt/bgt?aid=260901444085&wid=001&eno=01&mid=s00000027442001017000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1ELV76+5VQS+61Z81" alt="">
+              </template>
+              <template id="result-ad-4">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444068&wid=001&eno=01&mid=s00000020322001097000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" alt="">
+              </template>
+              <template id="result-ad-5">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1F7ASY+56OA+601S1" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www28.a8.net/svt/bgt?aid=260901444086&wid=001&eno=01&mid=s00000024193001008000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1F7ASY+56OA+601S1" alt="">
+              </template>
+              <template id="result-ad-6">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GE60I+4N0I+614CX" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444088&wid=001&eno=01&mid=s00000021645001013000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GE60I+4N0I+614CX" alt="">
+              </template>
             </div>
           </div>
         </div>
@@ -234,7 +261,7 @@ for (const id of Object.keys(ANIMALS)) {
 }
 const els = {
   q: document.getElementById('q'), miniQ: document.getElementById('miniQ'), score: document.getElementById('score'), round: document.getElementById('round'), total: document.getElementById('total'), miss: document.getElementById('miss'), reset: document.getElementById('reset'),
-  field: document.getElementById('field'), animals: document.getElementById('animals'), cross: document.getElementById('cross'), net: document.getElementById('net'), popup: document.getElementById('popup'), mark: document.getElementById('mark'), title: document.getElementById('title'), meaning: document.getElementById('meaning'), fire: document.getElementById('fire'), replay: document.getElementById('replay'), bgmToggle: document.getElementById('bgmToggle'), seToggle: document.getElementById('seToggle')
+  field: document.getElementById('field'), animals: document.getElementById('animals'), cross: document.getElementById('cross'), net: document.getElementById('net'), popup: document.getElementById('popup'), mark: document.getElementById('mark'), title: document.getElementById('title'), meaning: document.getElementById('meaning'), fire: document.getElementById('fire'), replay: document.getElementById('replay'), a8RotationSlot: document.getElementById('a8RotationSlot'), bgmToggle: document.getElementById('bgmToggle'), seToggle: document.getElementById('seToggle')
 };
 let order = [], idx = 0, score = 0, miss = 0;
 let current = null, movers = [], selected = null, raf = 0, last = 0;
@@ -419,12 +446,29 @@ function shoot(){
     }
   }, 250);
 }
+function renderResultAd(){
+  if(!els.a8RotationSlot) return;
+  els.a8RotationSlot.replaceChildren();
+  const ads = [
+    'result-ad-1',
+    'result-ad-2',
+    'result-ad-3',
+    'result-ad-4',
+    'result-ad-5',
+    'result-ad-6'
+  ];
+  const selectedAd = ads[Math.floor(Math.random() * ads.length)];
+  const template = document.getElementById(selectedAd);
+  if(template) els.a8RotationSlot.appendChild(template.content.cloneNode(true));
+}
 function endGame(){
   playing = false; busy = true; cancelAnimationFrame(raf); els.fire.disabled = true; clearSelection();
+  renderResultAd();
   showPopup('🏆', '全問終了！', `スコア ${score}点　ミス ${miss}回`, true);
 }
 function start(){
   cancelAnimationFrame(raf);
+  if(els.a8RotationSlot) els.a8RotationSlot.replaceChildren();
   order = shuffle(QUESTIONS.map((_,i)=>i)).slice(0, GAME_LENGTH);
   idx = 0; score = 0; miss = 0; playing = true; busy = false; last = 0;
   els.score.textContent = '0'; els.miss.textContent = '0';
