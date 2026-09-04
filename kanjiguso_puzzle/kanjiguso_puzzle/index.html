@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>カンジグシーパズ｜ガクハコ</title>
+<style>
+  :root{
+    --bg1:#e7f6ff;
+    --bg2:#f8fff2;
+    --ink:#16324a;
+    --blue:#2d8cff;
+    --green:#4fae4f;
+    --cream:#fffaf0;
+    --line:#8fb8d7;
+    --shadow:0 10px 24px rgba(33,76,112,.15);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;color:var(--ink);background:linear-gradient(var(--bg1),var(--bg2));}
+  body{display:flex;justify-content:center;}
+  button{font:inherit}
+  .app{width:min(100%,560px);min-height:100vh;padding:14px 12px 28px;position:relative;overflow:hidden;}
+  .home{position:relative;z-index:20;display:inline-flex;align-items:center;gap:.35em;text-decoration:none;color:#25516d;background:#ffffffd9;border:1px solid #c9dce9;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:800;box-shadow:0 3px 12px rgba(0,0,0,.06)}
+  .title{margin:10px auto 8px;width:max-content;max-width:100%;padding:10px 20px;border:3px solid #f4c96d;border-radius:999px;background:#fffdf7;box-shadow:var(--shadow);font-weight:1000;font-size:clamp(23px,7vw,38px);letter-spacing:.04em;color:#3b2f27}
+  .gradeRow{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:10px 0 8px}
+  .gradeBtn{border:1px solid #b9d0df;background:#fff;color:#2477bb;border-radius:999px;padding:10px 2px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .gradeBtn.active{background:linear-gradient(#3e9cff,#2379d6);color:white;border-color:#2379d6;box-shadow:0 5px 12px rgba(35,121,214,.25)}
+  .status{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:#fff9e7;border:1px solid #eddba8;border-radius:18px;padding:10px 12px;margin-bottom:10px;box-shadow:0 6px 18px rgba(94,74,33,.08)}
+  .statusText{min-width:0}.status strong{display:block;font-size:14px}.kanjiProgress{margin-top:2px;font-size:11px;color:#607684;font-weight:800}.count{font-weight:1000}.count b{font-size:24px;color:#ef7a1b}.sampleBtn{border:2px solid var(--blue);color:#1971bc;background:white;border-radius:999px;padding:7px 11px;font-weight:900;cursor:pointer}
+  .kanjiChip{display:inline-grid;place-items:center;min-width:42px;height:42px;border-radius:12px;background:#fff;border:1px solid #efd99d;font-size:28px;font-weight:900;box-shadow:inset 0 0 0 2px #fff}
+
+  .playArea{position:relative;user-select:none;-webkit-user-select:none;touch-action:none;}
+  .boardWrap{display:flex;justify-content:center;margin:8px auto 12px;position:relative;z-index:2}
+  .board{position:relative;width:min(72vw,320px);aspect-ratio:1;background:#fffdf6;border:5px solid #eadab0;border-radius:22px;box-shadow:var(--shadow);overflow:visible}
+  .ghost{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .15s;pointer-events:none;border-radius:16px}
+  .ghost.show{opacity:.13}
+  .slotLayer{position:absolute;inset:0;overflow:visible;pointer-events:none}
+  .slotCanvas{position:absolute;pointer-events:none;filter:drop-shadow(0 1px 0 rgba(255,255,255,.9))}
+
+  .tray{position:relative;z-index:1;margin-top:6px;height:420px;min-height:300px;background:#f8fff1;border:3px solid #7fbf53;border-radius:22px;box-shadow:var(--shadow);overflow:visible}
+  .trayHead{position:absolute;left:12px;right:12px;top:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;pointer-events:none}
+  .trayTitle{background:#42a943;color:#fff;border-radius:999px;padding:6px 16px;font-size:18px;font-weight:1000}
+  .help{font-size:13px;color:#347b35;font-weight:800;text-align:right}
+  .piece{position:absolute;z-index:10;cursor:grab;touch-action:none;transform-origin:50% 50%;transition:filter .12s, transform .14s;filter:drop-shadow(0 7px 7px rgba(0,0,0,.18));}
+  .piece:active{cursor:grabbing;filter:drop-shadow(0 10px 10px rgba(0,0,0,.24));}
+  .piece.snapped{z-index:8;filter:none;cursor:default;}
+  .piece canvas{display:block;width:100%;height:100%;}
+
+  .actions{display:grid;grid-template-columns:1fr 1.25fr;gap:10px;margin-top:14px}
+  .actionBtn{border:0;border-radius:999px;padding:13px 10px;font-size:18px;font-weight:1000;box-shadow:0 7px 14px rgba(0,0,0,.12);cursor:pointer}
+  .resetBtn{background:#fff;color:#1b74c9;border:3px solid #64a7e6}
+  .nextBtn{background:linear-gradient(#ffd95b,#ffb92f);color:#5a3800;border:3px solid #f0a31e}
+
+  .modal{position:fixed;inset:0;background:rgba(21,44,61,.4);display:none;place-items:center;padding:20px;z-index:100}
+  .modal.show{display:grid}
+  .modalCard{width:min(96vw,390px);max-height:96vh;overflow:auto;background:#fff;border-radius:24px;padding:20px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.24);border:4px solid #f1cf62}
+  .modalCard .big{font-size:72px;line-height:1;margin:8px 0 4px}.modalCard h2{margin:0 0 8px;font-size:30px}.modalCard p{margin:6px 0 14px;color:#4c6575}.modalActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 auto 14px}.modalCard button{border:0;border-radius:999px;background:#2f8ded;color:#fff;padding:11px 12px;font-weight:1000;font-size:15px}.modalCard .againBtn{background:#fff;color:#2477bb;border:2px solid #64a7e6}.resultPr{width:300px;max-width:100%;margin:10px auto 0;padding-top:10px;border-top:1px solid #e5e8ea;text-align:center}.resultPrHead{font-size:11px;color:#718087;font-weight:800;margin-bottom:5px}.a8Slot{width:300px;max-width:100%;min-height:250px;margin:0 auto}.tiny{margin-top:8px;font-size:11px;color:#66808e;text-align:center}
+  @media (max-width:340px){.modal{padding:2px}.modalCard{width:100%;padding:12px 4px;border-width:2px;border-radius:16px}.modalCard .big{font-size:58px}.modalCard h2{font-size:25px}.modalActions{padding:0 6px}.resultPr{max-width:300px}}
+  @media (max-width:380px){.status{grid-template-columns:1fr auto}.sampleBtn{grid-column:1/-1}.help{font-size:11px}.tray{min-height:250px}.gradeBtn{font-size:13px}}
+</style>
+</head>
+<body>
+<main class="app">
+  <a class="home" href="/" aria-label="ガクハコのトップへ戻る">← ガクハコ</a>
+  <div class="title">カンジグシーパズ</div>
+
+  <div class="gradeRow" id="gradeRow"></div>
+  <section class="status">
+    <div class="statusText"><strong id="gradeLabel">1年生・2×2</strong><div class="kanjiProgress" id="kanjiProgress">漢字 1 / 80</div></div>
+    <span class="count">のこり <b id="remain">0</b> ピース</span>
+    <button class="sampleBtn" id="sampleBtn">👁 おてほん</button>
+  </section>
+
+  <div class="playArea" id="playArea">
+    <div class="boardWrap">
+      <div class="board" id="board">
+        <canvas class="ghost" id="ghost"></canvas>
+        <div class="slotLayer" id="slotLayer"></div>
+      </div>
+    </div>
+    <div class="tray" id="tray">
+      <div class="trayHead"><span class="trayTitle">ピース</span><span class="help">タップで90°回転<br>ドラッグで移動</span></div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="actionBtn resetBtn" id="resetBtn">↺ やりなおす</button>
+    <button class="actionBtn nextBtn" id="nextBtn">つぎの漢字 →</button>
+  </div>
+  <div class="tiny">小学校学習指導要領（平成29年告示）の学年別漢字配当表 1,026字に対応。</div>
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="modalCard">
+    <h2>できた！</h2>
+    <div class="big" id="doneKanji">一</div>
+    <p>ぜんぶのピースが正しい向き・場所にはまりました。</p>
+    <div class="modalActions">
+      <button id="sameAgain" class="againBtn" type="button">同じ漢字でもう一度</button>
+      <button id="nextFromModal" type="button">つぎの漢字 →</button>
+    </div>
+    <div class="resultPr" aria-label="広告">
+      <div class="resultPrHead">保護者の方へ　PR</div>
+      <div id="a8Slot" class="a8Slot"></div>
+      <template id="result-ad-1">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
+      </template>
+      <template id="result-ad-2">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
+      </template>
+      <template id="result-ad-3">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1ELV76+5VQS+61Z81" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www20.a8.net/svt/bgt?aid=260901444085&wid=001&eno=01&mid=s00000027442001017000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1ELV76+5VQS+61Z81" alt="">
+      </template>
+      <template id="result-ad-4">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444068&wid=001&eno=01&mid=s00000020322001097000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" alt="">
+      </template>
+      <template id="result-ad-5">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1F7ASY+56OA+601S1" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www28.a8.net/svt/bgt?aid=260901444086&wid=001&eno=01&mid=s00000024193001008000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1F7ASY+56OA+601S1" alt="">
+      </template>
+      <template id="result-ad-6">
+<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GE60I+4N0I+614CX" rel="nofollow">
+<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444088&wid=001&eno=01&mid=s00000021645001013000&mc=1"></a>
+<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GE60I+4N0I+614CX" alt="">
+      </template>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const KANJI = {
+    1: Array.from('一右雨円王音下火花貝学気九休玉金空月犬見口校左三山子四糸字耳七車手十出女小上森人水正生青夕石赤千川先早草足村大男竹中虫町天田土二日入年白八百文木本名目立力林六五'),
+    2: Array.from('引羽雲園遠何科夏家歌画回会海絵外角楽活間丸岩顔汽記帰弓牛魚京強教近兄形計元言原戸古午後語工公広交光考行高黄合谷国黒今才細作算止市矢姉思紙寺自時室社弱首秋週春書少場色食心新親図数西声星晴切雪船線前組走多太体台地池知茶昼長鳥朝直通弟店点電刀冬当東答頭同道読内南肉馬売買麦半番父風分聞米歩母方北毎妹万明鳴毛門夜野友用曜来里理話'),
+    3: Array.from('悪安暗医委意育員院飲運泳駅央横屋温化荷界階寒感漢館岸起期客究急級宮球去橋業曲局銀区苦具君係軽血決研県庫湖向幸港号根祭皿仕死使始指歯詩次事持式実写者主守取酒受州拾終習集住重宿所暑助昭消商章勝乗植申身神真深進世整昔全相送想息速族他打対待代第題炭短談着注柱丁帳調追定庭笛鉄転都度投豆島湯登等動童農波配倍箱畑発反坂板皮悲美鼻筆氷表秒病品負部服福物平返勉放味命面問役薬由油有遊予羊洋葉陽様落流旅両緑礼列練路和開'),
+    4: Array.from('愛案以衣位茨印英栄媛塩岡億加果貨課芽賀改械害街各覚潟完官管関観願岐希季旗器機議求泣給挙漁共協鏡競極熊訓軍郡群径景芸欠結建健験固功好香候康佐差菜最埼材崎昨札刷察参産散残氏司試児治滋辞鹿失借種周祝順初松笑唱焼照城縄臣信井成省清静席積折節説浅戦選然争倉巣束側続卒孫帯隊達単置仲沖兆低底的典伝徒努灯働特徳栃奈梨熱念敗梅博阪飯飛必票標不夫付府阜富副兵別辺変便包法望牧末満未民無約勇要養浴利陸良料量輪類令冷例連老労録'),
+    5: Array.from('圧囲移因永営衛易益液演応往桜可仮価河過快解格確額刊幹慣眼紀基寄規喜技義逆久旧救居許境均禁句型経潔件険検限現減故個護効厚耕航鉱構興講告混査再災妻採際在財罪殺雑酸賛士支史志枝師資飼示似識質舎謝授修述術準序招証象賞条状常情織職制性政勢精製税責績接設絶祖素総造像増則測属率損貸態団断築貯張停提程適統堂銅導得毒独任燃能破犯判版比肥非費備評貧布婦武復複仏粉編弁保墓報豊防貿暴脈務夢迷綿輸余容略留領歴'),
+    6: Array.from('胃異遺域宇映延沿恩我灰拡革閣割株干巻看簡危机揮貴疑吸供胸郷勤筋系敬警劇激穴券絹権憲源厳己呼誤后孝皇紅降鋼刻穀骨困砂座済裁策冊蚕至私姿視詞誌磁射捨尺若樹収宗就衆従縦縮熟純処署諸除承将傷障蒸針仁垂推寸盛聖誠舌宣専泉洗染銭善奏窓創装層操蔵臓存尊退宅担探誕段暖値宙忠著庁頂腸潮賃痛敵展討党糖届難乳認納脳派拝背肺俳班晩否批秘俵腹奮並陛閉片補暮宝訪亡忘棒枚幕密盟模訳郵優預幼欲翌乱卵覧裏律臨朗論')
+  };
+  const gridByGrade = g => g <= 2 ? 2 : g <= 4 ? 3 : 4;
+  function shuffle(arr){
+    const a=[...arr];
+    for(let i=a.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  const gradeRow = document.getElementById('gradeRow');
+  const gradeLabel = document.getElementById('gradeLabel');
+  const remainEl = document.getElementById('remain');
+  const kanjiProgress = document.getElementById('kanjiProgress');
+  const board = document.getElementById('board');
+  const tray = document.getElementById('tray');
+  const playArea = document.getElementById('playArea');
+  const slotLayer = document.getElementById('slotLayer');
+  const ghost = document.getElementById('ghost');
+  const modal = document.getElementById('modal');
+  const doneKanji = document.getElementById('doneKanji');
+  const a8Slot = document.getElementById('a8Slot');
+
+  let grade = 1;
+  let kanjiIndex = 0;
+  let kanjiOrder = shuffle(KANJI[grade]);
+  let kanji = kanjiOrder[0];
+  let grid = gridByGrade(grade);
+  let pieces = [];
+  let edgeV = [], edgeH = [];
+  let sourceCanvas = null;
+  let sourceSize = 900;
+  let resizeTimer = null;
+
+  for(let g=1; g<=6; g++){
+    const b = document.createElement('button');
+    b.className='gradeBtn';
+    b.textContent=g+'年';
+    b.dataset.grade=g;
+    b.addEventListener('click',()=>{
+      setGrade(g);
+    });
+    gradeRow.appendChild(b);
+  }
+
+  function renderGrades(){
+    [...gradeRow.children].forEach(b=>b.classList.toggle('active', +b.dataset.grade===grade));
+    gradeLabel.textContent = `${grade}年生・${grid}×${grid}`;
+    kanjiProgress.textContent = `漢字 ${kanjiIndex + 1} / ${KANJI[grade].length}`;
+  }
+  function setGrade(g){
+    grade = g;
+    grid = gridByGrade(g);
+    kanjiOrder = shuffle(KANJI[g]);
+    kanjiIndex = 0;
+    kanji = kanjiOrder[0];
+    buildPuzzle();
+  }
+  function nextKanji(){
+    kanjiIndex++;
+    if(kanjiIndex >= kanjiOrder.length){
+      kanjiOrder = shuffle(KANJI[grade]);
+      kanjiIndex = 0;
+    }
+    kanji = kanjiOrder[kanjiIndex];
+    buildPuzzle();
+  }
+
+  function makeSource(){
+    sourceCanvas = document.createElement('canvas');
+    sourceCanvas.width = sourceCanvas.height = sourceSize;
+    const ctx = sourceCanvas.getContext('2d');
+    ctx.clearRect(0,0,sourceSize,sourceSize);
+    // 余白を持たせて字形全体が収まるようにする。
+    const fontSize = sourceSize * (grid===4 ? 0.72 : 0.76);
+    ctx.fillStyle = '#142029';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.font=`900 ${fontSize}px "Noto Sans JP","Yu Gothic","Meiryo",sans-serif`;
+    ctx.fillText(kanji, sourceSize/2, sourceSize/2 + sourceSize*0.015);
+
+    const gctx = ghost.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const s = board.clientWidth;
+    ghost.width = ghost.height = Math.round(s*dpr);
+    ghost.style.width = ghost.style.height = s+'px';
+    gctx.setTransform(dpr,0,0,dpr,0,0);
+    gctx.clearRect(0,0,s,s);
+    gctx.drawImage(sourceCanvas,0,0,s,s);
+  }
+
+  function randomEdges(){
+    edgeV = Array.from({length:grid},()=>Array(grid-1).fill(0));
+    edgeH = Array.from({length:grid-1},()=>Array(grid).fill(0));
+    for(let r=0;r<grid;r++) for(let c=0;c<grid-1;c++) edgeV[r][c] = Math.random()<.5 ? 1 : -1;
+    for(let r=0;r<grid-1;r++) for(let c=0;c<grid;c++) edgeH[r][c] = Math.random()<.5 ? 1 : -1;
+  }
+
+  // side sign: 0=flat, +1=tab outward, -1=hole inward
+  function edgeSigns(r,c){
+    return {
+      top: r===0 ? 0 : -edgeH[r-1][c],
+      right: c===grid-1 ? 0 : edgeV[r][c],
+      bottom: r===grid-1 ? 0 : edgeH[r][c],
+      left: c===0 ? 0 : -edgeV[r][c-1]
+    };
+  }
+
+  function jigsawPath(ctx, cell, margin, signs){
+    const x0=margin, y0=margin, x1=margin+cell, y1=margin+cell;
+    const neck=cell*0.17, tab=cell*0.22;
+    ctx.beginPath(); ctx.moveTo(x0,y0);
+
+    // top: left -> right, outward is negative y
+    ctx.lineTo(x0+cell*.34,y0);
+    if(signs.top){
+      const s=signs.top;
+      ctx.bezierCurveTo(x0+cell*.39,y0, x0+cell*.39,y0-s*tab, x0+cell*.50-neck,y0-s*tab);
+      ctx.bezierCurveTo(x0+cell*.50-neck*.25,y0-s*tab*1.08, x0+cell*.50+neck*.25,y0-s*tab*1.08, x0+cell*.50+neck,y0-s*tab);
+      ctx.bezierCurveTo(x0+cell*.61,y0-s*tab, x0+cell*.61,y0, x0+cell*.66,y0);
+    }
+    ctx.lineTo(x1,y0);
+
+    // right: top -> bottom, outward is +x
+    ctx.lineTo(x1,y0+cell*.34);
+    if(signs.right){
+      const s=signs.right;
+      ctx.bezierCurveTo(x1,y0+cell*.39, x1+s*tab,y0+cell*.39, x1+s*tab,y0+cell*.50-neck);
+      ctx.bezierCurveTo(x1+s*tab*1.08,y0+cell*.50-neck*.25, x1+s*tab*1.08,y0+cell*.50+neck*.25, x1+s*tab,y0+cell*.50+neck);
+      ctx.bezierCurveTo(x1+s*tab,y0+cell*.61, x1,y0+cell*.61, x1,y0+cell*.66);
+    }
+    ctx.lineTo(x1,y1);
+
+    // bottom: right -> left, outward is +y
+    ctx.lineTo(x0+cell*.66,y1);
+    if(signs.bottom){
+      const s=signs.bottom;
+      ctx.bezierCurveTo(x0+cell*.61,y1, x0+cell*.61,y1+s*tab, x0+cell*.50+neck,y1+s*tab);
+      ctx.bezierCurveTo(x0+cell*.50+neck*.25,y1+s*tab*1.08, x0+cell*.50-neck*.25,y1+s*tab*1.08, x0+cell*.50-neck,y1+s*tab);
+      ctx.bezierCurveTo(x0+cell*.39,y1+s*tab, x0+cell*.39,y1, x0+cell*.34,y1);
+    }
+    ctx.lineTo(x0,y1);
+
+    // left: bottom -> top, outward is -x
+    ctx.lineTo(x0,y0+cell*.66);
+    if(signs.left){
+      const s=signs.left;
+      ctx.bezierCurveTo(x0,y0+cell*.61, x0-s*tab,y0+cell*.61, x0-s*tab,y0+cell*.50+neck);
+      ctx.bezierCurveTo(x0-s*tab*1.08,y0+cell*.50+neck*.25, x0-s*tab*1.08,y0+cell*.50-neck*.25, x0-s*tab,y0+cell*.50-neck);
+      ctx.bezierCurveTo(x0-s*tab,y0+cell*.39, x0,y0+cell*.39, x0,y0+cell*.34);
+    }
+    ctx.lineTo(x0,y0); ctx.closePath();
+  }
+
+  function cellInkRatio(r,c){
+    const cell = sourceSize/grid;
+    const ctx = sourceCanvas.getContext('2d');
+    const pad = cell*.06;
+    const d = ctx.getImageData(Math.max(0,c*cell-pad), Math.max(0,r*cell-pad), Math.min(sourceSize-(c*cell-pad),cell+pad*2), Math.min(sourceSize-(r*cell-pad),cell+pad*2)).data;
+    let ink=0,total=d.length/4;
+    for(let i=3;i<d.length;i+=4) if(d[i]>30) ink++;
+    return ink/total;
+  }
+
+  function drawPieceCanvas(r,c,cellPx,marginPx,signs,slot=false){
+    const dpr=window.devicePixelRatio||1;
+    const size=cellPx+marginPx*2;
+    const cvs=document.createElement('canvas');
+    cvs.width=cvs.height=Math.ceil(size*dpr);
+    cvs.style.width=cvs.style.height=size+'px';
+    const ctx=cvs.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,size,size);
+    jigsawPath(ctx,cellPx,marginPx,signs);
+
+    if(slot){
+      ctx.fillStyle='rgba(255,255,255,.34)';
+      ctx.fill();
+      ctx.strokeStyle='rgba(90,145,180,.48)';
+      ctx.lineWidth=Math.max(1.5,cellPx*.018);
+      ctx.setLineDash([cellPx*.07,cellPx*.055]);
+      ctx.stroke();
+      return cvs;
+    }
+
+    ctx.save();
+    jigsawPath(ctx,cellPx,marginPx,signs);
+    ctx.clip();
+    // piece background
+    ctx.fillStyle='#fffdf7'; ctx.fillRect(0,0,size,size);
+    const scale=(cellPx*grid)/sourceSize;
+    const full=cellPx*grid;
+    ctx.drawImage(sourceCanvas, marginPx-c*cellPx, marginPx-r*cellPx, full, full);
+    ctx.restore();
+
+    jigsawPath(ctx,cellPx,marginPx,signs);
+    ctx.strokeStyle='#d7c8a3'; ctx.lineWidth=Math.max(1.4,cellPx*.018); ctx.setLineDash([]); ctx.stroke();
+    return cvs;
+  }
+
+  function buildPuzzle(){
+    document.querySelectorAll('.piece').forEach(el=>el.remove());
+    slotLayer.innerHTML=''; pieces=[]; modal.classList.remove('show'); ghost.classList.remove('show');
+    if(a8Slot) a8Slot.replaceChildren();
+    renderGrades();
+    requestAnimationFrame(()=>{
+      makeSource(); randomEdges();
+      const boardRect=board.getBoundingClientRect();
+      const playRect=playArea.getBoundingClientRect();
+      const boardSize=board.clientWidth;
+      const cell=boardSize/grid;
+      const margin=cell*.25;
+
+      const movable=[];
+      let fixedCount=0;
+      for(let r=0;r<grid;r++){
+        for(let c=0;c<grid;c++){
+          const signs=edgeSigns(r,c);
+          const slotC=drawPieceCanvas(r,c,cell,margin,signs,true);
+          slotC.className='slotCanvas';
+          slotC.style.width=slotC.style.height=(cell+margin*2)+'px';
+          slotC.style.left=(c*cell-margin)+'px';
+          slotC.style.top=(r*cell-margin)+'px';
+          slotLayer.appendChild(slotC);
+
+          const ink=cellInkRatio(r,c);
+          // 実線がほぼないピースは開始時から固定。高学年では閾値を少し厳しめに。
+          const blankish = ink < (grid===4 ? 0.008 : 0.006);
+          const p = {r,c,signs,rotation:0,snapped:blankish,el:null,targetX:0,targetY:0};
+          pieces.push(p);
+          if(blankish){
+            fixedCount++;
+            const el=document.createElement('div'); el.className='piece snapped'; el.dataset.r=r; el.dataset.c=c;
+            const pc=drawPieceCanvas(r,c,cell,margin,signs,false);
+            el.appendChild(pc);
+            el.style.width=el.style.height=(cell+margin*2)+'px';
+            el.style.left=(boardRect.left-playRect.left + c*cell-margin)+'px';
+            el.style.top=(boardRect.top-playRect.top + r*cell-margin)+'px';
+            el.style.opacity='.72';
+            p.el=el; p.targetX=parseFloat(el.style.left); p.targetY=parseFloat(el.style.top);
+            playArea.appendChild(el);
+          } else movable.push(p);
+        }
+      }
+
+      // ピースをトレー内へランダム配置。実寸のジグソーピースなので、
+      // スマホでは少し重ねて「机に広げた」ように並べる。
+      const pieceSize=cell+margin*2;
+      const cols = grid===2 ? 2 : (grid===3 ? 3 : 4);
+      const rows = Math.max(1, Math.ceil(movable.length/cols));
+      const gapY = pieceSize*.61;
+      const neededTrayH = Math.max(300, 72 + (rows-1)*gapY + pieceSize + 22);
+      tray.style.height = neededTrayH+'px';
+      const trayRect=tray.getBoundingClientRect();
+      const usableW = tray.clientWidth-28;
+      const startY = (trayRect.top-playRect.top)+64;
+      const gapX = cols<=1 ? 0 : (usableW-pieceSize)/(cols-1);
+      movable.sort(()=>Math.random()-.5).forEach((p,i)=>{
+        const el=document.createElement('div'); el.className='piece'; el.dataset.r=p.r; el.dataset.c=p.c;
+        const pc=drawPieceCanvas(p.r,p.c,cell,margin,p.signs,false); el.appendChild(pc);
+        el.style.width=el.style.height=pieceSize+'px';
+        const col=i%cols,row=Math.floor(i/cols);
+        const jitterX=(Math.random()-.5)*Math.min(16,cell*.13);
+        const jitterY=(Math.random()-.5)*Math.min(12,cell*.11);
+        const x=(trayRect.left-playRect.left)+14+col*gapX+jitterX;
+        const y=startY+row*gapY+jitterY;
+        el.style.left=x+'px'; el.style.top=y+'px';
+        p.rotation=[0,90,180,270][Math.floor(Math.random()*4)];
+        el.style.transform=`rotate(${p.rotation}deg)`;
+        p.el=el;
+        p.targetX=(boardRect.left-playRect.left)+p.c*cell-margin;
+        p.targetY=(boardRect.top-playRect.top)+p.r*cell-margin;
+        bindDrag(p,cell,margin);
+        playArea.appendChild(el);
+      });
+      updateRemain();
+    });
+  }
+
+  function bindDrag(p,cell,margin){
+    const el=p.el; let sx=0,sy=0,ox=0,oy=0,moved=0,pointerId=null;
+    el.addEventListener('pointerdown',e=>{
+      if(p.snapped) return;
+      pointerId=e.pointerId; el.setPointerCapture(pointerId);
+      sx=e.clientX; sy=e.clientY; ox=parseFloat(el.style.left); oy=parseFloat(el.style.top); moved=0;
+      el.style.transition='filter .12s'; el.style.zIndex=30;
+    });
+    el.addEventListener('pointermove',e=>{
+      if(pointerId!==e.pointerId || p.snapped) return;
+      const dx=e.clientX-sx,dy=e.clientY-sy; moved=Math.max(moved,Math.hypot(dx,dy));
+      el.style.left=(ox+dx)+'px'; el.style.top=(oy+dy)+'px';
+    });
+    el.addEventListener('pointerup',e=>{
+      if(pointerId!==e.pointerId || p.snapped) return;
+      el.releasePointerCapture(pointerId); pointerId=null; el.style.zIndex=10;
+      if(moved<8){
+        p.rotation=(p.rotation+90)%360;
+        el.style.transition='transform .14s, filter .12s';
+        el.style.transform=`rotate(${p.rotation}deg)`;
+        return;
+      }
+      const x=parseFloat(el.style.left), y=parseFloat(el.style.top);
+      const dist=Math.hypot(x-p.targetX,y-p.targetY);
+      if(dist < cell*.35 && p.rotation%360===0){
+        p.snapped=true;
+        el.classList.add('snapped');
+        el.style.transition='left .14s, top .14s, transform .14s';
+        el.style.left=p.targetX+'px'; el.style.top=p.targetY+'px'; el.style.transform='rotate(0deg)';
+        updateRemain();
+        if(pieces.every(q=>q.snapped)) setTimeout(showDone,220);
+      }
+    });
+    el.addEventListener('pointercancel',()=>{pointerId=null;});
+  }
+
+  function updateRemain(){ remainEl.textContent=pieces.filter(p=>!p.snapped).length; }
+  function renderResultAd(){
+    if(!a8Slot) return;
+    a8Slot.replaceChildren();
+    const ads=['result-ad-1','result-ad-2','result-ad-3','result-ad-4','result-ad-5','result-ad-6'];
+    const selectedAd=ads[Math.floor(Math.random() * ads.length)];
+    const template=document.getElementById(selectedAd);
+    if(template) a8Slot.appendChild(template.content.cloneNode(true));
+  }
+  function showDone(){
+    doneKanji.textContent=kanji;
+    renderResultAd();
+    modal.classList.add('show');
+  }
+
+  document.getElementById('sampleBtn').addEventListener('pointerdown',()=>ghost.classList.add('show'));
+  document.getElementById('sampleBtn').addEventListener('pointerup',()=>ghost.classList.remove('show'));
+  document.getElementById('sampleBtn').addEventListener('pointerleave',()=>ghost.classList.remove('show'));
+  document.getElementById('sampleBtn').addEventListener('click',()=>{
+    ghost.classList.add('show'); setTimeout(()=>ghost.classList.remove('show'),900);
+  });
+  document.getElementById('resetBtn').addEventListener('click',buildPuzzle);
+  document.getElementById('nextBtn').addEventListener('click',nextKanji);
+  document.getElementById('sameAgain').addEventListener('click',buildPuzzle);
+  document.getElementById('nextFromModal').addEventListener('click',nextKanji);
+
+  let lastLayoutWidth = window.innerWidth;
+  window.addEventListener('resize',()=>{
+    const now = window.innerWidth;
+    if(Math.abs(now-lastLayoutWidth) < 20) return;
+    lastLayoutWidth = now;
+    clearTimeout(resizeTimer);
+    resizeTimer=setTimeout(buildPuzzle,220);
+  });
+
+  renderGrades();
+  buildPuzzle();
+})();
+</script>
+</body>
+</html>

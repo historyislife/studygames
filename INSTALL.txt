@@ -1,19 +1,16 @@
-ガクハコ：ことわざ動物園 公開用更新
+ガクハコ：カンジグシーパズ 公開更新
 
-1. 添付のことわざ動物園ZIPを展開し、リポジトリ直下へ
-   kotowaza_zoo/
-   として配置してください。
-   起動ファイルは kotowaza_zoo/index.html にします。
+更新内容
+・TOPの国語欄に「カンジグシーパズ」を追加
+・リンク先：./kanjiguso_puzzle/
+・sitemap.xml に https://manabigames.jp/kanjiguso_puzzle/ を追加
+・現在のTOPにある i-mobile / A8短バナー8種ローテーション / OFUSE は維持
 
-2. この更新セットの index.html を、リポジトリ直下の index.html に上書きします。
+配置
+studygames/
+├─ index.html          ← このセットの index.html に上書き
+├─ sitemap.xml         ← このセットの sitemap.xml に上書き
+└─ kanjiguso_puzzle/
+   └─ index.html       ← 先ほどのゲーム本体
 
-3. sitemap.xml を、リポジトリ直下の sitemap.xml に上書きします。
-
-4. GitHub Desktopで差分を確認し、Commit → Push。
-
-このTOPは、直前のi-mobile実装済みTOPを基準にしています。
-・i-mobile PC/SP 1枠を維持
-・すららA8 PRを維持
-・OFUSEを維持
-・国語欄へ「ことわざ動物園」を追加
-・リンク先：./kotowaza_zoo/
+公開ゲームリンク数：15
