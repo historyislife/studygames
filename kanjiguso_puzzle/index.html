@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>カンジグシーパズ｜ガクハコ</title>
+<title>カンジグソーパズル - 試遊版</title>
 <style>
   :root{
     --bg1:#e7f6ff;
@@ -13,60 +13,125 @@
     --green:#4fae4f;
     --cream:#fffaf0;
     --line:#8fb8d7;
-    --shadow:0 10px 24px rgba(33,76,112,.15);
+    --shadow:0 8px 20px rgba(33,76,112,.14);
   }
   *{box-sizing:border-box}
-  html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;color:var(--ink);background:linear-gradient(var(--bg1),var(--bg2));}
-  body{display:flex;justify-content:center;}
+  html,body{
+    margin:0;width:100%;height:100%;min-height:100%;overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+    color:var(--ink);background:linear-gradient(var(--bg1),var(--bg2));
+  }
+  body{display:flex;justify-content:center;overscroll-behavior:none}
   button{font:inherit}
-  .app{width:min(100%,560px);min-height:100vh;padding:14px 12px 28px;position:relative;overflow:hidden;}
-  .home{position:relative;z-index:20;display:inline-flex;align-items:center;gap:.35em;text-decoration:none;color:#25516d;background:#ffffffd9;border:1px solid #c9dce9;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:800;box-shadow:0 3px 12px rgba(0,0,0,.06)}
-  .title{margin:10px auto 8px;width:max-content;max-width:100%;padding:10px 20px;border:3px solid #f4c96d;border-radius:999px;background:#fffdf7;box-shadow:var(--shadow);font-weight:1000;font-size:clamp(23px,7vw,38px);letter-spacing:.04em;color:#3b2f27}
-  .gradeRow{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:10px 0 8px}
-  .gradeBtn{border:1px solid #b9d0df;background:#fff;color:#2477bb;border-radius:999px;padding:10px 2px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-  .gradeBtn.active{background:linear-gradient(#3e9cff,#2379d6);color:white;border-color:#2379d6;box-shadow:0 5px 12px rgba(35,121,214,.25)}
-  .status{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:#fff9e7;border:1px solid #eddba8;border-radius:18px;padding:10px 12px;margin-bottom:10px;box-shadow:0 6px 18px rgba(94,74,33,.08)}
-  .statusText{min-width:0}.status strong{display:block;font-size:14px}.kanjiProgress{margin-top:2px;font-size:11px;color:#607684;font-weight:800}.count{font-weight:1000}.count b{font-size:24px;color:#ef7a1b}.sampleBtn{border:2px solid var(--blue);color:#1971bc;background:white;border-radius:999px;padding:7px 11px;font-weight:900;cursor:pointer}
-  .kanjiChip{display:inline-grid;place-items:center;min-width:42px;height:42px;border-radius:12px;background:#fff;border:1px solid #efd99d;font-size:28px;font-weight:900;box-shadow:inset 0 0 0 2px #fff}
+  .app{
+    width:min(100%,1180px);height:100vh;height:100dvh;min-height:0;
+    padding:8px 9px max(8px,env(safe-area-inset-bottom));
+    position:relative;overflow:hidden;display:flex;flex-direction:column;
+  }
+  .home{
+    position:absolute;left:8px;top:8px;z-index:20;display:inline-flex;align-items:center;gap:.35em;
+    text-decoration:none;color:#25516d;background:#ffffffdf;border:1px solid #c9dce9;
+    padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800;box-shadow:0 3px 12px rgba(0,0,0,.06)
+  }
+  .title{
+    flex:0 0 auto;margin:0 auto 4px;width:max-content;max-width:70%;padding:6px 14px;
+    border:2px solid #f4c96d;border-radius:999px;background:#fffdf7;box-shadow:var(--shadow);
+    font-weight:1000;font-size:clamp(20px,6vw,30px);line-height:1.15;letter-spacing:.03em;color:#3b2f27
+  }
+  .gradeRow{flex:0 0 auto;display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:4px 0}
+  .gradeBtn{
+    border:1px solid #b9d0df;background:#fff;color:#2477bb;border-radius:999px;padding:7px 1px;
+    font-size:13px;font-weight:900;box-shadow:0 2px 6px rgba(0,0,0,.05)
+  }
+  .gradeBtn.active{background:linear-gradient(#3e9cff,#2379d6);color:white;border-color:#2379d6;box-shadow:0 4px 10px rgba(35,121,214,.22)}
+  .status{
+    flex:0 0 auto;display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;
+    background:#fff9e7;border:1px solid #eddba8;border-radius:14px;padding:6px 8px;margin-bottom:6px;
+    box-shadow:0 4px 12px rgba(94,74,33,.07)
+  }
+  .status strong{font-size:12px;white-space:nowrap}.count{font-size:12px;font-weight:1000;white-space:nowrap}.count b{font-size:19px;color:#ef7a1b}
+  .sampleBtn{border:2px solid var(--blue);color:#1971bc;background:white;border-radius:999px;padding:5px 8px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
 
-  .playArea{position:relative;user-select:none;-webkit-user-select:none;touch-action:none;}
-  .boardWrap{display:flex;justify-content:center;margin:8px auto 12px;position:relative;z-index:2}
-  .board{position:relative;width:min(72vw,320px);aspect-ratio:1;background:#fffdf6;border:5px solid #eadab0;border-radius:22px;box-shadow:var(--shadow);overflow:visible}
-  .ghost{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .15s;pointer-events:none;border-radius:16px}
+  .playArea{
+    position:relative;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:6px;
+    user-select:none;-webkit-user-select:none;touch-action:none;
+  }
+  .boardWrap{flex:0 0 auto;display:flex;justify-content:center;align-items:center;margin:0;position:relative;z-index:2;min-height:0}
+  .board{
+    position:relative;width:220px;aspect-ratio:1;background:#fffdf6;border:4px solid #eadab0;border-radius:18px;
+    box-shadow:var(--shadow);overflow:visible;flex:0 0 auto
+  }
+  .ghost{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .15s;pointer-events:none;border-radius:13px}
   .ghost.show{opacity:.13}
   .slotLayer{position:absolute;inset:0;overflow:visible;pointer-events:none}
   .slotCanvas{position:absolute;pointer-events:none;filter:drop-shadow(0 1px 0 rgba(255,255,255,.9))}
 
-  .tray{position:relative;z-index:1;margin-top:6px;height:420px;min-height:300px;background:#f8fff1;border:3px solid #7fbf53;border-radius:22px;box-shadow:var(--shadow);overflow:visible}
-  .trayHead{position:absolute;left:12px;right:12px;top:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;pointer-events:none}
-  .trayTitle{background:#42a943;color:#fff;border-radius:999px;padding:6px 16px;font-size:18px;font-weight:1000}
-  .help{font-size:13px;color:#347b35;font-weight:800;text-align:right}
-  .piece{position:absolute;z-index:10;cursor:grab;touch-action:none;transform-origin:50% 50%;transition:filter .12s, transform .14s;filter:drop-shadow(0 7px 7px rgba(0,0,0,.18));}
-  .piece:active{cursor:grabbing;filter:drop-shadow(0 10px 10px rgba(0,0,0,.24));}
-  .piece.snapped{z-index:8;filter:none;cursor:default;}
-  .piece canvas{display:block;width:100%;height:100%;}
+  .tray{
+    position:relative;z-index:1;flex:1 1 auto;min-height:105px;height:auto!important;margin:0;
+    background:#f8fff1;border:2px solid #7fbf53;border-radius:18px;box-shadow:var(--shadow);overflow:hidden
+  }
+  .trayHead{position:absolute;left:8px;right:8px;top:7px;display:flex;align-items:flex-start;justify-content:space-between;gap:6px;pointer-events:none;z-index:5}
+  .trayTitle{background:#42a943;color:#fff;border-radius:999px;padding:4px 11px;font-size:14px;line-height:1.2;font-weight:1000}
+  .help{font-size:10px;line-height:1.25;color:#347b35;font-weight:800;text-align:right}
+  .piece{position:absolute;z-index:10;cursor:grab;touch-action:none;transform-origin:50% 50%;transition:filter .12s, transform .14s;filter:drop-shadow(0 5px 5px rgba(0,0,0,.17))}
+  .piece:active{cursor:grabbing;filter:drop-shadow(0 8px 8px rgba(0,0,0,.23))}
+  .piece.snapped{z-index:8;filter:none;cursor:default}
+  .piece canvas{display:block;width:100%;height:100%}
 
-  .actions{display:grid;grid-template-columns:1fr 1.25fr;gap:10px;margin-top:14px}
-  .actionBtn{border:0;border-radius:999px;padding:13px 10px;font-size:18px;font-weight:1000;box-shadow:0 7px 14px rgba(0,0,0,.12);cursor:pointer}
-  .resetBtn{background:#fff;color:#1b74c9;border:3px solid #64a7e6}
-  .nextBtn{background:linear-gradient(#ffd95b,#ffb92f);color:#5a3800;border:3px solid #f0a31e}
+  .actions{flex:0 0 auto;display:grid;grid-template-columns:1fr 1.25fr;gap:7px;margin-top:6px}
+  .actionBtn{border:0;border-radius:999px;padding:8px 7px;font-size:14px;line-height:1.15;font-weight:1000;box-shadow:0 5px 10px rgba(0,0,0,.11);cursor:pointer}
+  .resetBtn{background:#fff;color:#1b74c9;border:2px solid #64a7e6}
+  .nextBtn{background:linear-gradient(#ffd95b,#ffb92f);color:#5a3800;border:2px solid #f0a31e}
+  .tiny{display:none}
 
-  .modal{position:fixed;inset:0;background:rgba(21,44,61,.4);display:none;place-items:center;padding:20px;z-index:100}
+  .modal{
+    position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;background:rgba(21,44,61,.42);
+    display:none;place-items:center;padding:12px;z-index:100;overflow:hidden
+  }
   .modal.show{display:grid}
-  .modalCard{width:min(96vw,390px);max-height:96vh;overflow:auto;background:#fff;border-radius:24px;padding:20px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.24);border:4px solid #f1cf62}
-  .modalCard .big{font-size:72px;line-height:1;margin:8px 0 4px}.modalCard h2{margin:0 0 8px;font-size:30px}.modalCard p{margin:6px 0 14px;color:#4c6575}.modalActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 auto 14px}.modalCard button{border:0;border-radius:999px;background:#2f8ded;color:#fff;padding:11px 12px;font-weight:1000;font-size:15px}.modalCard .againBtn{background:#fff;color:#2477bb;border:2px solid #64a7e6}.resultPr{width:300px;max-width:100%;margin:10px auto 0;padding-top:10px;border-top:1px solid #e5e8ea;text-align:center}.resultPrHead{font-size:11px;color:#718087;font-weight:800;margin-bottom:5px}.a8Slot{width:300px;max-width:100%;min-height:250px;margin:0 auto}.tiny{margin-top:8px;font-size:11px;color:#66808e;text-align:center}
-  @media (max-width:340px){.modal{padding:2px}.modalCard{width:100%;padding:12px 4px;border-width:2px;border-radius:16px}.modalCard .big{font-size:58px}.modalCard h2{font-size:25px}.modalActions{padding:0 6px}.resultPr{max-width:300px}}
-  @media (max-width:380px){.status{grid-template-columns:1fr auto}.sampleBtn{grid-column:1/-1}.help{font-size:11px}.tray{min-height:250px}.gradeBtn{font-size:13px}}
+  .modalCard{
+    width:100%;max-width:380px;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow:auto;
+    background:#fff;border-radius:22px;padding:18px 16px;text-align:center;box-shadow:0 18px 45px rgba(0,0,0,.23);border:3px solid #f1cf62
+  }
+  .modalCard .big{font-size:60px;line-height:1;margin:5px 0 3px}.modalCard h2{margin:0 0 5px;font-size:25px}.modalCard p{margin:4px 0 13px;color:#4c6575;font-size:13px;line-height:1.45}
+  .modalActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .modalCard button{min-width:0;border-radius:999px;padding:9px 8px;font-size:13px;line-height:1.25;font-weight:1000;cursor:pointer}
+  .modalSame{background:#fff;color:#1b74c9;border:2px solid #64a7e6}
+  .modalNext{background:#2f8ded;color:#fff;border:2px solid #2f8ded}
+
+  @media (max-width:380px){
+    .home{font-size:10px;padding:4px 7px}.title{font-size:19px;max-width:72%;padding:5px 11px}
+    .gradeBtn{font-size:12px;padding:6px 0}.status{gap:4px;padding:5px 6px}.status strong,.count{font-size:11px}.count b{font-size:17px}
+    .sampleBtn{font-size:11px;padding:4px 6px}.help{font-size:9px}.actionBtn{font-size:13px;padding:7px 5px}
+  }
+
+  /* PC・タブレット横幅では、盤面を左、ピース置き場を右に分ける */
+  @media (min-width:760px){
+    .app{padding:14px 18px 12px}
+    .home{left:16px;top:14px;font-size:13px;padding:7px 11px}
+    .title{margin-bottom:8px;max-width:80%;padding:8px 20px;border-width:3px;font-size:32px}
+    .gradeRow{width:min(620px,70%);margin:5px auto 7px;gap:7px}.gradeBtn{font-size:15px;padding:9px 3px}
+    .status{width:min(760px,82%);margin:0 auto 10px;padding:8px 11px;border-radius:17px;gap:9px}
+    .status strong,.count{font-size:14px}.count b{font-size:22px}.sampleBtn{font-size:14px;padding:6px 10px}
+    .playArea{display:grid;grid-template-columns:minmax(330px,430px) minmax(470px,1fr);gap:22px;align-items:stretch}
+    .boardWrap{height:100%;align-items:flex-start}
+    .board{border-width:5px;border-radius:22px}
+    .tray{height:auto!important;min-height:0;border-width:3px;border-radius:22px}
+    .trayHead{left:12px;right:12px;top:10px}.trayTitle{padding:6px 16px;font-size:18px}.help{font-size:13px;line-height:1.3}
+    .actions{width:min(620px,58%);margin:10px 0 0 auto;gap:10px}.actionBtn{font-size:17px;padding:11px 9px;border-width:3px}
+    .tiny{display:block;flex:0 0 auto;margin-top:5px;font-size:10px;color:#66808e;text-align:right}
+    .modalCard{max-width:420px;padding:24px 22px}.modalCard .big{font-size:72px}.modalCard h2{font-size:30px}.modalCard p{font-size:14px}.modalCard button{font-size:15px;padding:11px 10px}
+  }
 </style>
 </head>
 <body>
 <main class="app">
   <a class="home" href="/" aria-label="ガクハコのトップへ戻る">← ガクハコ</a>
-  <div class="title">カンジグシーパズ</div>
+  <div class="title">カンジグソーパズル</div>
 
   <div class="gradeRow" id="gradeRow"></div>
   <section class="status">
-    <div class="statusText"><strong id="gradeLabel">1年生・2×2</strong><div class="kanjiProgress" id="kanjiProgress">漢字 1 / 80</div></div>
+    <strong id="gradeLabel">4年生・デモ</strong>
     <span class="count">のこり <b id="remain">0</b> ピース</span>
     <button class="sampleBtn" id="sampleBtn">👁 おてほん</button>
   </section>
@@ -87,51 +152,17 @@
     <button class="actionBtn resetBtn" id="resetBtn">↺ やりなおす</button>
     <button class="actionBtn nextBtn" id="nextBtn">つぎの漢字 →</button>
   </div>
-  <div class="tiny">小学校学習指導要領（平成29年告示）の学年別漢字配当表 1,026字に対応。</div>
+  <div class="tiny">※これは操作確認用のHTML試遊版です。学年別1,026字の本収録は次段階で追加できます。</div>
 </main>
 
-<div class="modal" id="modal" role="dialog" aria-modal="true">
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="doneTitle">
   <div class="modalCard">
-    <h2>できた！</h2>
-    <div class="big" id="doneKanji">一</div>
+    <h2 id="doneTitle">できた！</h2>
+    <div class="big" id="doneKanji">機</div>
     <p>ぜんぶのピースが正しい向き・場所にはまりました。</p>
     <div class="modalActions">
-      <button id="sameAgain" class="againBtn" type="button">同じ漢字でもう一度</button>
-      <button id="nextFromModal" type="button">つぎの漢字 →</button>
-    </div>
-    <div class="resultPr" aria-label="広告">
-      <div class="resultPrHead">保護者の方へ　PR</div>
-      <div id="a8Slot" class="a8Slot"></div>
-      <template id="result-ad-1">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
-      </template>
-      <template id="result-ad-2">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
-      </template>
-      <template id="result-ad-3">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1ELV76+5VQS+61Z81" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www20.a8.net/svt/bgt?aid=260901444085&wid=001&eno=01&mid=s00000027442001017000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1ELV76+5VQS+61Z81" alt="">
-      </template>
-      <template id="result-ad-4">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444068&wid=001&eno=01&mid=s00000020322001097000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" alt="">
-      </template>
-      <template id="result-ad-5">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1F7ASY+56OA+601S1" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www28.a8.net/svt/bgt?aid=260901444086&wid=001&eno=01&mid=s00000024193001008000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1F7ASY+56OA+601S1" alt="">
-      </template>
-      <template id="result-ad-6">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GE60I+4N0I+614CX" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444088&wid=001&eno=01&mid=s00000021645001013000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GE60I+4N0I+614CX" alt="">
-      </template>
+      <button class="modalSame" id="sameModal">同じ漢字でもう一度</button>
+      <button class="modalNext" id="nextModal">つぎの漢字 →</button>
     </div>
   </div>
 </div>
@@ -140,28 +171,20 @@
 (() => {
   'use strict';
 
-  const KANJI = {
-    1: Array.from('一右雨円王音下火花貝学気九休玉金空月犬見口校左三山子四糸字耳七車手十出女小上森人水正生青夕石赤千川先早草足村大男竹中虫町天田土二日入年白八百文木本名目立力林六五'),
-    2: Array.from('引羽雲園遠何科夏家歌画回会海絵外角楽活間丸岩顔汽記帰弓牛魚京強教近兄形計元言原戸古午後語工公広交光考行高黄合谷国黒今才細作算止市矢姉思紙寺自時室社弱首秋週春書少場色食心新親図数西声星晴切雪船線前組走多太体台地池知茶昼長鳥朝直通弟店点電刀冬当東答頭同道読内南肉馬売買麦半番父風分聞米歩母方北毎妹万明鳴毛門夜野友用曜来里理話'),
-    3: Array.from('悪安暗医委意育員院飲運泳駅央横屋温化荷界階寒感漢館岸起期客究急級宮球去橋業曲局銀区苦具君係軽血決研県庫湖向幸港号根祭皿仕死使始指歯詩次事持式実写者主守取酒受州拾終習集住重宿所暑助昭消商章勝乗植申身神真深進世整昔全相送想息速族他打対待代第題炭短談着注柱丁帳調追定庭笛鉄転都度投豆島湯登等動童農波配倍箱畑発反坂板皮悲美鼻筆氷表秒病品負部服福物平返勉放味命面問役薬由油有遊予羊洋葉陽様落流旅両緑礼列練路和開'),
-    4: Array.from('愛案以衣位茨印英栄媛塩岡億加果貨課芽賀改械害街各覚潟完官管関観願岐希季旗器機議求泣給挙漁共協鏡競極熊訓軍郡群径景芸欠結建健験固功好香候康佐差菜最埼材崎昨札刷察参産散残氏司試児治滋辞鹿失借種周祝順初松笑唱焼照城縄臣信井成省清静席積折節説浅戦選然争倉巣束側続卒孫帯隊達単置仲沖兆低底的典伝徒努灯働特徳栃奈梨熱念敗梅博阪飯飛必票標不夫付府阜富副兵別辺変便包法望牧末満未民無約勇要養浴利陸良料量輪類令冷例連老労録'),
-    5: Array.from('圧囲移因永営衛易益液演応往桜可仮価河過快解格確額刊幹慣眼紀基寄規喜技義逆久旧救居許境均禁句型経潔件険検限現減故個護効厚耕航鉱構興講告混査再災妻採際在財罪殺雑酸賛士支史志枝師資飼示似識質舎謝授修述術準序招証象賞条状常情織職制性政勢精製税責績接設絶祖素総造像増則測属率損貸態団断築貯張停提程適統堂銅導得毒独任燃能破犯判版比肥非費備評貧布婦武復複仏粉編弁保墓報豊防貿暴脈務夢迷綿輸余容略留領歴'),
-    6: Array.from('胃異遺域宇映延沿恩我灰拡革閣割株干巻看簡危机揮貴疑吸供胸郷勤筋系敬警劇激穴券絹権憲源厳己呼誤后孝皇紅降鋼刻穀骨困砂座済裁策冊蚕至私姿視詞誌磁射捨尺若樹収宗就衆従縦縮熟純処署諸除承将傷障蒸針仁垂推寸盛聖誠舌宣専泉洗染銭善奏窓創装層操蔵臓存尊退宅担探誕段暖値宙忠著庁頂腸潮賃痛敵展討党糖届難乳認納脳派拝背肺俳班晩否批秘俵腹奮並陛閉片補暮宝訪亡忘棒枚幕密盟模訳郵優預幼欲翌乱卵覧裏律臨朗論')
+  // 学年ごとのデモ字。正式版では文科省の学年別漢字配当表に差し替える想定。
+  const demo = {
+    1: ['山','川','森'],
+    2: ['海','風','星'],
+    3: ['駅','島','庭'],
+    4: ['機','旗','鏡'],
+    5: ['夢','導','像'],
+    6: ['警','劇','権']
   };
   const gridByGrade = g => g <= 2 ? 2 : g <= 4 ? 3 : 4;
-  function shuffle(arr){
-    const a=[...arr];
-    for(let i=a.length-1;i>0;i--){
-      const j=Math.floor(Math.random()*(i+1));
-      [a[i],a[j]]=[a[j],a[i]];
-    }
-    return a;
-  }
 
   const gradeRow = document.getElementById('gradeRow');
   const gradeLabel = document.getElementById('gradeLabel');
   const remainEl = document.getElementById('remain');
-  const kanjiProgress = document.getElementById('kanjiProgress');
   const board = document.getElementById('board');
   const tray = document.getElementById('tray');
   const playArea = document.getElementById('playArea');
@@ -169,12 +192,10 @@
   const ghost = document.getElementById('ghost');
   const modal = document.getElementById('modal');
   const doneKanji = document.getElementById('doneKanji');
-  const a8Slot = document.getElementById('a8Slot');
 
-  let grade = 1;
-  let kanjiIndex = 0;
-  let kanjiOrder = shuffle(KANJI[grade]);
-  let kanji = kanjiOrder[0];
+  let grade = 4;
+  let kanjiIndex = Math.floor(Math.random()*demo[grade].length);
+  let kanji = demo[grade][kanjiIndex];
   let grid = gridByGrade(grade);
   let pieces = [];
   let edgeV = [], edgeH = [];
@@ -188,32 +209,43 @@
     b.textContent=g+'年';
     b.dataset.grade=g;
     b.addEventListener('click',()=>{
-      setGrade(g);
+      grade=g; grid=gridByGrade(g); kanjiIndex=Math.floor(Math.random()*demo[g].length); kanji=demo[g][kanjiIndex]; renderGrades(); buildPuzzle();
     });
     gradeRow.appendChild(b);
   }
 
   function renderGrades(){
     [...gradeRow.children].forEach(b=>b.classList.toggle('active', +b.dataset.grade===grade));
-    gradeLabel.textContent = `${grade}年生・${grid}×${grid}`;
-    kanjiProgress.textContent = `漢字 ${kanjiIndex + 1} / ${KANJI[grade].length}`;
+    gradeLabel.textContent = `${grade}年生・${grid}×${grid} デモ`;
   }
-  function setGrade(g){
-    grade = g;
-    grid = gridByGrade(g);
-    kanjiOrder = shuffle(KANJI[g]);
-    kanjiIndex = 0;
-    kanji = kanjiOrder[0];
-    buildPuzzle();
+
+  function isMobileLayout(){
+    return window.matchMedia('(max-width: 759px)').matches;
   }
-  function nextKanji(){
-    kanjiIndex++;
-    if(kanjiIndex >= kanjiOrder.length){
-      kanjiOrder = shuffle(KANJI[grade]);
-      kanjiIndex = 0;
+
+  function setResponsiveBoardSize(){
+    const mobile = isMobileLayout();
+    let size;
+    if(mobile){
+      const byGrid = grid===2 ? 190 : (grid===3 ? 218 : 232);
+      const byHeight = Math.max(152, Math.min(238, window.innerHeight * 0.285));
+      const byWidth = Math.max(152, window.innerWidth - 68);
+      size = Math.min(byGrid, byHeight, byWidth);
+    }else{
+      const byGrid = grid===2 ? 300 : (grid===3 ? 330 : 360);
+      const byHeight = Math.max(270, playArea.clientHeight - 24);
+      size = Math.min(byGrid, byHeight);
     }
-    kanji = kanjiOrder[kanjiIndex];
-    buildPuzzle();
+    board.style.width = Math.round(size) + 'px';
+  }
+
+  function chooseDifferentKanji(){
+    const list = demo[grade];
+    if(list.length <= 1){ kanjiIndex = 0; kanji = list[0]; return; }
+    let next = kanjiIndex;
+    while(next === kanjiIndex) next = Math.floor(Math.random()*list.length);
+    kanjiIndex = next;
+    kanji = list[kanjiIndex];
   }
 
   function makeSource(){
@@ -351,8 +383,8 @@
   function buildPuzzle(){
     document.querySelectorAll('.piece').forEach(el=>el.remove());
     slotLayer.innerHTML=''; pieces=[]; modal.classList.remove('show'); ghost.classList.remove('show');
-    if(a8Slot) a8Slot.replaceChildren();
     renderGrades();
+    setResponsiveBoardSize();
     requestAnimationFrame(()=>{
       makeSource(); randomEdges();
       const boardRect=board.getBoundingClientRect();
@@ -393,26 +425,27 @@
         }
       }
 
-      // ピースをトレー内へランダム配置。実寸のジグソーピースなので、
-      // スマホでは少し重ねて「机に広げた」ように並べる。
+      // 画面内に必ず収めるため、トレーの「現在の実寸」に合わせて並べる。
+      // スマホは縦方向を強めに重ね、PCは右側トレーへゆったり配置する。
       const pieceSize=cell+margin*2;
+      const mobile=isMobileLayout();
       const cols = grid===2 ? 2 : (grid===3 ? 3 : 4);
       const rows = Math.max(1, Math.ceil(movable.length/cols));
-      const gapY = pieceSize*.61;
-      const neededTrayH = Math.max(300, 72 + (rows-1)*gapY + pieceSize + 22);
-      tray.style.height = neededTrayH+'px';
       const trayRect=tray.getBoundingClientRect();
-      const usableW = tray.clientWidth-28;
-      const startY = (trayRect.top-playRect.top)+64;
-      const gapX = cols<=1 ? 0 : (usableW-pieceSize)/(cols-1);
+      const usableW = Math.max(pieceSize, tray.clientWidth-20);
+      const headerH = mobile ? 38 : 58;
+      const usableH = Math.max(pieceSize*.62, tray.clientHeight-headerH-8);
+      const gapX = cols<=1 ? 0 : Math.max(0,(usableW-pieceSize)/(cols-1));
+      const gapY = rows<=1 ? 0 : Math.max(0,Math.min(pieceSize*(mobile?.78:.66),(usableH-pieceSize)/(rows-1)));
+      const startY = (trayRect.top-playRect.top)+headerH;
       movable.sort(()=>Math.random()-.5).forEach((p,i)=>{
         const el=document.createElement('div'); el.className='piece'; el.dataset.r=p.r; el.dataset.c=p.c;
         const pc=drawPieceCanvas(p.r,p.c,cell,margin,p.signs,false); el.appendChild(pc);
         el.style.width=el.style.height=pieceSize+'px';
         const col=i%cols,row=Math.floor(i/cols);
-        const jitterX=(Math.random()-.5)*Math.min(16,cell*.13);
-        const jitterY=(Math.random()-.5)*Math.min(12,cell*.11);
-        const x=(trayRect.left-playRect.left)+14+col*gapX+jitterX;
+        const jitterX=(Math.random()-.5)*Math.min(mobile?8:16,cell*.11);
+        const jitterY=(Math.random()-.5)*Math.min(mobile?5:12,cell*.09);
+        const x=(trayRect.left-playRect.left)+10+col*gapX+jitterX;
         const y=startY+row*gapY+jitterY;
         el.style.left=x+'px'; el.style.top=y+'px';
         p.rotation=[0,90,180,270][Math.floor(Math.random()*4)];
@@ -464,19 +497,7 @@
   }
 
   function updateRemain(){ remainEl.textContent=pieces.filter(p=>!p.snapped).length; }
-  function renderResultAd(){
-    if(!a8Slot) return;
-    a8Slot.replaceChildren();
-    const ads=['result-ad-1','result-ad-2','result-ad-3','result-ad-4','result-ad-5','result-ad-6'];
-    const selectedAd=ads[Math.floor(Math.random() * ads.length)];
-    const template=document.getElementById(selectedAd);
-    if(template) a8Slot.appendChild(template.content.cloneNode(true));
-  }
-  function showDone(){
-    doneKanji.textContent=kanji;
-    renderResultAd();
-    modal.classList.add('show');
-  }
+  function showDone(){ doneKanji.textContent=kanji; modal.classList.add('show'); }
 
   document.getElementById('sampleBtn').addEventListener('pointerdown',()=>ghost.classList.add('show'));
   document.getElementById('sampleBtn').addEventListener('pointerup',()=>ghost.classList.remove('show'));
@@ -485,18 +506,11 @@
     ghost.classList.add('show'); setTimeout(()=>ghost.classList.remove('show'),900);
   });
   document.getElementById('resetBtn').addEventListener('click',buildPuzzle);
-  document.getElementById('nextBtn').addEventListener('click',nextKanji);
-  document.getElementById('sameAgain').addEventListener('click',buildPuzzle);
-  document.getElementById('nextFromModal').addEventListener('click',nextKanji);
+  document.getElementById('nextBtn').addEventListener('click',()=>{ chooseDifferentKanji(); buildPuzzle(); });
+  document.getElementById('sameModal').addEventListener('click',()=>{ modal.classList.remove('show'); buildPuzzle(); });
+  document.getElementById('nextModal').addEventListener('click',()=>{ modal.classList.remove('show'); chooseDifferentKanji(); buildPuzzle(); });
 
-  let lastLayoutWidth = window.innerWidth;
-  window.addEventListener('resize',()=>{
-    const now = window.innerWidth;
-    if(Math.abs(now-lastLayoutWidth) < 20) return;
-    lastLayoutWidth = now;
-    clearTimeout(resizeTimer);
-    resizeTimer=setTimeout(buildPuzzle,220);
-  });
+  window.addEventListener('resize',()=>{clearTimeout(resizeTimer); resizeTimer=setTimeout(buildPuzzle,220);});
 
   renderGrades();
   buildPuzzle();
