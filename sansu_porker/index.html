@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>算数ポーカー｜ガクハコ</title>
+  <meta name="description" content="0～9の数字カードと四則演算を使って正しい等式を作る、5ラウンド制の算数学習ゲームです。">
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --panel:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#d8dee9;
+      --accent:#2563eb;
+      --accent2:#0f766e;
+      --danger:#b91c1c;
+      --ok:#166534;
+      --warn:#d97706;
+      --shadow:0 10px 30px rgba(31,41,55,.10);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,#eef4ff 0%,var(--bg) 45%,#eef8f6 100%);
+    }
+    button{font:inherit}
+    .wrap{max-width:980px;margin:0 auto;padding:18px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+    .topbar-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+    .topbar-btn{border:1px solid var(--line);background:#fff;color:#334155;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
+    h1{font-size:clamp(24px,5vw,38px);margin:0;letter-spacing:.02em}
+    .badge{padding:7px 10px;border-radius:999px;background:#e0e7ff;color:#3730a3;font-weight:800;font-size:13px;white-space:nowrap}
+    .status-panel{padding:10px 12px}
+    .status-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+    .status-item{min-width:0;text-align:center;background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:6px 5px}
+    .status-label{display:block;font-size:10px;color:#64748b;font-weight:800;line-height:1.15}
+    .status-value{display:block;margin-top:2px;font-size:16px;color:#111827;font-weight:950;line-height:1.15;white-space:nowrap}
+    .panel{background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.9);border-radius:20px;box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+    .rule{font-size:14px;line-height:1.7;color:#374151}
+    .rule b{color:#111827}
+    .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px}
+    .stat{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:9px 10px;font-size:12px;text-align:center;min-width:0}
+    .stat b{display:block;font-size:17px;color:#111827;margin-top:2px}
+    .score-rules{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+    .score-chip{background:#eff6ff;border:1px solid #bfdbfe;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;color:#1e3a8a}
+    .rules-body{font-size:14px;line-height:1.75;color:#374151}
+    .rules-body p{margin:0 0 10px}
+    .rules-body .score-rules{margin-top:10px}
+    .hand-title,.build-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .hand-title h2,.build-title h2,.alt-title h2{font-size:18px;margin:0}
+    .hand{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+    .cardbox{display:flex;flex-direction:column;gap:7px;min-width:0}
+    .card{
+      position:relative;width:100%;aspect-ratio:3/4;border:2px solid #cbd5e1;border-radius:16px;
+      background:linear-gradient(145deg,#fff,#f8fafc);box-shadow:0 5px 14px rgba(15,23,42,.08);
+      display:flex;align-items:center;justify-content:center;font-size:clamp(34px,8vw,58px);font-weight:900;color:#111827;
+      cursor:pointer;user-select:none;transition:.15s ease;
+    }
+    .card:hover{transform:translateY(-2px);border-color:#93c5fd}
+    .card.used{opacity:.35;transform:none;cursor:not-allowed;background:#e5e7eb}
+    .card.exchange-mark{outline:4px solid #f59e0b;outline-offset:1px}
+    .small-btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 6px;font-size:12px;font-weight:800;cursor:pointer}
+    .small-btn.on{background:#fff7ed;border-color:#fb923c;color:#9a3412}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+    .op{min-width:56px;padding:12px 14px;border:0;border-radius:12px;background:#e2e8f0;color:#0f172a;font-size:21px;font-weight:900;cursor:pointer}
+    .op.eq{background:#dbeafe;color:#1d4ed8}
+    .op:disabled{opacity:.4;cursor:not-allowed}
+    .expr{
+      min-height:78px;border:2px dashed #94a3b8;border-radius:16px;background:#f8fafc;padding:14px;
+      display:flex;align-items:center;flex-wrap:wrap;gap:7px;font-size:clamp(28px,6vw,44px);font-weight:900;letter-spacing:.04em;word-break:break-all;
+    }
+    .token.digit{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:50px;padding:0 7px;border-radius:10px;background:#fff;border:1px solid #cbd5e1;box-shadow:0 2px 7px rgba(15,23,42,.06)}
+    .token.op{background:transparent;min-width:auto;padding:0 2px}
+    .placeholder{font-size:15px;color:var(--muted);font-weight:700;letter-spacing:0}
+    .actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+    .btn{border:0;border-radius:12px;padding:11px 15px;font-weight:900;cursor:pointer}
+    .primary{background:var(--accent);color:#fff}
+    .secondary{background:#e5e7eb;color:#111827}
+    .good{background:var(--accent2);color:#fff}
+    .warn{background:#f59e0b;color:#fff}
+    .pass-btn{background:#fff7ed;color:#9a3412;border:1px solid #fdba74}
+    .hand-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:stretch}
+    .hand-actions #passBtn{min-width:96px}
+    .btn:disabled{opacity:.45;cursor:not-allowed}
+    .result{margin-top:12px;border-radius:14px;padding:12px 14px;font-weight:800;line-height:1.65;background:#f1f5f9;color:#334155}
+    .result.ok{background:#ecfdf5;color:var(--ok);border:1px solid #bbf7d0}
+    .result.ng{background:#fef2f2;color:var(--danger);border:1px solid #fecaca}
+    .score-breakdown{display:inline-flex;flex-wrap:wrap;gap:5px;margin-top:5px;font-size:12px;font-weight:800;color:#475569}
+    .score-breakdown span{background:#fff;border:1px solid #dbe3ef;border-radius:999px;padding:2px 7px}
+    .hint{font-size:13px;color:var(--muted);line-height:1.6;margin-top:8px}
+    .alternatives{display:none}
+    .alternatives.show{display:block}
+    .alt-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+    .best-note{font-size:12px;font-weight:800;color:#1d4ed8}
+    .alt-list{display:grid;gap:8px}
+    .alt-item{border:1px solid var(--line);background:#f8fafc;border-radius:13px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .alt-expr{font-weight:900;font-size:clamp(19px,4.5vw,27px)}
+    .alt-meta{text-align:right;font-size:12px;color:#475569;font-weight:800;white-space:nowrap}
+    .delta.plus{color:#166534}.delta.same{color:#475569}.delta.minus{color:#9a3412}
+    .summary{display:none}
+    .summary.show{display:block}
+    .summary h2{margin:0 0 10px;font-size:23px}
+    .final-score{font-size:clamp(34px,8vw,54px);font-weight:950;color:#1d4ed8;line-height:1.1}
+    .round-list{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:12px}
+    .round-cell{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:8px 5px;text-align:center;font-size:12px}
+    .round-cell b{display:block;font-size:18px;margin-top:2px}
+    .footer-note{font-size:12px;color:#64748b;text-align:center;padding:5px 0 18px}
+
+    .used-cards-bar{display:flex;justify-content:flex-end;margin-top:10px}
+    .used-cards-btn{padding:9px 12px;font-size:13px}
+
+    .modal-backdrop{
+      position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;
+      padding:calc(16px + env(safe-area-inset-top)) 14px calc(16px + env(safe-area-inset-bottom));
+      background:rgba(15,23,42,.62);backdrop-filter:blur(4px);
+    }
+    .modal-backdrop.show{display:flex}
+    .modal-card{
+      width:min(680px,100%);max-height:min(88vh,820px);overflow:auto;background:#fff;border-radius:22px;
+      box-shadow:0 24px 80px rgba(15,23,42,.34);border:1px solid rgba(255,255,255,.75);padding:18px;
+    }
+    .modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .modal-head h2{margin:0;font-size:22px}.modal-kicker{font-size:12px;font-weight:900;color:#2563eb;margin-bottom:3px}
+    .icon-btn{width:38px;height:38px;border:0;border-radius:999px;background:#eef2f7;color:#334155;font-weight:900;font-size:20px;cursor:pointer;flex:0 0 auto}
+    .answer-hero{border-radius:17px;background:linear-gradient(135deg,#eff6ff,#ecfdf5);border:1px solid #bfdbfe;padding:14px;text-align:center}
+    .answer-expr{font-size:clamp(28px,7vw,42px);font-weight:950;letter-spacing:.03em;word-break:break-word}
+    .answer-meta{margin-top:6px;font-weight:900;color:#334155}
+    .modal-section{margin-top:15px}.modal-section h3{font-size:16px;margin:0 0 8px}
+    .modal-actions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:16px}
+    .modal-actions .btn{width:100%;padding:13px 15px;font-size:16px}
+    .confirm-card{width:min(440px,100%)}
+    .confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+    .confirm-actions .btn{width:100%;padding:12px 10px}
+    .pass-discard-note{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:13px;font-weight:850;line-height:1.55}
+    .used-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+    .used-stat{border:1px solid var(--line);border-radius:13px;background:#f8fafc;padding:9px 5px;text-align:center}
+    .used-stat .num{font-size:24px;font-weight:950;line-height:1}.used-stat .count{font-size:12px;color:#64748b;font-weight:800;margin-top:4px}
+    .used-history{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+    .used-chip{width:34px;height:42px;border-radius:9px;border:1px solid #cbd5e1;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:20px;font-weight:950}
+    .body-modal-open{overflow:hidden}
+
+    /* ガクハコへ戻る */
+    .home-back-btn{
+      display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+      padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.9);color:#263238;
+      border:1px solid rgba(0,0,0,.12);font-size:12px;font-weight:800;line-height:1;text-decoration:none;
+      box-shadow:0 2px 8px rgba(0,0,0,.10);-webkit-tap-highlight-color:transparent;touch-action:manipulation;
+    }
+    .home-back-btn:hover{background:#fff}
+    .home-back-btn:active{transform:scale(.96)}
+    .title-group{display:flex;align-items:center;gap:9px;min-width:0}
+
+    /* 最終結果だけに表示するPR */
+    .result-pr{width:300px;max-width:100%;margin:18px auto 0;padding-top:12px;border-top:1px solid var(--line);text-align:center}
+    .result-pr-head{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;font-size:13px;font-weight:900;color:#475569}
+    .result-pr-head span{border:1px solid #94a3b8;border-radius:999px;padding:1px 7px;color:#64748b;font-size:10px;line-height:1.4}
+    .a8-rotation-slot{min-height:0}
+    .a8-rotation-slot a{display:block;line-height:0}
+    .a8-rotation-slot img{max-width:100%;height:auto}
+
+    @media (max-width:700px){
+      body{min-height:100dvh}
+      .wrap{padding:calc(8px + env(safe-area-inset-top)) 8px calc(12px + env(safe-area-inset-bottom))}
+      .topbar{margin-bottom:6px;gap:5px}.title-group{gap:5px;min-width:0}.topbar h1{font-size:20px;white-space:nowrap}.home-back-btn{font-size:10px;padding:6px 7px}.topbar-actions{gap:3px}.topbar-btn{font-size:9px;padding:6px 6px}.badge{font-size:11px;padding:6px 8px}
+      .panel{padding:9px;border-radius:14px;margin-bottom:7px}
+      .status-panel{padding:6px}.status-strip{gap:4px}.status-item{padding:5px 2px;border-radius:9px}.status-label{font-size:8px}.status-value{font-size:13px}
+      .rule{font-size:12px;line-height:1.5}.score-rules{gap:5px;margin-top:8px}.score-chip{font-size:10px;padding:4px 7px}
+      .stats{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:8px}.stat{padding:6px 2px;font-size:9px;border-radius:9px}.stat b{font-size:13px;margin-top:1px}
+      .used-cards-bar{margin-top:7px}.used-cards-btn{width:100%;padding:8px 10px}
+      .hand-title,.build-title{margin-bottom:5px}.hand-title h2,.build-title h2{font-size:15px}
+      .hand{gap:4px}.cardbox{gap:3px}.card{border-radius:10px;font-size:clamp(28px,12vw,43px);border-width:1.5px}
+      .small-btn{padding:5px 1px;font-size:9px;border-radius:7px;min-height:27px}
+      #handPanel .actions{margin-top:6px}#handPanel .actions .btn{width:100%;padding:8px 6px}.hand-actions{grid-template-columns:minmax(0,1fr) 76px;gap:5px}.hand-actions #passBtn{min-width:0}
+      .toolbar{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:6px 0}.op{min-width:0;padding:7px 2px;border-radius:9px;font-size:19px}
+      .expr{min-height:54px;padding:6px;gap:4px;border-radius:11px;font-size:clamp(23px,8vw,34px)}.token.digit{min-width:27px;height:37px;padding:0 4px;border-radius:7px}
+      .actions{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px}.actions .btn{padding:8px 7px;font-size:11px}.actions .primary,.actions .good{grid-column:span 1}
+      #handPanel>.hint,#buildPanel>.hint{display:none}#result:not(.ok):not(.ng){display:none}.hint{font-size:11px;line-height:1.45;margin-top:6px}.result{font-size:11px;padding:7px 8px;margin-top:6px}
+      .alt-item{align-items:flex-start;flex-direction:column;gap:5px}.alt-meta{text-align:left;white-space:normal}.alt-expr{font-size:21px}
+      .modal-backdrop{padding:calc(8px + env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom));align-items:center}
+      .modal-card{max-height:92dvh;border-radius:17px;padding:13px}.modal-head h2{font-size:19px}.answer-hero{padding:11px}.answer-expr{font-size:clamp(26px,9vw,36px)}
+      .modal-section{margin-top:12px}.modal-section h3{font-size:14px}.modal-actions{position:sticky;bottom:-13px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff 24%);padding-top:18px;padding-bottom:2px}
+      .used-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.used-stat{padding:7px 2px}.used-stat .num{font-size:21px}.used-stat .count{font-size:10px}.used-chip{width:30px;height:38px;font-size:18px}
+      .round-list{gap:5px}.round-cell{padding:7px 2px}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="topbar">
+      <div class="title-group">
+        <a href="/" class="home-back-btn" aria-label="ガクハコのトップへ戻る">← ガクハコ</a>
+        <h1>算数ポーカー</h1>
+      </div>
+      <div class="topbar-actions">
+        <button id="rulesBtn" class="topbar-btn" type="button">ルール</button>
+        <button id="usedCardsBtn" class="topbar-btn" type="button">使用済み 5枚</button>
+      </div>
+    </div>
+
+    <section class="panel status-panel" aria-label="ゲーム状況">
+      <div class="status-strip">
+        <div class="status-item"><span class="status-label">ラウンド</span><span class="status-value"><span id="roundNo">1</span>/5</span></div>
+        <div class="status-item"><span class="status-label">スコア</span><span class="status-value"><span id="totalScore">0</span>点</span></div>
+        <div class="status-item"><span class="status-label">山札</span><span class="status-value"><span id="deckCount">35</span>枚</span></div>
+        <div class="status-item"><span class="status-label">交換</span><span id="exchangeState" class="status-value">未使用</span></div>
+      </div>
+    </section>
+
+    <section class="panel" id="handPanel">
+      <div class="hand-title">
+        <h2>手札</h2>
+      </div>
+      <div id="hand" class="hand" aria-label="数字カード5枚"></div>
+      <div class="actions hand-actions">
+        <button id="exchangeBtn" class="btn warn">選んだカードを交換</button>
+        <button id="passBtn" class="btn pass-btn" type="button">パス</button>
+      </div>
+      <div class="hint">数字カード本体を押すと式に追加。「交換する」で交換候補を選び、まとめて1回だけ交換できます。作れないときは「パス」で0点のまま次へ進めます。パスしたラウンド中に出たカードはすべて捨て札になります。</div>
+    </section>
+
+    <section class="panel" id="buildPanel">
+      <div class="build-title"><h2>式を作る <span style="font-size:11px;color:#64748b;font-weight:800">使用 <span id="usedCount">0</span>/5</span></h2><span id="currentRole" class="badge" style="display:none"></span></div>
+      <div id="expression" class="expr"><span class="placeholder">数字カードと演算記号を押して式を作ってください</span></div>
+      <div class="toolbar" aria-label="演算記号">
+        <button class="op" data-op="+">＋</button>
+        <button class="op" data-op="-">－</button>
+        <button class="op" data-op="*">×</button>
+        <button class="op" data-op="/">÷</button>
+        <button class="op eq" data-op="=">＝</button>
+      </div>
+      <div class="actions">
+        <button id="checkBtn" class="btn primary">役を判定</button>
+        <button id="confirmBtn" class="btn good" disabled>この役で確定</button>
+        <button id="undoBtn" class="btn secondary">1つ戻す</button>
+        <button id="clearBtn" class="btn secondary">式を全部消す</button>
+      </div>
+      <div id="result" class="result">まだ判定していません。</div>
+      <div class="hint">確定するまでは何度でも作り直せます。確定後に、その手札から作れた別の正解例を表示します。</div>
+    </section>
+
+    <div class="footer-note">ガクハコ ～学習おもちゃ箱～</div>
+  </main>
+
+  <div id="roundModal" class="modal-backdrop" aria-hidden="true">
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="roundModalTitle">
+      <div class="modal-head">
+        <div>
+          <div id="roundModalKicker" class="modal-kicker">ROUND RESULT</div>
+          <h2 id="roundModalTitle">ラウンド結果</h2>
+        </div>
+      </div>
+      <div class="answer-hero">
+        <div id="modalAnswerExpr" class="answer-expr"></div>
+        <div id="modalAnswerMeta" class="answer-meta"></div>
+        <div id="modalBreakdown"></div>
+      </div>
+      <div class="modal-section">
+        <div class="alt-title">
+          <h3 id="modalAltTitle">ほかの解答例</h3>
+          <div id="modalBestNote" class="best-note"></div>
+        </div>
+        <div id="modalAltList" class="alt-list"></div>
+        <div class="hint">※答えは一例です。同じ手札でも、ほかにも正しい式がある場合があります。</div>
+      </div>
+      <div id="finalSummaryArea" class="modal-section" style="display:none">
+        <h3>5ラウンドの結果</h3>
+        <div id="modalFinalScore" class="final-score">0点</div>
+        <div id="modalRoundList" class="round-list"></div>
+        <aside class="result-pr" aria-label="保護者向けPR">
+          <div class="result-pr-head">保護者の方へ <span>PR</span></div>
+          <div id="finalAdSlot" class="a8-rotation-slot"></div>
+        </aside>
+      </div>
+      <div class="modal-actions">
+        <button id="modalNextBtn" class="btn primary">次のラウンドへ</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="rulesModal" class="modal-backdrop" aria-hidden="true">
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+      <div class="modal-head">
+        <div>
+          <div class="modal-kicker">HOW TO PLAY</div>
+          <h2 id="rulesTitle">ルール・得点</h2>
+        </div>
+        <button id="rulesClose" class="icon-btn" type="button" aria-label="閉じる">×</button>
+      </div>
+      <div class="rules-body">
+        <p><b>0～9を各4枚、合計40枚。</b> 5ラウンドを通して同じ山札を使い、一度手札に出たカードは山札に戻りません。</p>
+        <p>各ラウンド5枚を配り、数字を自由に並べて <b>＋ － × ÷ ＝</b> で正しい等式を作ります。数字カードは1枚につき1回だけ使用。交換は各ラウンド1回です。</p>
+        <p><b>式が作れないときはパスできます。</b> パスは0点で、そのラウンド中に山札から出たカード（最初の5枚＋交換で引いたカード）はすべて捨て札になり、山札には戻りません。</p>
+        <p>例：2・3・8・3・1 → <b>23＋8＝31</b></p>
+        <div class="score-rules" aria-label="得点ルール">
+          <span class="score-chip">数字1枚＝1点</span>
+          <span class="score-chip">＋ / －＝1点</span>
+          <span class="score-chip">×＝2点</span>
+          <span class="score-chip">÷＝3点</span>
+          <span class="score-chip">2桁の数＝1個につき＋1点</span>
+          <span class="score-chip">＝は0点</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="usedCardsModal" class="modal-backdrop" aria-hidden="true">
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="usedCardsTitle">
+      <div class="modal-head">
+        <div>
+          <div class="modal-kicker">CARD HISTORY</div>
+          <h2 id="usedCardsTitle">使用済みカード</h2>
+        </div>
+        <button id="usedCardsClose" class="icon-btn" type="button" aria-label="閉じる">×</button>
+      </div>
+      <div class="hint" style="margin-top:0">山札から一度でも出たカードです。交換で引いたカードも含みます。</div>
+      <div id="usedGrid" class="used-grid"></div>
+      <div class="modal-section">
+        <h3>出た順</h3>
+        <div id="usedHistory" class="used-history"></div>
+      </div>
+    </section>
+  </div>
+
+  <div id="passModal" class="modal-backdrop" aria-hidden="true">
+    <section class="modal-card confirm-card" role="dialog" aria-modal="true" aria-labelledby="passModalTitle">
+      <div class="modal-head">
+        <div>
+          <div class="modal-kicker">PASS</div>
+          <h2 id="passModalTitle">このラウンドをパスしますか？</h2>
+        </div>
+      </div>
+      <div style="font-size:14px;line-height:1.65;color:#475569">パスすると、このラウンドは <b>0点</b> で終了します。</div>
+      <div id="passDiscardText" class="pass-discard-note"></div>
+      <div class="confirm-actions">
+        <button id="passCancelBtn" class="btn secondary" type="button">戻る</button>
+        <button id="passConfirmBtn" class="btn pass-btn" type="button">パスする</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- RESULT_AD_TEMPLATES: 5ラウンド終了時のみランダム表示 -->
+  <template id="result-ad-1">
+    <a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
+      <img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1">
+    </a>
+    <img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
+  </template>
+  <template id="result-ad-2">
+    <a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
+      <img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1">
+    </a>
+    <img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
+  </template>
+  <template id="result-ad-3">
+    <a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1ELV76+5VQS+61Z81" rel="nofollow">
+      <img border="0" width="300" height="250" alt="" src="https://www20.a8.net/svt/bgt?aid=260901444085&wid=001&eno=01&mid=s00000027442001017000&mc=1">
+    </a>
+    <img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1ELV76+5VQS+61Z81" alt="">
+  </template>
+  <template id="result-ad-4">
+    <a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" rel="nofollow">
+      <img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444068&wid=001&eno=01&mid=s00000020322001097000&mc=1">
+    </a>
+    <img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" alt="">
+  </template>
+  <template id="result-ad-5">
+    <a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1F7ASY+56OA+601S1" rel="nofollow">
+      <img border="0" width="300" height="250" alt="" src="https://www28.a8.net/svt/bgt?aid=260901444086&wid=001&eno=01&mid=s00000024193001008000&mc=1">
+    </a>
+    <img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1F7ASY+56OA+601S1" alt="">
+  </template>
+  <template id="result-ad-6">
+    <a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GE60I+4N0I+614CX" rel="nofollow">
+      <img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444088&wid=001&eno=01&mid=s00000021645001013000&mc=1">
+    </a>
+    <img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GE60I+4N0I+614CX" alt="">
+  </template>
+
+<script>
+(() => {
+  const MAX_ROUNDS = 5;
+  const handEl = document.getElementById('hand');
+  const exprEl = document.getElementById('expression');
+  const resultEl = document.getElementById('result');
+  const deckCountEl = document.getElementById('deckCount');
+  const exchangeStateEl = document.getElementById('exchangeState');
+  const usedCountEl = document.getElementById('usedCount');
+  const roundNoEl = document.getElementById('roundNo');
+  const totalScoreEl = document.getElementById('totalScore');
+  const currentRoleEl = document.getElementById('currentRole');
+  const exchangeBtn = document.getElementById('exchangeBtn');
+  const passBtn = document.getElementById('passBtn');
+  const checkBtn = document.getElementById('checkBtn');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const undoBtn = document.getElementById('undoBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const usedCardsBtn = document.getElementById('usedCardsBtn');
+  const rulesBtn = document.getElementById('rulesBtn');
+  const rulesModal = document.getElementById('rulesModal');
+  const rulesClose = document.getElementById('rulesClose');
+  const roundModal = document.getElementById('roundModal');
+  const roundModalTitle = document.getElementById('roundModalTitle');
+  const modalAnswerExpr = document.getElementById('modalAnswerExpr');
+  const modalAltTitle = document.getElementById('modalAltTitle');
+  const modalAnswerMeta = document.getElementById('modalAnswerMeta');
+  const modalBreakdown = document.getElementById('modalBreakdown');
+  const modalAltList = document.getElementById('modalAltList');
+  const modalBestNote = document.getElementById('modalBestNote');
+  const finalSummaryArea = document.getElementById('finalSummaryArea');
+  const modalFinalScore = document.getElementById('modalFinalScore');
+  const modalRoundList = document.getElementById('modalRoundList');
+  const modalNextBtn = document.getElementById('modalNextBtn');
+  const finalAdSlot = document.getElementById('finalAdSlot');
+  const usedCardsModal = document.getElementById('usedCardsModal');
+  const usedCardsClose = document.getElementById('usedCardsClose');
+  const passModal = document.getElementById('passModal');
+  const passDiscardText = document.getElementById('passDiscardText');
+  const passCancelBtn = document.getElementById('passCancelBtn');
+  const passConfirmBtn = document.getElementById('passConfirmBtn');
+  const usedGrid = document.getElementById('usedGrid');
+  const usedHistory = document.getElementById('usedHistory');
+  const opButtons = [...document.querySelectorAll('[data-op]')];
+
+  let deck = [];
+  let hand = [];
+  let tokens = [];
+  let exchangeUsed = false;
+  let isConfirmed = false;
+  let lastValidHand = null;
+  let currentRound = 1;
+  let totalScore = 0;
+  let roundScores = [];
+  let usedCards = [];
+  let roundUsedStart = 0;
+
+  function uid() {
+    return (globalThis.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now();
+  }
+
+  function buildDeck() {
+    const d = [];
+    for (let n = 0; n <= 9; n++) for (let i = 0; i < 4; i++) d.push(n);
+    for (let i = d.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [d[i], d[j]] = [d[j], d[i]];
+    }
+    return d;
+  }
+
+  function newGame() {
+    currentRound = 1;
+    totalScore = 0;
+    roundScores = [];
+    usedCards = [];
+    if (finalAdSlot) finalAdSlot.replaceChildren();
+    deck = buildDeck();
+    closeModal(roundModal);
+    closeModal(usedCardsModal);
+    closeModal(rulesModal);
+    closeModal(passModal);
+    startRound();
+  }
+
+  function startRound() {
+    roundUsedStart = usedCards.length;
+    hand = [];
+    for (let i = 0; i < 5; i++) {
+      const value = deck.pop();
+      hand.push({ value, used:false, exchange:false, id:uid() });
+      usedCards.push(value);
+    }
+    tokens = [];
+    exchangeUsed = false;
+    isConfirmed = false;
+    lastValidHand = null;
+    currentRoleEl.style.display = 'none';
+    resultEl.className = 'result';
+    resultEl.textContent = 'まだ判定していません。';
+    closeModal(roundModal);
+    closeModal(passModal);
+    render();
+  }
+
+  function render() {
+    handEl.innerHTML = '';
+    hand.forEach((c, idx) => {
+      const box = document.createElement('div');
+      box.className = 'cardbox';
+
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'card' + (c.used ? ' used' : '') + (c.exchange ? ' exchange-mark' : '');
+      card.textContent = c.value;
+      card.setAttribute('aria-label', `数字${c.value}`);
+      card.disabled = c.used || isConfirmed;
+      card.addEventListener('click', () => addDigit(idx));
+
+      const ex = document.createElement('button');
+      ex.type = 'button';
+      ex.className = 'small-btn' + (c.exchange ? ' on' : '');
+      ex.textContent = c.exchange ? '交換候補' : '交換する';
+      const selectedExchangeCount = hand.filter(x => x.exchange && !x.used).length;
+      const exchangeCap = maxExchangeNow();
+      ex.disabled = isConfirmed || exchangeUsed || c.used || exchangeCap === 0 || (!c.exchange && selectedExchangeCount >= exchangeCap);
+      ex.addEventListener('click', () => {
+        if (exchangeUsed || c.used || isConfirmed) return;
+        const cap = maxExchangeNow();
+        const selected = hand.filter(x => x.exchange && !x.used).length;
+        if (!c.exchange && selected >= cap) return;
+        c.exchange = !c.exchange;
+        render();
+      });
+
+      box.append(card, ex);
+      handEl.appendChild(box);
+    });
+
+    renderExpression();
+    deckCountEl.textContent = deck.length;
+    const exchangeCap = maxExchangeNow();
+    exchangeStateEl.textContent = exchangeUsed ? '使用済み' : (exchangeCap === 0 ? '不可' : '未使用');
+    usedCountEl.textContent = hand.filter(c => c.used).length;
+    roundNoEl.textContent = currentRound;
+    totalScoreEl.textContent = totalScore;
+    usedCardsBtn.textContent = `使用済み ${usedCards.length}枚`;
+    const selectedForExchange = hand.filter(c => c.exchange && !c.used).length;
+    exchangeBtn.textContent = exchangeUsed ? '交換済み' : (exchangeCap > 0 ? `選んだカードを交換（最大${exchangeCap}枚）` : 'このラウンドは交換不可');
+    exchangeBtn.disabled = isConfirmed || exchangeUsed || exchangeCap === 0 || selectedForExchange === 0 || selectedForExchange > exchangeCap;
+    checkBtn.disabled = isConfirmed;
+    undoBtn.disabled = isConfirmed || tokens.length === 0;
+    clearBtn.disabled = isConfirmed || tokens.length === 0;
+    confirmBtn.disabled = isConfirmed || !lastValidHand;
+    passBtn.disabled = isConfirmed;
+    opButtons.forEach(btn => btn.disabled = isConfirmed);
+  }
+
+  function renderExpression() {
+    exprEl.innerHTML = '';
+    if (tokens.length === 0) {
+      const p = document.createElement('span');
+      p.className = 'placeholder';
+      p.textContent = '数字カードと演算記号を押して式を作ってください';
+      exprEl.appendChild(p);
+      return;
+    }
+    tokens.forEach(t => {
+      const span = document.createElement('span');
+      span.className = 'token ' + (t.type === 'digit' ? 'digit' : 'op');
+      span.textContent = t.type === 'digit' ? t.value : prettyOp(t.value);
+      exprEl.appendChild(span);
+    });
+  }
+
+  function prettyOp(v) {
+    return ({'*':'×','/':'÷','=':'＝','+':'＋','-':'－'})[v] || v;
+  }
+
+  function prettyExpr(raw) {
+    return raw.replaceAll('*','×').replaceAll('/','÷').replaceAll('+','＋').replaceAll('-','－').replaceAll('=','＝');
+  }
+
+  function addDigit(handIndex) {
+    if (isConfirmed) return;
+    const c = hand[handIndex];
+    if (!c || c.used) return;
+    c.used = true;
+    c.exchange = false;
+    tokens.push({ type:'digit', value:String(c.value), handIndex });
+    clearResult();
+    render();
+  }
+
+  function addOp(op) {
+    if (isConfirmed || tokens.length === 0) return;
+    const last = tokens[tokens.length - 1];
+    if (last.type === 'op') return;
+    if (op === '=' && tokens.some(t => t.type === 'op' && t.value === '=')) return;
+    tokens.push({ type:'op', value:op });
+    clearResult();
+    render();
+  }
+
+  function undo() {
+    if (isConfirmed) return;
+    const t = tokens.pop();
+    if (!t) return;
+    if (t.type === 'digit' && hand[t.handIndex]) hand[t.handIndex].used = false;
+    clearResult();
+    render();
+  }
+
+  function clearExpression() {
+    if (isConfirmed) return;
+    hand.forEach(c => c.used = false);
+    tokens = [];
+    clearResult();
+    render();
+  }
+
+  function clearResult() {
+    lastValidHand = null;
+    currentRoleEl.style.display = 'none';
+    resultEl.className = 'result';
+    resultEl.textContent = 'まだ判定していません。';
+  }
+
+  function maxExchangeNow() {
+    // このラウンドで交換しても、残りラウンドに5枚ずつ配れる枚数を必ず残す。
+    const cardsNeededForFutureRounds = (MAX_ROUNDS - currentRound) * 5;
+    return Math.min(5, Math.max(0, deck.length - cardsNeededForFutureRounds));
+  }
+
+  function exchangeSelected() {
+    if (isConfirmed || exchangeUsed) return;
+    const targets = hand.map((c,i) => c.exchange && !c.used ? i : -1).filter(i => i >= 0);
+    if (!targets.length) return;
+    const cap = maxExchangeNow();
+    if (targets.length > cap) {
+      showNG(`残りラウンドの配牌を確保するため、今回は最大${cap}枚まで交換できます。`);
+      return;
+    }
+    targets.forEach(i => {
+      const value = deck.pop();
+      hand[i] = { value, used:false, exchange:false, id:uid() };
+      usedCards.push(value);
+    });
+    exchangeUsed = true;
+    clearResult();
+    render();
+  }
+
+  function tokensToString() {
+    return tokens.map(t => t.value).join('');
+  }
+
+  function isValidSideSyntax(side) {
+    if (!side || !/^[0-9+\-*/]+$/.test(side)) return false;
+    if (/^[+\-*/]/.test(side) || /[+\-*/]$/.test(side)) return false;
+    if (/[+\-*/]{2,}/.test(side)) return false;
+    const nums = side.split(/[+\-*/]/);
+    if (nums.some(n => n.length > 1 && n.startsWith('0'))) return false;
+    return true;
+  }
+
+  function evalSide(expr) {
+    const parts = expr.match(/\d+|[+\-*/]/g);
+    if (!parts || parts.join('') !== expr || !/^\d+$/.test(parts[0])) throw new Error('invalid');
+    let term = Number(parts[0]);
+    let total = 0;
+    for (let i = 1; i < parts.length; i += 2) {
+      const op = parts[i];
+      const n = Number(parts[i + 1]);
+      if (!Number.isFinite(n)) throw new Error('invalid');
+      if (op === '*') term *= n;
+      else if (op === '/') {
+        if (n === 0) throw new Error('div0');
+        term /= n;
+      } else if (op === '+') {
+        total += term;
+        term = n;
+      } else if (op === '-') {
+        total += term;
+        term = -n;
+      } else throw new Error('invalid');
+    }
+    const v = total + term;
+    if (!Number.isFinite(v)) throw new Error('non-finite');
+    return v;
+  }
+
+  function roleName(used) {
+    if (used === 2) return 'ワンペア';
+    if (used === 3) return 'スリーカード';
+    if (used === 4) return 'フォーカード';
+    if (used === 5) return 'ファイブカード';
+    return `${used}枚役`;
+  }
+
+  function scoreExpression(raw, usedDigits) {
+    let operatorScore = 0;
+    for (const ch of raw) {
+      if (ch === '+' || ch === '-') operatorScore += 1;
+      else if (ch === '*') operatorScore += 2;
+      else if (ch === '/') operatorScore += 3;
+    }
+    const numbers = raw.match(/\d+/g) || [];
+    const twoDigitCount = numbers.filter(n => n.length === 2).length;
+    return {
+      total: usedDigits + operatorScore + twoDigitCount,
+      digitScore: usedDigits,
+      operatorScore,
+      twoDigitScore: twoDigitCount
+    };
+  }
+
+  function checkRawExpression(raw) {
+    const eqs = [...raw].filter(ch => ch === '=').length;
+    if (eqs !== 1) return {ok:false, message:'「＝」をちょうど1つ入れてください。'};
+    const [left, right] = raw.split('=');
+    if (!isValidSideSyntax(left) || !isValidSideSyntax(right)) return {ok:false, message:'式の並びを確認してください。演算子の連続や先頭0の多桁数は使えません。'};
+    try {
+      const lv = evalSide(left);
+      const rv = evalSide(right);
+      if (Math.abs(lv - rv) < 1e-10) return {ok:true, left:lv, right:rv};
+      return {ok:false, message:`不成立です。左辺は ${formatNum(lv)}、右辺は ${formatNum(rv)} です。`};
+    } catch(e) {
+      return {ok:false, message:'計算できない式です。0で割っていないか確認してください。'};
+    }
+  }
+
+  function checkExpression() {
+    if (isConfirmed) return;
+    lastValidHand = null;
+    const raw = tokensToString();
+    const used = hand.filter(c => c.used).length;
+    const checked = checkRawExpression(raw);
+    if (!checked.ok) return showNG(checked.message);
+
+    const score = scoreExpression(raw, used);
+    const pretty = prettyExpr(raw);
+    const role = roleName(used);
+    lastValidHand = { raw, pretty, used, role, score };
+    currentRoleEl.textContent = role;
+    currentRoleEl.style.display = 'inline-block';
+    resultEl.className = 'result ok';
+    resultEl.innerHTML = `成立！ <b>${pretty}</b><br><b>${role}</b> ／ この式は <b>${score.total}点</b><br>${scoreBreakdownHTML(score)}<br><span style="font-size:13px">この内容でよければ「この役で確定」を押してください。</span>`;
+    render();
+  }
+
+  function scoreBreakdownHTML(score) {
+    return `<span class="score-breakdown"><span>数字 ${score.digitScore}点</span><span>演算 ${score.operatorScore}点</span><span>2桁 ${score.twoDigitScore}点</span></span>`;
+  }
+
+  function formatNum(n) {
+    if (Number.isInteger(n)) return String(n);
+    return String(Math.round(n * 1000000) / 1000000);
+  }
+
+  function showNG(msg) {
+    lastValidHand = null;
+    currentRoleEl.style.display = 'none';
+    resultEl.className = 'result ng';
+    resultEl.textContent = msg;
+    render();
+  }
+
+  function currentRoundDrawnCards() {
+    return usedCards.slice(roundUsedStart);
+  }
+
+  function openPassConfirm() {
+    if (isConfirmed) return;
+    const count = currentRoundDrawnCards().length;
+    passDiscardText.textContent = `このラウンド中に出た ${count}枚（交換で引いたカードを含む）は、すべて捨て札になります。`;
+    openModal(passModal);
+  }
+
+  function passRound() {
+    if (isConfirmed) return;
+    const discardedCount = currentRoundDrawnCards().length;
+    isConfirmed = true;
+    lastValidHand = null;
+    tokens = [];
+    hand.forEach(c => { c.used = false; c.exchange = false; });
+
+    const passed = {
+      raw:'', pretty:'パス', used:0, role:'パス', isPass:true, discardedCount,
+      score:{ total:0, digitScore:0, operatorScore:0, twoDigitScore:0 }
+    };
+    roundScores.push({ round:currentRound, score:0, role:'パス', expr:`${discardedCount}枚を捨て札` });
+
+    resultEl.className = 'result';
+    resultEl.innerHTML = `パス：<b>0点</b> ／ このラウンドで出た <b>${discardedCount}枚</b> を捨て札にしました。`;
+    closeModal(passModal);
+    fillRoundResultModal(passed);
+    openModal(roundModal);
+    render();
+  }
+
+  function confirmHand() {
+    if (isConfirmed || !lastValidHand) return;
+    isConfirmed = true;
+    const confirmed = lastValidHand;
+    totalScore += confirmed.score.total;
+    roundScores.push({ round:currentRound, score:confirmed.score.total, role:confirmed.role, expr:confirmed.pretty });
+    totalScoreEl.textContent = totalScore;
+
+    resultEl.className = 'result ok';
+    resultEl.innerHTML = `確定！ <b>${confirmed.pretty}</b><br><b>${confirmed.role} ／ ${confirmed.score.total}点</b>`;
+
+    fillRoundResultModal(confirmed);
+    openModal(roundModal);
+    render();
+  }
+
+  function nextRound() {
+    if (!isConfirmed || currentRound >= MAX_ROUNDS) return;
+    currentRound += 1;
+    startRound();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function fillRoundResultModal(confirmed) {
+    roundModalTitle.textContent = currentRound === MAX_ROUNDS ? '最終ラウンド結果' : `${currentRound}ラウンド目の結果`;
+    modalAnswerExpr.textContent = confirmed.pretty;
+    if (confirmed.isPass) {
+      modalAnswerMeta.textContent = '0点';
+      modalBreakdown.innerHTML = `<div class="pass-discard-note" style="margin-top:10px">このラウンド中に出た ${confirmed.discardedCount}枚は、すべて捨て札になりました。</div>`;
+      fillPassSolutions();
+    } else {
+      modalAnswerMeta.textContent = `${confirmed.role} ／ ${confirmed.score.total}点`;
+      modalBreakdown.innerHTML = scoreBreakdownHTML(confirmed.score);
+      fillAlternativeSolutions(confirmed);
+    }
+
+    if (currentRound < MAX_ROUNDS) {
+      finalSummaryArea.style.display = 'none';
+      modalNextBtn.textContent = '次のラウンドへ';
+      modalNextBtn.dataset.action = 'next';
+    } else {
+      fillFinalSummary();
+      showRandomResultAd(finalAdSlot);
+      finalSummaryArea.style.display = 'block';
+      modalNextBtn.textContent = 'もう一度遊ぶ';
+      modalNextBtn.dataset.action = 'restart';
+    }
+  }
+
+  function fillFinalSummary() {
+    modalFinalScore.textContent = `${totalScore}点`;
+    modalRoundList.innerHTML = '';
+    roundScores.forEach(r => {
+      const cell = document.createElement('div');
+      cell.className = 'round-cell';
+      cell.innerHTML = `${r.round}R<b>${r.role === 'パス' ? 'パス' : `${r.score}点`}</b>`;
+      cell.title = `${r.expr} / ${r.role}`;
+      modalRoundList.appendChild(cell);
+    });
+  }
+
+  function fillAlternativeSolutions(confirmed) {
+    modalAltTitle.textContent = 'ほかの解答例';
+    const solutions = findSolutions(hand.map(c => c.value));
+    const currentCanonical = canonicalEquation(confirmed.raw);
+    const filtered = solutions.filter(s => canonicalEquation(s.raw) !== currentCanonical);
+    const best = solutions.length ? solutions[0].score.total : confirmed.score.total;
+    const selected = chooseDiverseExamples(filtered, confirmed.score.total, 4);
+
+    modalAltList.innerHTML = '';
+    modalBestNote.textContent = best > confirmed.score.total ? `最高例：${best}点` : `最高点クラス！ ${best}点`;
+
+    if (!selected.length) {
+      const item = document.createElement('div');
+      item.className = 'alt-item';
+      item.textContent = '今回は、別の正解例を見つけられませんでした。';
+      modalAltList.appendChild(item);
+      return;
+    }
+
+    selected.forEach(s => {
+      const delta = s.score.total - confirmed.score.total;
+      const item = document.createElement('div');
+      item.className = 'alt-item';
+      const deltaClass = delta > 0 ? 'plus' : delta === 0 ? 'same' : 'minus';
+      const deltaText = delta > 0 ? `＋${delta}点` : delta === 0 ? '同点' : `${delta}点`;
+      item.innerHTML = `<div class="alt-expr">${s.pretty}</div><div class="alt-meta"><b>${s.role} / ${s.score.total}点</b><br><span class="delta ${deltaClass}">${deltaText}</span>　数字${s.score.digitScore}・演算${s.score.operatorScore}・2桁${s.score.twoDigitScore}</div>`;
+      modalAltList.appendChild(item);
+    });
+  }
+
+
+  function fillPassSolutions() {
+    const solutions = findSolutions(hand.map(c => c.value));
+    modalAltTitle.textContent = 'この手札の解答例';
+    modalAltList.innerHTML = '';
+
+    if (!solutions.length) {
+      modalBestNote.textContent = '解答なし';
+      const item = document.createElement('div');
+      item.className = 'alt-item';
+      item.textContent = 'この手札では、正しい等式を作れませんでした。';
+      modalAltList.appendChild(item);
+      return;
+    }
+
+    modalBestNote.textContent = `最高例：${solutions[0].score.total}点`;
+    solutions.slice(0,4).forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'alt-item';
+      item.innerHTML = `<div class="alt-expr">${s.pretty}</div><div class="alt-meta"><b>${s.role} / ${s.score.total}点</b><br>数字${s.score.digitScore}・演算${s.score.operatorScore}・2桁${s.score.twoDigitScore}</div>`;
+      modalAltList.appendChild(item);
+    });
+  }
+
+  function showRandomResultAd(slot) {
+    if (!slot) return;
+    const ads = ['result-ad-1','result-ad-2','result-ad-3','result-ad-4','result-ad-5','result-ad-6'];
+    slot.replaceChildren();
+    const selected = ads[Math.floor(Math.random() * ads.length)];
+    const template = document.getElementById(selected);
+    if (template) slot.append(template.content.cloneNode(true));
+  }
+
+  function renderUsedCards() {
+    usedGrid.innerHTML = '';
+    const counts = Array(10).fill(0);
+    usedCards.forEach(v => counts[v]++);
+    for (let n = 0; n <= 9; n++) {
+      const cell = document.createElement('div');
+      cell.className = 'used-stat';
+      cell.innerHTML = `<div class="num">${n}</div><div class="count">${counts[n]} / 4枚使用</div>`;
+      usedGrid.appendChild(cell);
+    }
+    usedHistory.innerHTML = '';
+    usedCards.forEach(v => {
+      const chip = document.createElement('span');
+      chip.className = 'used-chip';
+      chip.textContent = v;
+      usedHistory.appendChild(chip);
+    });
+  }
+
+  function openModal(el) {
+    el.classList.add('show');
+    el.setAttribute('aria-hidden','false');
+    document.body.classList.add('body-modal-open');
+  }
+
+  function closeModal(el) {
+    el.classList.remove('show');
+    el.setAttribute('aria-hidden','true');
+    if (![roundModal, usedCardsModal, rulesModal, passModal].some(m => m.classList.contains('show'))) {
+      document.body.classList.remove('body-modal-open');
+    }
+  }
+
+  function canonicalEquation(raw) {
+    const parts = raw.split('=');
+    if (parts.length !== 2) return raw;
+    return [parts[0], parts[1]].sort().join('=');
+  }
+
+  function chooseDiverseExamples(solutions, baseScore, limit) {
+    if (!solutions.length) return [];
+    const chosen = [];
+    const seenShape = new Set();
+
+    // まず高得点の式を優先。同じ並べ替えだけが続かないよう、演算子構成と使用枚数の違いを優先する。
+    for (const s of solutions) {
+      const opShape = [...s.raw].filter(ch => '+-*/'.includes(ch)).sort().join('') + '|' + s.used;
+      if (!seenShape.has(opShape) || chosen.length === 0) {
+        chosen.push(s);
+        seenShape.add(opShape);
+      }
+      if (chosen.length >= limit) return chosen;
+    }
+    for (const s of solutions) {
+      if (!chosen.includes(s)) chosen.push(s);
+      if (chosen.length >= limit) break;
+    }
+    return chosen;
+  }
+
+  function findSolutions(values) {
+    const found = new Map();
+    const n = values.length;
+    const gapChoices = ['', '+', '-', '*', '/'];
+
+    function permute(prefix, usedIdx, k) {
+      if (prefix.length === k) {
+        enumerateGaps(prefix.map(i => values[i]));
+        return;
+      }
+      for (let i = 0; i < n; i++) {
+        if (usedIdx.has(i)) continue;
+        usedIdx.add(i);
+        prefix.push(i);
+        permute(prefix, usedIdx, k);
+        prefix.pop();
+        usedIdx.delete(i);
+      }
+    }
+
+    function enumerateGaps(digits) {
+      const k = digits.length;
+      for (let eqGap = 0; eqGap < k - 1; eqGap++) {
+        const otherCount = k - 2;
+        const combos = Math.pow(gapChoices.length, otherCount);
+        for (let mask = 0; mask < combos; mask++) {
+          let m = mask;
+          let raw = String(digits[0]);
+          let otherPos = 0;
+          for (let gap = 0; gap < k - 1; gap++) {
+            let symbol;
+            if (gap === eqGap) symbol = '=';
+            else {
+              symbol = gapChoices[Math.floor(m / Math.pow(gapChoices.length, otherPos)) % gapChoices.length];
+              otherPos++;
+            }
+            raw += symbol + String(digits[gap + 1]);
+          }
+          const checked = checkRawExpression(raw);
+          if (!checked.ok) continue;
+          const canon = canonicalEquation(raw);
+          if (found.has(canon)) continue;
+          const score = scoreExpression(raw, k);
+          found.set(canon, {raw, pretty:prettyExpr(raw), used:k, role:roleName(k), score});
+        }
+      }
+    }
+
+    for (let k = 2; k <= 5; k++) permute([], new Set(), k);
+
+    return [...found.values()].sort((a,b) =>
+      b.score.total - a.score.total ||
+      b.used - a.used ||
+      b.score.operatorScore - a.score.operatorScore ||
+      a.raw.localeCompare(b.raw, 'ja')
+    );
+  }
+
+  opButtons.forEach(btn => btn.addEventListener('click', () => addOp(btn.dataset.op)));
+  undoBtn.addEventListener('click', undo);
+  clearBtn.addEventListener('click', clearExpression);
+  checkBtn.addEventListener('click', checkExpression);
+  confirmBtn.addEventListener('click', confirmHand);
+  exchangeBtn.addEventListener('click', exchangeSelected);
+  passBtn.addEventListener('click', openPassConfirm);
+  passCancelBtn.addEventListener('click', () => closeModal(passModal));
+  passConfirmBtn.addEventListener('click', passRound);
+  passModal.addEventListener('click', e => { if (e.target === passModal) closeModal(passModal); });
+  rulesBtn.addEventListener('click', () => openModal(rulesModal));
+  rulesClose.addEventListener('click', () => closeModal(rulesModal));
+  rulesModal.addEventListener('click', e => { if (e.target === rulesModal) closeModal(rulesModal); });
+  usedCardsBtn.addEventListener('click', () => { renderUsedCards(); openModal(usedCardsModal); });
+  usedCardsClose.addEventListener('click', () => closeModal(usedCardsModal));
+  usedCardsModal.addEventListener('click', e => { if (e.target === usedCardsModal) closeModal(usedCardsModal); });
+  modalNextBtn.addEventListener('click', () => {
+    if (modalNextBtn.dataset.action === 'restart') {
+      newGame();
+      window.scrollTo({top:0, behavior:'smooth'});
+    } else {
+      nextRound();
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (passModal.classList.contains('show')) closeModal(passModal);
+    if (usedCardsModal.classList.contains('show')) closeModal(usedCardsModal);
+    if (rulesModal.classList.contains('show')) closeModal(rulesModal);
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>
