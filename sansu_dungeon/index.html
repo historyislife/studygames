@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>算数ダンジョン HARDカットイン版｜ガクハコ</title>
+<title>算数ダンジョン｜ガクハコ</title>
 <style>
 :root{
   --ink:#f8fafc;
@@ -980,6 +980,44 @@ button{font:inherit}
   .home-back-btn{position:fixed}
 }
 
+
+/* ===== 端末の縦幅に合わせる最終フィット処理 ===== */
+@media (max-width:600px){
+  #game.mobile-scroll-fallback{
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+  }
+  .boardWrap.mobile-fit{
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+}
+@media (max-width:600px) and (max-height:680px){
+  .statusGrid{
+    margin-top:2px;
+    margin-bottom:2px;
+  }
+  .puzzleHead{
+    padding-bottom:1px;
+  }
+  .combatMsg{
+    margin-bottom:2px;
+  }
+  .footerRow{
+    padding-bottom:max(3px,env(safe-area-inset-bottom));
+  }
+}
+@media (max-width:600px) and (max-height:610px){
+  .enemyHud,.playerHud{padding:2px 3px}
+  .statusTitle{font-size:8px}
+  .enemyHud .name{font-size:8px}
+  .playerNumbers span{font-size:7px}
+  .buffList{max-height:12px;overflow:hidden}
+  .combatMsg{min-height:22px;font-size:9px}
+  .footerRow button{min-height:26px;font-size:8px}
+}
+
 </style>
 </head>
 <body>
@@ -1354,6 +1392,7 @@ function renderBoard(){
     boardEl.appendChild(b);
   });
   updateSelection();
+  setTimeout(fitMobileViewport,0);
 }
 function startDrag(e){
   if(startScreenActive||battleIntroActive||specialCutinActive||paused||userPaused||ended||animating||traveling)return;
@@ -1661,6 +1700,7 @@ function beginBattleAfterIntro(){
   deadline=performance.now()+enemy.interval*1000;
   $('combatMsg').textContent='合計が弱点になるようになぞろう';
   showSceneMessage(`${enemy.name} が あらわれた！`);
+  setTimeout(fitMobileViewport,0);
 }
 
 function blackoutRandomTiles(count=3){
@@ -1790,6 +1830,7 @@ function startTravel(){
   travelStart=performance.now();
   $('travelLabel').classList.add('show');
   $('sceneMessage').classList.remove('show');
+  setTimeout(fitMobileViewport,0);
 }
 function completeTravel(){
   battle++;
@@ -1937,6 +1978,90 @@ function startGame(){
   playSE("select");
   $('sceneMessage').classList.remove('show');
   showBattleIntro();
+}
+
+
+let mobileFitRaf=0;
+
+function resetMobileFitStyles(){
+  const game=$('game');
+  const battleEl=$('battleScene');
+  const wrap=document.querySelector('.boardWrap');
+  if(!game||!battleEl||!wrap)return;
+
+  game.classList.remove('mobile-scroll-fallback');
+  wrap.classList.remove('mobile-fit');
+
+  battleEl.style.removeProperty('height');
+  wrap.style.removeProperty('width');
+  wrap.style.removeProperty('margin-left');
+  wrap.style.removeProperty('margin-right');
+}
+
+function fitMobileViewport(){
+  cancelAnimationFrame(mobileFitRaf);
+
+  mobileFitRaf=requestAnimationFrame(()=>{
+    const game=$('game');
+    const battleEl=$('battleScene');
+    const wrap=document.querySelector('.boardWrap');
+    if(!game||!battleEl||!wrap)return;
+
+    if(window.innerWidth>600){
+      resetMobileFitStyles();
+      return;
+    }
+
+    resetMobileFitStyles();
+
+    mobileFitRaf=requestAnimationFrame(()=>{
+      const viewportH=Math.round(
+        window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight
+      );
+
+      // まず上段の戦闘シーンだけを縮める。
+      let overflow=Math.ceil(game.scrollHeight-viewportH);
+      if(overflow>1){
+        const currentBattle=battleEl.getBoundingClientRect().height;
+        const minBattle=window.innerHeight<=610 ? 118 : 132;
+        const nextBattle=Math.max(minBattle,currentBattle-overflow-4);
+        battleEl.style.height=`${nextBattle}px`;
+      }
+
+      mobileFitRaf=requestAnimationFrame(()=>{
+        let overflow2=Math.ceil(game.scrollHeight-viewportH);
+
+        // まだ収まらない時だけ盤面を縮小。
+        if(overflow2>1){
+          const currentBoard=wrap.getBoundingClientRect().width;
+          const minBoard=Math.min(
+            window.innerWidth-16,
+            window.innerHeight<=610 ? 238 : 260
+          );
+          const nextBoard=Math.max(minBoard,currentBoard-overflow2-8);
+
+          wrap.style.width=`${nextBoard}px`;
+          wrap.style.marginLeft='auto';
+          wrap.style.marginRight='auto';
+          wrap.classList.add('mobile-fit');
+        }
+
+        mobileFitRaf=requestAnimationFrame(()=>{
+          // 超小型端末では切断よりスクロールを優先する。
+          const finalOverflow=Math.ceil(game.scrollHeight-viewportH);
+          if(finalOverflow>2){
+            game.classList.add('mobile-scroll-fallback');
+          }
+        });
+      });
+    });
+  });
+}
+
+window.addEventListener('resize',fitMobileViewport,{passive:true});
+window.addEventListener('orientationchange',()=>setTimeout(fitMobileViewport,120),{passive:true});
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',fitMobileViewport,{passive:true});
 }
 
 function restart(){
