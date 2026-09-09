@@ -1,0 +1,3 @@
+<url>
+  <loc>https://manabigames.jp/quick/</loc>
+</url>
