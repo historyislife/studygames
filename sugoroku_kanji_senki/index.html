@@ -677,7 +677,111 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
   .idiom-detail-section{margin-top:10px;padding:9px 10px}
 }
 
-.result-pr{width:300px;max-width:100%;margin:20px auto 0;padding-top:12px;border-top:1px solid #a67a39;text-align:center}.result-pr-head{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:8px;font:800 12px sans-serif}.result-pr-head span{padding:2px 7px;border:1px solid currentColor;border-radius:999px;font-size:10px}@media(max-width:340px){.modal{padding:2px}.modal .dialog{width:316px;max-width:calc(100vw - 4px);padding-left:6px!important;padding-right:6px!important}}
+
+/* Short landscape desktops need a compact die area in the smaller board. */
+@media(min-width:961px) and (max-height:800px){
+ .center{gap:3px;padding:2px}
+ #msg{font-size:12px;line-height:1.2;max-width:94%;padding:4px 5px;max-height:64px;overflow:hidden}
+ .stage{height:90px;flex:0 0 90px;width:180px;transform:none;margin:0}
+ .die{--s:48px}
+ .face{font-size:26px;border-width:2px}
+ .f1{transform:translateZ(calc(var(--s)/2))}.f6{transform:rotateY(180deg) translateZ(calc(var(--s)/2))}
+ .f3{transform:rotateY(90deg) translateZ(calc(var(--s)/2))}.f4{transform:rotateY(-90deg) translateZ(calc(var(--s)/2))}
+ .f2{transform:rotateX(90deg) translateZ(calc(var(--s)/2))}.f5{transform:rotateX(-90deg) translateZ(calc(var(--s)/2))}
+ #progressQuickBtn{margin-top:3px;min-height:35px;padding:5px 10px}
+ .music-credit{margin-bottom:0}
+}
+/* v31: On wide screens, scale the board to the actual viewport height rather than only the width. */
+@media(min-width:961px){
+ #playLayout{
+   grid-template-columns:minmax(0,min(55vw,calc(100dvh - 295px),700px)) minmax(330px,1fr);
+ }
+ #wrap{width:100%;max-width:700px;margin-top:8px}
+ #sideCol{max-height:calc(100dvh - 250px);min-height:0}
+}
+/* v31: Mobile-first gameplay. Header controls are never positioned over title/board. */
+#gameHeader{width:min(96vw,1240px);margin:0 auto}
+.game-toolbar{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 0 0}
+.game-toolbar .home,.game-toolbar .manual-btn,.game-toolbar .sound-toggle{
+ position:static!important;inset:auto!important;top:auto!important;right:auto!important;left:auto!important;
+ z-index:auto;display:inline-flex;align-items:center;justify-content:center;min-width:0;min-height:38px;
+ margin:0;flex:0 0 auto;white-space:nowrap;text-decoration:none;font-size:13px;padding:5px 9px;box-shadow:none
+}
+.game-toolbar .home{font-weight:900;background:#fff9e0;border:1px solid #947345}
+.game-brand h1{margin:3px 0 0;font-size:clamp(25px,3.1vw,38px);line-height:1.12}
+.game-brand .lead{margin:2px 0 7px;font-size:13px;line-height:1.25}
+.turn-compact{display:none}
+.hud-name-short{display:none}
+.ready-alert,.ready-mark{display:inline-flex;align-items:center;justify-content:center;background:#db3d32;color:white;border-radius:99px;font-size:16px;font-weight:1000;min-width:23px;height:23px;line-height:1;box-shadow:0 1px 3px #0003}
+.ready-mark{margin:0 4px;vertical-align:middle;min-width:20px;height:20px;font-size:13px}
+#progressQuickBtn{position:relative;white-space:nowrap}
+#progressQuickBtn .ready-alert{position:absolute;top:-9px;right:-10px;border:2px solid #fff9e0}
+.progress-make-btn{background:#df9f24;border:2px solid #8d6221;color:#32210e;border-radius:8px;padding:5px 7px;white-space:nowrap;font-weight:1000;min-height:36px;min-width:57px;font-size:13px;cursor:pointer}
+.progress-row:has(.progress-make-btn){background:#fff6d8;border-color:#d5a445}
+#mobileQuickActions{display:none}
+.mobile-castle-summary{margin-top:8px;font-weight:900}
+.castle-list{display:grid;gap:7px;text-align:left}.castle-list>div{padding:9px;background:#fffaf0;border:1px solid #dcc49b;border-radius:8px}
+.modal .dialog{width:min(94vw,560px);max-height:calc(100dvh - 24px);overflow-y:auto}
+@media(max-width:700px){
+ body{overflow-x:hidden}
+ #gameHeader{width:calc(100% - 20px)}
+ .game-toolbar{gap:5px;padding-top:6px}
+ .game-toolbar .home,.game-toolbar .manual-btn,.game-toolbar .sound-toggle{min-height:36px;padding:5px 7px;font-size:11px;line-height:1.1}
+ .game-toolbar .home{font-size:12px}
+ .game-brand h1{margin:4px 0 0!important;font-size:clamp(23px,6vw,29px)!important;line-height:1.08!important}
+ .game-brand .lead{font-size:11px;white-space:nowrap;letter-spacing:-.03em;margin:2px 0 5px!important}
+ .manual-btn{position:static!important}
+ #turnBanner{width:calc(100% - 20px);margin:3px auto 4px!important;padding:5px 8px!important;font-size:12px!important}
+ .turn-full{display:none}.turn-compact{display:flex;justify-content:center;align-items:center;gap:12px;white-space:nowrap}
+ .turn-compact b{font-size:14px}
+ #hud{width:calc(100% - 20px);grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;margin:0 auto}
+ #hud .p{padding:5px 2px!important;border-radius:9px;min-height:57px;overflow:hidden}
+ #hud .p.on{outline:0;box-shadow:inset 0 0 0 2px #e1ab25;background:#fff9dc}
+ #hud .p .hud-head{justify-content:center;gap:0}
+ #hud .p .hud-name,#hud .p .role,#hud .p .hud-hand{display:none!important}
+ #hud .p .hud-name-short{display:block;font-weight:1000;font-size:14px;text-align:center}
+ #hud .p .hud-stats{justify-content:center;gap:2px 6px;font-size:10px;line-height:1.08}
+ #hud .p .hud-stats span{display:block}
+ #hud .p .hud-stats span:first-child{font-weight:900}
+ #viewNotice{display:none}
+ #playLayout{width:calc(100% - 20px);margin:0 auto}
+ #wrap{width:100%;margin:5px auto 0}
+ .board{border-width:5px;gap:2px;padding:2px}
+ .cell{border-width:1px;border-radius:6px;font-size:clamp(8px,2.55vw,12px)}
+ .token{width:46%;height:58%}
+ .center{border-width:2px;padding:2px;border-radius:9px;gap:3px}
+ #msg{font-size:clamp(10px,2.9vw,12px);line-height:1.2;padding:4px 5px;max-width:96%;border-width:1px}
+ .stage{transform:none!important;margin:0!important;height:89px;width:180px;flex:0 0 89px;perspective:600px}
+ .die{--s:48px}
+ .face{font-size:26px;border-width:2px;border-radius:8px}
+ .f1{transform:translateZ(calc(var(--s)/2))}.f6{transform:rotateY(180deg) translateZ(calc(var(--s)/2))}
+ .f3{transform:rotateY(90deg) translateZ(calc(var(--s)/2))}.f4{transform:rotateY(-90deg) translateZ(calc(var(--s)/2))}
+ .f2{transform:rotateX(90deg) translateZ(calc(var(--s)/2))}.f5{transform:rotateX(-90deg) translateZ(calc(var(--s)/2))}
+ #roll{font-size:13px;min-height:38px;padding:7px 14px;box-shadow:0 3px #815918}
+ #progressQuickBtn{min-height:34px;font-size:12px;margin:3px 0 0;padding:5px 11px}
+ #mobileQuickActions{display:flex;justify-content:center;gap:8px;margin:7px 0 9px}
+ #mobileQuickActions button{min-width:0;flex:1;min-height:42px;border-radius:10px;border:2px solid #916a39;background:#fff9e5;color:#2b2118;font-weight:900;font-size:13px}
+ #sideCol{display:none}
+ #below{display:none}
+ .progress-box{margin:5px 0 2px}
+ .progress-row{grid-template-columns:72px minmax(0,1fr) auto;gap:4px;padding:4px;min-height:34px}
+ .progress-word{font-size:12px}
+ .progress-char{width:23px;height:23px;font-size:13px}
+ .progress-state{grid-column:auto;font-size:10px}
+ .progress-make-btn{font-size:12px;padding:4px;min-width:54px}
+ .modal .dialog{padding:10px!important}
+ .choice{min-height:42px!important}
+ .music-credit{font-size:10px;margin:2px auto 10px;padding:4px 10px}
+}
+@media(max-width:359px){
+ .game-toolbar .home,.game-toolbar .manual-btn,.game-toolbar .sound-toggle{font-size:10px;padding:5px 5px}
+ .game-brand .lead{font-size:10px}
+ .turn-compact{gap:8px}
+ #hud .p .hud-stats{gap:2px 4px;font-size:9px}
+ .progress-row{grid-template-columns:65px minmax(0,1fr) auto}
+ .progress-char{width:21px;height:21px;font-size:12px}
+}
+
 </style></head><body>
 <div id="setupOverlay" class="setup-overlay" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
   <div class="setup-card">
@@ -696,7 +800,7 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
   </div>
 </div>
 
-<button id="manualBtn" class="manual-btn" type="button" aria-label="遊び方を開く">📖 遊び方</button>
+
 <div id="manualOverlay" class="manual-overlay" role="dialog" aria-modal="true" aria-labelledby="manualTitle">
   <section class="manual-panel">
     <div class="manual-head">
@@ -715,7 +819,7 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
       <h3>遊ぶ人数と、みんなのようす</h3><p>遊ぶ人は紅→蒼→翠→紫の順です。画面の上にある勢力パネルを押すと、今の番ではない人の手札・四字熟語のそろい具合・城の数も見られます。番がかわると、表示も次の人に自動で切りかわります。</p><h3>四字熟語のそろい具合を見る</h3>
       <p>相手から漢字をうばうときは、<b>自分と相手の四字熟語を左右にスワイプして見くらべられます</b>。自分にほしい漢字や、相手に残したくない漢字を考えてえらびましょう。</p>
       <p>築城や城強化では、四字熟語のそろい具合といっしょに、<b>今持っている漢字</b>も大きく表示します。</p>
-      <p>盤面の真ん中にある「📜 熟語のそろい具合」を押すと、画面を下へ動かさなくても、今の人の5つの四字熟語を見られます。</p>
+      <p>盤面の真ん中にある「📜 熟語のそろい具合」を押すと、今の人の5つの四字熟語を見られます。作れる熟語があると「！」がつき、そこから直接作れます。ただし四字熟語札を作れるのは1ターンに1枚だけです。</p>
       <p>本陣・おみくじ・市場で漢字を選ぶときや、築城・城強化で漢字を消費するときも、同じ画面に熟語のそろい具合が表示されます。色の付いた文字は所持中、薄い文字は不足中です。</p>
       <h3>自分のターン</h3>
       <ol><li>作れる四字熟語があれば、好きなら<b>1枚だけ</b>作れます。</li><li>サイコロを振ります。</li><li>出た目だけ進みます。</li><li>止まったマスの効果を行います。</li></ol>
@@ -776,13 +880,25 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
     <div id="idiomFlashEffect" class="idiom-flash-effect"></div>
   </div>
 </div>
-<a class="home" href="/">← ガクハコ</a><button class="sound-toggle" id="bgmToggle" type="button" aria-label="BGMのオンオフ">🎵 BGM</button><button class="sound-toggle" id="soundToggle" type="button" aria-label="効果音のオンオフ">🔊 SE</button><h1>すごろく漢字戦記</h1><div class="lead">漢字を集め、城を築き、四字熟語で天下統一！</div>
+<header id="gameHeader">
+  <nav class="game-toolbar" aria-label="ゲームのメニュー">
+    <a class="home" href="/">← ガクハコ</a>
+    <button id="manualBtn" class="manual-btn" type="button" aria-label="遊び方を開く">📖 遊び方</button>
+    <button class="sound-toggle" id="bgmToggle" type="button" aria-label="BGMのオンオフ">🎵 BGM</button>
+    <button class="sound-toggle" id="soundToggle" type="button" aria-label="効果音のオンオフ">🔊 SE</button>
+  </nav>
+  <div class="game-brand"><h1>すごろく漢字戦記</h1><div class="lead">漢字を集め、城を築き、四字熟語で天下統一！</div></div>
+</header>
 <div id="turnBanner">遊ぶ人数を選んでゲームを始めてください</div><div id="hud"></div><div id="viewNotice"></div>
 <div id="playLayout">
   <div id="boardCol">
     <div id="wrap"><div class="board" id="board"><div class="center"><div id="msg">あなたの番です。サイコロを振ろう！</div>
     <div class="stage"><div class="die" id="die"><div class="face f1">1</div><div class="face f2">2</div><div class="face f3">3</div><div class="face f4">4</div><div class="face f5">5</div><div class="face f6">6</div></div></div>
     <button id="roll">🎲 サイコロを振る</button><button id="progressQuickBtn" class="progress-quick-btn" type="button">📜 熟語のそろい具合</button></div></div></div>
+    <div id="mobileQuickActions" aria-label="情報を確認する">
+      <button type="button" id="mobileHandBtn">🀄 手札を見る</button>
+      <button type="button" id="mobileCastleBtn">🏯 城を見る</button>
+    </div>
   </div>
   <div id="sideCol">
     <div id="below"><div class="panel"><h2 id="handTitle">🀄 漢字</h2><div id="hand"></div><small>空地では1字を城に使います。熟語作成後に最低1字残る必要があります。</small></div><div class="panel"><h2 id="idiomTitle">📜 四字熟語札</h2><div class="small">この対局で使う5熟語</div><div class="idiom-longpress-hint">熟語を長押しすると、意味と能力を見られます</div><div id="idioms"></div></div></div>
@@ -809,40 +925,8 @@ h1{text-align:center;margin:18px 0 0;font-family:serif;font-size:clamp(30px,6vw,
     <button id="idiomDetailClose" class="idiom-detail-close" type="button">閉じる</button>
   </div>
 </div>
-<div class="modal" id="modal"><div class="dialog"><h2 id="mt"></h2><div id="mb"></div><div class="choices" id="choices"></div><div id="resultAdArea" class="result-pr" aria-label="保護者向けPR" hidden><div class="result-pr-head">保護者の方へ <span>PR</span></div><div class="a8-rotation-slot"></div></div></div></div>
-<!-- RESULT_AD_TEMPLATES -->
-<template id="result-ad-1">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+15OD4I+4GM8+68MF5" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444070&wid=001&eno=01&mid=s00000020816001048000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www11.a8.net/0.gif?a8mat=4BC0UC+15OD4I+4GM8+68MF5" alt="">
-</template>
-<template id="result-ad-2">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www22.a8.net/svt/bgt?aid=260901444089&wid=001&eno=01&mid=s00000012254003036000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www10.a8.net/0.gif?a8mat=4BC0UC+1GZLMA+2MJW+I2PXD" alt="">
-</template>
-<template id="result-ad-3">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1ELV76+5VQS+61Z81" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www20.a8.net/svt/bgt?aid=260901444085&wid=001&eno=01&mid=s00000027442001017000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1ELV76+5VQS+61Z81" alt="">
-</template>
-<template id="result-ad-4">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444068&wid=001&eno=01&mid=s00000020322001097000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www12.a8.net/0.gif?a8mat=4BC0UC+14HHWY+4CT0+6J4I9" alt="">
-</template>
-<template id="result-ad-5">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1F7ASY+56OA+601S1" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www28.a8.net/svt/bgt?aid=260901444086&wid=001&eno=01&mid=s00000024193001008000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www16.a8.net/0.gif?a8mat=4BC0UC+1F7ASY+56OA+601S1" alt="">
-</template>
-<template id="result-ad-6">
-<a href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+1GE60I+4N0I+614CX" rel="nofollow">
-<img border="0" width="300" height="250" alt="" src="https://www21.a8.net/svt/bgt?aid=260901444088&wid=001&eno=01&mid=s00000021645001013000&mc=1"></a>
-<img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+1GE60I+4N0I+614CX" alt="">
-</template>
+<div class="modal" id="modal"><div class="dialog"><h2 id="mt"></h2><div id="mb"></div><div class="choices" id="choices"></div></div></div>
 <script>
-function showRandomResultAd(slot){const ads=["result-ad-1","result-ad-2","result-ad-3","result-ad-4","result-ad-5","result-ad-6"];slot.replaceChildren();const selected=ads[Math.floor(Math.random() * ads.length)];slot.append(document.getElementById(selected).content.cloneNode(true))}
 // ===== Background music: 甘茶の音楽工房 =====
 // 「イカロスの墜落」→ 誰かが熟語札2枚で「残業戦士」へ
 const BGM_TRACKS={
@@ -1051,14 +1135,25 @@ let turn=0,busy=false,extra=false,wordMadeThisTurn=false,cells=[],humanCount=1,g
 function rk(){return pool[Math.floor(Math.random()*pool.length)]}
 function isHuman(i){return !!ps[i]?.human}
 function playerRoleLabel(i){return isHuman(i)?"プレイヤー":"コンピューター"}
-function setViewPlayer(i){if(i<0||i>=ps.length)return;viewPlayer=i;render()}
+function setViewPlayer(i){
+  if(i<0||i>=ps.length)return;
+  if(window.matchMedia('(max-width:700px)').matches){showPlayerStatusPopup(i);return}
+  viewPlayer=i;render();
+}
+function mayMakeNow(i,w){
+  if(!gameStarted||i!==turn||!isHuman(i)||busy||wordMadeThisTurn)return false;
+  const p=ps[i];
+  return p.alive&&!p.fogActive&&!p.w.includes(w)&&can(p,w);
+}
+function readyWords(){return words.filter(w=>mayMakeNow(turn,w))}
 function rc(i){if(i<6)return[1,i+1];if(i<11)return[i-4,6];if(i<16)return[6,16-i];return[21-i,1]}
 const sp={0:["start","紅軍本陣"],3:["omikuji","おみくじ"],5:["start","蒼軍本陣"],6:["market","市場"],8:["omikuji","おみくじ"],10:["start","翠軍本陣"],13:["omikuji","おみくじ"],15:["start","紫軍本陣"],16:["market","市場"],18:["omikuji","おみくじ"]};
 const B=document.getElementById("board");for(let i=0;i<20;i++){let [r,c]=rc(i),d=document.createElement("div"),s=sp[i];d.className="cell "+(s?s[0]:"");d.style.gridRow=r;d.style.gridColumn=c;d.innerHTML=s?s[1]:"空地";if([0,5,10,15].includes(i))d.dataset.faction=cols[[0,5,10,15].indexOf(i)];B.appendChild(d);cells.push({el:d,own:null,ch:null})}
 function render(){
   let active=ps[turn];
   turnBanner.innerHTML=gameStarted
-    ? `今の番：<b>${active.n}</b> <span style="opacity:.7">（${playerRoleLabel(turn)}）</span>`
+    ? `<span class="turn-full">今の番：<b>${active.n}</b>（${playerRoleLabel(turn)}）</span>
+       <span class="turn-compact"><b>${factionNames[turn]}の番</b><span>漢字${active.h.length}字</span><span>札${active.w.length}/3</span></span>`
     : "遊ぶ人数を選んでゲームを始めてください";
 
   hud.innerHTML=ps.map((p,i)=>{
@@ -1067,6 +1162,7 @@ function render(){
       style="${p.alive?"":"opacity:.42;filter:grayscale(1)"}" onclick="setViewPlayer(${i})">
       <span class="hud-head">
         <span class="hud-name">${p.n}${p.alive?"":"（ぬけた）"}${p.fogActive?" 🌫️":""}</span>
+        <span class="hud-name-short">${factionNames[i]}${p.alive?"":" ×"}${p.fogActive?" 🌫️":""}</span>
         <span class="role">${playerRoleLabel(i)}</span>
       </span>
       <span class="hud-stats">
@@ -1081,18 +1177,18 @@ function render(){
   idiomTitle.textContent=`📜 ${vp.n}の四字熟語札`;
   viewNotice.textContent=viewPlayer===turn
     ? `${vp.n}のようすを表示中`
-    : `${vp.n}の状況を確認中　｜　現在の今の番：${active.n}`;
+    : `${vp.n}のようすを確認中　｜　今の番：${active.n}`;
 
   hand.innerHTML=vp.h.map(x=>`<span class="k">${x}</span>`).join("")||"なし";
   idioms.innerHTML=words.map(w=>{
     let fog=vp.fogActive;
     let owned=vp.w.includes(w);
     let prog=fog&&!owned?"？？？？":progress(vp,w);
-    let make=gameStarted&&viewPlayer===turn&&isHuman(turn)&&!fog&&!wordMadeThisTurn&&!owned&&can(vp,w)&&!busy;
+    let make=viewPlayer===turn&&mayMakeNow(turn,w);
     return `<div class="idiom ${owned?"acquired":""}" data-idiom-word="${w}" title="長押しで意味と能力を見る">
       <b>${w}</b><span class="idiom-progress">　${owned?"●●●●":prog}</span>
       ${owned?`<span class="idiom-owned">✓ 手に入れた</span>`:""}
-      ${make?`<button onclick="makeWord('${w}')">作る</button>`:""}
+      ${make?`<span class="ready-mark" aria-label="作れる熟語">！</span><button onclick="makeWord('${w}')">作る</button>`:""}
       <span style="opacity:.75">⚡ ${effects[w]}</span>
     </div>`;
   }).join("");
@@ -1105,10 +1201,13 @@ function render(){
     cells[p.pos].el.appendChild(im)
   });
   roll.disabled=!gameStarted||busy||!isHuman(turn);
+  const count=readyWords().length;
+  progressQuickBtn.innerHTML=`📜 熟語のそろい具合${count?'<span class="ready-alert" aria-label="作れる熟語あり">！</span>':''}`;
+  progressQuickBtn.setAttribute('aria-label',count?`熟語のそろい具合・作れる熟語が${count}個あります`:'熟語のそろい具合');
 }
 function progress(p,w){let h=[...p.h];return [...w].map(x=>{let i=h.indexOf(x);if(i<0)return"○";h.splice(i,1);return"●"}).join("")}
 function can(p,w){return p.h.length>4&&!progress(p,w).includes("○")}function consume(p,w){for(let x of w)p.h.splice(p.h.indexOf(x),1)}
-function show(t,b,opts){mt.textContent=t;mb.innerHTML=b;choices.innerHTML="";const resultAdArea=document.getElementById("resultAdArea");resultAdArea.hidden=true;resultAdArea.querySelector(".a8-rotation-slot").replaceChildren();opts.forEach(o=>{let q=document.createElement("button");q.className="choice";q.innerHTML=o[0];q.onclick=()=>{modal.classList.remove("show");o[1]()};choices.appendChild(q)});modal.classList.add("show")}
+function show(t,b,opts){mt.textContent=t;mb.innerHTML=b;choices.innerHTML="";opts.forEach(o=>{let q=document.createElement("button");q.className="choice";q.innerHTML=o[0];q.onclick=()=>{modal.classList.remove("show");o[1]()};choices.appendChild(q)});modal.classList.add("show")}
 function openIdiomDetail(word){
   const info=idiomInfo[word];
   if(!info)return;
@@ -1182,7 +1281,7 @@ function idiomCharacterStates(p,w){
     return[ch,false];
   });
 }
-function progressPanelHTML(p){
+function progressPanelHTML(p,allowMake=false){
   if(!p)return"";
   let handText=p.h.length?p.h.join("　"):"なし";
   let rows=words.map(w=>{
@@ -1197,10 +1296,11 @@ function progressPanelHTML(p){
     let states=idiomCharacterStates(p,w);
     let have=states.filter(x=>x[1]).length;
     let ready=!owned&&have===4&&p.h.length>4;
+    let make=allowMake&&ps[turn]===p&&mayMakeNow(turn,w);
     return `<div class="progress-row ${owned?"owned":""}" data-idiom-word="${w}" title="長押しで意味と能力を見る">
       <span class="progress-word">${w}</span>
       <span class="progress-chars">${states.map(([ch,ok])=>`<span class="progress-char ${ok?"have":"miss"}">${ch}</span>`).join("")}</span>
-      <span class="progress-state ${owned?"done":ready?"ready":""}">${owned?"✓ 手に入れた":ready?"今作れる":`${have}/4`}</span>
+      <span class="progress-state ${owned?"done":ready?"ready":""}">${owned?"✓ 手に入れた":make?'<button class="progress-make-btn" type="button" data-make-word="'+w+'">！ 作る</button>':ready?'4/4':`${have}/4`}</span>
     </div>`;
   }).join("");
   return `<div class="progress-box">
@@ -1213,9 +1313,35 @@ function showWithProgress(t,b,opts,p=ps[turn]){
   show(t,`${b}${progressPanelHTML(p)}`,opts);
 }
 function showProgressPopup(i=turn){
-  let p=ps[i];
-  show(`${p.n}の熟語のそろい具合`,progressPanelHTML(p),[["閉じる",()=>{}]]);
+  const p=ps[i];
+  const canCreate=i===turn&&readyWords().length>0;
+  show(`${p.n}の熟語のそろい具合`,progressPanelHTML(p,canCreate),[["閉じる",()=>{}]]);
 }
+// Only the dedicated progress popup offers direct creation. Build/acquisition dialogs remain read-only.
+mb.addEventListener('click',event=>{
+  const button=event.target.closest('button[data-make-word]');
+  if(!button||!mayMakeNow(turn,button.dataset.makeWord))return;
+  const word=button.dataset.makeWord;
+  modal.classList.remove('show');
+  makeWord(word);
+});
+function ownedCastleHTML(i){
+  const own=cells.map((c,pos)=>({c,pos})).filter(x=>x.c.own===i);
+  if(!own.length)return '<p>まだ城はありません。</p>';
+  return '<div class="castle-list">'+own.map(({c,pos})=>`<div><b>${c.ch}城</b>（${[...c.ch].length}字の城・相手から${[...c.ch].length}字うばう）</div>`).join('')+'</div>';
+}
+function showPlayerStatusPopup(i){
+  const p=ps[i];
+  show(`${p.n}のようす`,kanjiInventoryHTML(p)+progressPanelHTML(p,i===turn&&readyWords().length>0)+`<div class="mobile-castle-summary">🏯 城 ${cells.filter(c=>c.own===i).length}か所</div>`,[["閉じる",()=>{}]]);
+}
+mobileHandBtn.addEventListener('click',()=>{
+  if(!gameStarted)return;
+  const p=ps[turn];show(`${p.n}の手札`,kanjiInventoryHTML(p),[["閉じる",()=>{}]]);
+});
+mobileCastleBtn.addEventListener('click',()=>{
+  if(!gameStarted)return;
+  show(`${ps[turn].n}の城`,ownedCastleHTML(turn),[["閉じる",()=>{}]]);
+});
 function kanjiInventoryHTML(p){
   return `<div class="kanji-inventory">
     <div class="kanji-inventory-title">🀄 所持漢字 ${p.h.length}字</div>
@@ -1832,7 +1958,7 @@ async function makeWord(w){
      <p>⚡ <b>能力：</b>${effects[w]}</p>`,
     [["サイコロへ",()=>{
       busy=false;viewPlayer=turn;render();
-      message("熟語札の能力を使うしました。サイコロを振ろう！");
+      message("サイコロを振ろう！");
     }]]
   );
 }
@@ -1914,10 +2040,10 @@ function end(){
   render();
   if(isHuman(turn)){
     message(ps[turn].fogActive
-      ? `【${ps[turn].n}の番】五里霧中！ このターンは熟語のそろい具合が霧に隠れ、熟語札を作れません。`
-      : `【${ps[turn].n}の番】四字熟語を作るか、サイコロを振ろう！`);
+      ? '五里霧中！この番は熟語札を作れません。'
+      : '四字熟語を作るか、サイコロを振ろう！');
   }else{
-    message(`【${ps[turn].n}の番】コンピューターが行動します…`);
+    message('コンピューターが行動中…');
     setTimeout(cpu,650);
   }
 }
@@ -1933,7 +2059,7 @@ function startLocalGame(count){
   startTurn(0);
   setupOverlay.classList.add("hide");
   render();
-  message(`【${ps[0].n}の番】四字熟語を作るか、サイコロを振ろう！`);
+  message('四字熟語を作るか、サイコロを振ろう！');
   if(bgmEnabled)startBGM();
   if(!isHuman(0))setTimeout(cpu,650);
 }
@@ -1985,7 +2111,7 @@ async function cpu(){
   }
   await doRoll();
 }
-function win(i){busy=true;roll.disabled=true;stopBGM();playSE("victory");show("天下統一！",`<h2>${ps[i].n}の勝利！</h2><p>四字熟語3枚完成、または最後まで生き残り、天下を統一しました。</p>`,[["再戦",()=>location.reload()]]);const resultAdArea=document.getElementById("resultAdArea");resultAdArea.hidden=false;showRandomResultAd(resultAdArea.querySelector(".a8-rotation-slot"))}
+function win(i){busy=true;roll.disabled=true;stopBGM();playSE("victory");show("天下統一！",`<h2>${ps[i].n}の勝利！</h2><p>四字熟語3枚完成、または最後まで生き残り、天下を統一しました。</p>`,[["再戦",()=>location.reload()]])}
 render();
 
 const manualBtn=document.getElementById("manualBtn");
