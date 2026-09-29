@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>九九スライドパズル｜ガクハコ ～学習おもちゃ箱～</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:#173047;background:#f1f7fb;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;min-height:100dvh;padding:clamp(10px,3vw,24px);display:flex;justify-content:center}main{width:min(100%,650px)}h1{margin:0 0 5px;font-size:clamp(23px,5vw,32px)}.lead{font-size:14px;line-height:1.55;margin:0 0 14px;color:#536879}.panel{padding:clamp(10px,3vw,22px);background:#fff;border-radius:20px;box-shadow:0 10px 35px #1a527018}.bar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px}.difficulty-control{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:750;color:#174a78;white-space:nowrap}.difficulty-control select{font:inherit;color:#174a78;background:#e6f1fa;border:1px solid #a9cce5;border-radius:9px;padding:8px 7px;max-width:155px;cursor:pointer}.difficulty-control select:focus-visible{outline:3px solid #f6ab41;outline-offset:2px}.stats{display:flex;gap:12px;font-weight:750;font-variant-numeric:tabular-nums}.stats span{color:#536879;font-weight:500;font-size:12px}.actions{display:flex;gap:7px;flex-wrap:wrap}button{font:inherit;touch-action:manipulation}button.action{border:0;background:#176cb5;color:#fff;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:750;cursor:pointer}button.action.secondary{background:#e6f1fa;color:#174a78}.board{position:relative;touch-action:none;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(3px,1vw,7px);width:100%;margin:auto;user-select:none}.cell{aspect-ratio:1;min-width:0;border-radius:clamp(6px,1.6vw,12px);display:grid;place-items:center;font-size:clamp(14px,4.4vw,28px);font-weight:800;font-variant-numeric:tabular-nums}.corner{background:#153b60;color:white}.header{background:#d8eafa;color:#155087}.slot{background:#eaf3f8;border:1px solid #d7e7f0}.tile-layer{position:absolute;inset:0;pointer-events:none}.tile{position:absolute;left:0;top:0;display:grid;place-items:center;border-radius:clamp(6px,1.6vw,12px);border:2px solid #c3dfed;background:linear-gradient(160deg,#fff,#e7f5fa);color:#11364f;box-shadow:0 3px 0 #b2d0df;font-size:clamp(14px,4.4vw,28px);font-weight:800;font-variant-numeric:tabular-nums;touch-action:none;pointer-events:auto;cursor:grab;will-change:transform;transition:transform 160ms cubic-bezier(.2,.8,.2,1),box-shadow 130ms,background 130ms;white-space:nowrap}.tile.moving{z-index:3;border-color:#edae36;box-shadow:0 8px 20px #9e762e55;transition:transform 170ms cubic-bezier(.2,.8,.2,1)}.tile:focus-visible,.action:focus-visible{outline:3px solid #f6ab41;outline-offset:2px}.tile.correct{border-color:#ff49b3;background:linear-gradient(160deg,#fff3fb,#ffc5e7);color:#8b145f;box-shadow:0 0 0 2px #ff9bd6,0 0 13px 4px #ff59baaa,0 0 23px 7px #ff9ad477}.slot{position:relative;color:#91aabd;font-size:clamp(13px,3.5vw,21px);font-weight:650}.slot.blank{background:#deedf6;outline:2px dashed #75a8c8;outline-offset:-3px;color:#155087;font-weight:850}.tile.can-move{cursor:pointer}.tile:not(.can-move){cursor:default}.message{min-height:24px;margin:13px 0 0;text-align:center;color:#365b72;font-size:13px;line-height:1.5}.message.success{color:#178053;font-weight:800}.help{font-size:13px;line-height:1.7;color:#567083;margin:14px 2px 0}@media(max-width:390px){.panel{padding:10px}.board{gap:3px}.cell,.tile{font-size:clamp(13px,4.5vw,19px)}.bar{align-items:stretch}.actions{width:100%}.action{flex:1}}
+/* ガクハコ共通導線とスマホ向け調整 */
+.site-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.site-head h1{margin:0}
+.home-back-btn{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;padding:9px 12px;border-radius:999px;background:#174a78;color:#fff;text-decoration:none;font-size:13px;font-weight:800;white-space:nowrap}
+.home-back-btn:focus-visible{outline:3px solid #ff49b3;outline-offset:3px}
+.rules{font-size:13px;line-height:1.6;color:#567083;margin:10px 2px 0}
+.rules summary{cursor:pointer;font-weight:750;color:#174a78;touch-action:manipulation}
+.rules .help{margin:6px 0 0}
+.action.hint{background:#7047bd}
+button.action:disabled{opacity:.55;cursor:not-allowed}
+/* １手ヒント：次に動かすパネルと、その移動先の空白を示す */
+.tile.hint-target{z-index:4;border-color:#7c3aed;background:linear-gradient(160deg,#fbf7ff,#e7d7ff);color:#4c1d95;animation:hint-pulse 1.15s ease-in-out infinite}
+.slot.blank.hint-destination{background:#f3e8ff;outline:3px solid #a855f7;outline-offset:-3px;box-shadow:0 0 12px #a855f7aa}
+.slot.blank.hint-destination::after{content:attr(data-hint-arrow);position:absolute;right:2px;bottom:1px;font-size:clamp(13px,3.8vw,19px);font-weight:900;line-height:1;color:#6d28d9}
+@keyframes hint-pulse{0%,100%{box-shadow:0 0 0 2px #c4b5fd,0 0 9px #8b5cf6aa}50%{box-shadow:0 0 0 3px #a78bfa,0 0 20px 5px #a855f7bb}}
+@media(prefers-reduced-motion:reduce){.tile.hint-target{animation:none;box-shadow:0 0 0 3px #a78bfa,0 0 14px 3px #a855f7aa}}
+@media(max-width:700px){
+ body{padding:8px 8px max(8px,env(safe-area-inset-bottom))}
+ main{max-width:530px}
+ .site-head{margin-bottom:5px}
+ .site-head h1{font-size:clamp(19px,5vw,26px)}
+ .home-back-btn{padding:7px 10px;font-size:12px}
+ .lead{font-size:12px;line-height:1.35;margin:0 0 7px}
+ .panel{padding:8px;border-radius:14px}
+ .bar{margin-bottom:8px;gap:6px}
+ .stats{gap:10px;font-size:14px}
+ .stats span{font-size:11px}
+ button.action{padding:8px 9px;font-size:12px}
+ .board{width:min(100%,max(175px,calc(100dvh - 208px)))}
+ .cell,.tile{font-size:clamp(13px,4.3vw,23px)}
+ .message{min-height:18px;margin:7px 0 0;font-size:12px}
+ .rules{margin-top:7px;font-size:12px}
+}
+@media(max-width:370px){.actions{gap:5px}.site-head h1{font-size:18px}.board{width:min(100%,max(165px,calc(100dvh - 215px)))}}
+
+/* クリア後ポップアップ。広告コードは HTML 末尾の #clear-ad-slot に設置する。 */
+.clear-modal[hidden]{display:none}
+.clear-modal{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:12px max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:rgba(11,30,51,.68)}
+.clear-dialog{width:min(100%,440px);max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;background:#fff;border-radius:20px;padding:clamp(15px,4vw,24px);box-shadow:0 25px 70px #061e3888;text-align:center}
+.clear-dialog h2{font-size:clamp(23px,5.5vw,30px);margin:0 0 6px;color:#a61365}
+.clear-result{font-size:15px;font-weight:800;color:#234760;margin:0 0 14px;font-variant-numeric:tabular-nums}
+.clear-ad{border:1px solid #d7e7f0;border-radius:14px;background:#f7fafc;padding:8px;margin:0 0 16px}
+.clear-ad-label{display:block;text-align:left;color:#697988;font-size:11px;font-weight:750;margin:0 0 5px}
+.clear-ad-slot{width:100%;min-height:clamp(110px,21dvh,185px);display:grid;place-items:center;overflow:hidden}
+.clear-ad-placeholder{color:#61788b;font-size:13px;line-height:1.55;margin:6px 0;padding:12px}
+.clear-ad-slot iframe,.clear-ad-slot img,.clear-ad-slot ins{max-width:100%}
+.clear-question{margin:0 0 12px;font-size:15px;font-weight:750;color:#234760}
+.clear-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.clear-actions button{min-height:48px;border-radius:12px;border:0;padding:10px 8px;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+.clear-next{background:#176cb5;color:#fff}
+.clear-review{background:#e6f1fa;color:#174a78}
+.clear-actions button:focus-visible{outline:3px solid #f6ab41;outline-offset:2px}
+@media(max-width:350px){.clear-dialog{padding:13px}.clear-actions{gap:6px}.clear-actions button{font-size:12px}}
+@media(max-height:590px){.clear-ad-slot{min-height:82px}.clear-dialog{padding:12px}.clear-dialog h2{font-size:22px}.clear-result{margin-bottom:7px}.clear-ad{margin-bottom:9px}}
+</style>
+</head>
+<body>
+<main>
+<header class="site-head"><h1>九九スライドパズル</h1><a class="home-back-btn" href="https://manabigames.jp/" aria-label="ガクハコのトップページへ戻る">← ガクハコ</a></header>
+<p class="lead">左上が空白のときに表示される答えを手がかりに、上と左の数字で九九を計算してパネルをそろえよう！</p>
+<section class="panel">
+<div class="bar"><div class="stats"><div><span>操作回数</span><br><strong id="moves">0</strong></div><div><span>経過時間</span><br><strong id="time">0:00</strong></div></div><label class="difficulty-control" for="difficulty">難易度<select id="difficulty"><option value="20">かんたん（20回）</option><option value="40">ふつう（40回）</option><option value="60">むずかしい（60回）</option></select></label><div class="actions"><button class="action hint" id="hint" type="button">１手ヒント</button><button class="action secondary" id="answer" type="button">完成形を見る</button><button class="action" id="restart" type="button">新しい問題</button></div></div>
+<div id="board" class="board" role="group" aria-label="九九の５×５スライドパズル"></div>
+<p id="message" class="message" aria-live="polite">空白の上下左右にあるパネルをタップ、または空白へスライドさせよう。</p>
+</section>
+<details class="rules"><summary>遊び方・ルール</summary><p class="help">左上の計算マスが空白です。空白の上下左右にあるパネルだけを、タップまたはドラッグで空白へ移動できます。左上のマスが空白のときだけ、その位置の答えを表示します。空白がほかのマスに移動しても、そこに正解は表示されません。上と左の数字を掛け算して、それぞれのパネルが入る位置を考えましょう。正しい位置に入ったパネルはピンク色に発光します。「１手ヒント」を押すと、今の盤面から完成できる手順の次の１手を表示します。紫色のパネルを矢印のある空白へ動かしてください。途中で正解パネルを動かすこともありますが、続けてヒントどおりに動かせば完成します。左上を空白にしたまま、残り24枚を正しく並べるとクリアです。難易度はシャッフル回数（20・40・60回）で選べます。</p></details>
+</main>
+
+<!-- クリア後：実広告の配信タグは #clear-ad-slot 内へ追加してください。現在は未設定です。 -->
+<div id="clear-modal" class="clear-modal" hidden>
+  <section class="clear-dialog" role="dialog" aria-modal="true" aria-labelledby="clear-title" aria-describedby="clear-result clear-question" tabindex="-1">
+    <h2 id="clear-title">🎉 クリア！</h2>
+    <p id="clear-result" class="clear-result"></p>
+    <div class="clear-ad" aria-label="広告表示枠">
+      <span class="clear-ad-label">広告</span>
+      <div id="clear-ad-slot" class="clear-ad-slot">
+        <p class="clear-ad-placeholder">広告枠（現在は広告を表示していません）</p>
+        <!-- 広告配信タグ設置位置：上の .clear-ad-placeholder を削除し、ここに正式な広告コードを貼り付けます。 -->
+      </div>
+    </div>
+    <p id="clear-question" class="clear-question">次のゲームに進みますか？</p>
+    <div class="clear-actions">
+      <button id="clear-review" class="clear-review" type="button">盤面に戻る</button>
+      <button id="clear-next" class="clear-next" type="button">次のゲームへ</button>
+    </div>
+  </section>
+</div>
+<script>
+(()=>{'use strict';
+const N=5,COUNT=N*N,board=document.getElementById('board'),msg=document.getElementById('message');
+const movesEl=document.getElementById('moves'),timeEl=document.getElementById('time'),hintBtn=document.getElementById('hint'),answerBtn=document.getElementById('answer'),difficultyEl=document.getElementById('difficulty');
+let cols=[],rows=[],target=[],order=[],cards=[],slots=[],layer=null,moves=0,startedAt=null,elapsed=0,clock=null,showAnswer=false,won=false,drag=null,locked=false,hintPos=null;
+let hintPlan=[],hintPlanKey=null,knownPlans=new Map();
+const gameMain=document.querySelector('main'),clearModal=document.getElementById('clear-modal');
+const clearResult=document.getElementById('clear-result'),clearNext=document.getElementById('clear-next'),clearReview=document.getElementById('clear-review');
+let clearTimer=null;
+function closeClear(restoreFocus=true){
+  if(clearTimer!==null){clearTimeout(clearTimer);clearTimer=null;}
+  if(clearModal.hidden)return;
+  clearModal.hidden=true;gameMain.inert=false;
+  if(restoreFocus)document.getElementById('restart').focus({preventScroll:true});
+}
+function showClear(){
+  clearTimer=null;
+  if(!won||!clearModal.hidden)return;
+  clearResult.textContent=`${moves}手・${fmt(elapsed)}で完成！`;
+  gameMain.inert=true;clearModal.hidden=false;
+  clearNext.focus({preventScroll:true});
+}
+function scheduleClear(){
+  if(clearTimer!==null)clearTimeout(clearTimer);
+  clearTimer=setTimeout(showClear,240); // 最後のパネルが移動し終わってから表示
+}
+clearReview.addEventListener('click',()=>closeClear());
+clearNext.addEventListener('click',()=>{closeClear(false);fresh();document.getElementById('hint').focus({preventScroll:true});});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!clearModal.hidden)closeClear();});
+const choice5=()=>{const a=[2,3,4,5,6,7,8,9];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,5);};
+const fmt=t=>`${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
+function stopClock(){if(clock!==null){clearInterval(clock);clock=null;}}
+function updateTime(){if(startedAt!==null)elapsed=Math.floor((Date.now()-startedAt)/1000);timeEl.textContent=fmt(elapsed);}
+function startClock(){if(startedAt===null){startedAt=Date.now()-elapsed*1000;clock=setInterval(updateTime,250);}}
+function solved(){return order[0]===null&&order.every((id,i)=>id===null||target[id]===target[i]);}
+function setMessage(s,success=false){msg.textContent=s;msg.classList.toggle('success',success);}
+function square(value,cls){const el=document.createElement('div');el.className='cell '+cls;el.textContent=value;return el;}
+function neighbors(pos){const r=Math.floor(pos/N),c=pos%N,out=[];if(r>0)out.push(pos-N);if(r<N-1)out.push(pos+N);if(c>0)out.push(pos-1);if(c<N-1)out.push(pos+1);return out;}
+// ヒントは操作履歴の巻き戻しではなく、現在の盤面を段階的に完成させる解法を使う。
+// 下段と右列を、単独のパネル→最後の２枚の順に確定していく。
+// 正しいマスを経由する必要があっても、提示した順に動かし続ければ完成する。
+function stateKeyFor(state){return state.map(id=>id===null?'_':String(id)).join(',');}
+function stateKey(){return stateKeyFor(order);}
+// シャッフル時に通った盤面について、完成までの既知の合法手順を保存する。
+function saveKnownPaths(trace){
+  knownPlans=new Map([[trace[0].key,[]]]);
+  for(let i=1;i<trace.length;i++){
+    const previous=knownPlans.get(trace[i-1].key),plan=[trace[i-1].blank,...previous];
+    const old=knownPlans.get(trace[i].key);
+    if(!old||plan.length<old.length)knownPlans.set(trace[i].key,plan);
+  }
+}
+function knownPath(current){return knownPlans.get(stateKeyFor(current))?.slice()??null;}
+// プレイヤーが別の手を選んでも、短い経路で既知の解法へ合流できるか探す。
+// プレイヤーの操作履歴を無条件に巻き戻す処理ではない。
+function connectKnown(current,bestLength,maxDepth=7){
+  const nodes=[{state:current.slice(),blank:current.indexOf(null),prev:-1,via:-1,depth:0,priorBlank:-1}];
+  const visited=new Set([stateKeyFor(current)]);
+  let chosen=null;
+  for(let head=0;head<nodes.length;head++){
+    const node=nodes[head];
+    if(node.depth>=bestLength)continue;
+    const known=knownPlans.get(stateKeyFor(node.state));
+    if(known&&node.depth+known.length<bestLength){
+      const prefix=[];
+      for(let index=head;nodes[index].prev!==-1;index=nodes[index].prev)prefix.push(nodes[index].via);
+      prefix.reverse();chosen=[...prefix,...known];bestLength=chosen.length;
+    }
+    if(node.depth>=maxDepth||node.depth+1>=bestLength)continue;
+    for(const pos of neighbors(node.blank)){
+      if(pos===node.priorBlank)continue;
+      const next=node.state.slice();next[node.blank]=next[pos];next[pos]=null;
+      const key=stateKeyFor(next);if(visited.has(key))continue;
+      visited.add(key);nodes.push({state:next,blank:pos,prev:head,via:pos,depth:node.depth+1,priorBlank:node.blank});
+    }
+  }
+  return chosen;
+}
+// 現在の状態から、マンハッタン距離を参考に短い解法を探す。
+// 探索が長引く場合は、必ず完成できる段階式の解法へ切り替える。
+function searchShortPath(current,bestLength,limit=12000){
+  const distances=Array.from({length:COUNT},(_,id)=>Array.from({length:COUNT},(_,pos)=>
+    Math.abs(Math.floor(id/N)-Math.floor(pos/N))+Math.abs(id%N-pos%N)));
+  const initialH=current.reduce((total,id,pos)=>total+(id===null?0:distances[id][pos]),0);
+  if(initialH>=bestLength)return null;
+  const heap=[],best=new Map([[stateKeyFor(current),0]]);
+  function better(a,b){return a.f<b.f||(a.f===b.f&&a.h<b.h);}
+  function push(node){let i=heap.length;heap.push(node);while(i>0){const parent=(i-1)>>1;if(!better(node,heap[parent]))break;heap[i]=heap[parent];i=parent;}heap[i]=node;}
+  function pop(){const first=heap[0],last=heap.pop();if(heap.length){let i=0;while((i*2+1)<heap.length){let child=i*2+1;if(child+1<heap.length&&better(heap[child+1],heap[child]))child++;if(!better(heap[child],last))break;heap[i]=heap[child];i=child;}heap[i]=last;}return first;}
+  push({state:current.slice(),blank:current.indexOf(null),g:0,h:initialH,f:initialH*1.8,prev:null,via:-1,priorBlank:-1});
+  let expanded=0;
+  while(heap.length&&expanded++<limit){
+    const node=pop(),key=stateKeyFor(node.state);
+    if(node.g!==best.get(key))continue;
+    if(node.h===0){
+      const path=[];for(let n=node;n.prev;n=n.prev)path.push(n.via);
+      return path.reverse();
+    }
+    for(const pos of neighbors(node.blank)){
+      if(pos===node.priorBlank)continue;
+      const id=node.state[pos],g=node.g+1;
+      const h=node.h-distances[id][pos]+distances[id][node.blank];
+      if(g+h>=bestLength)continue;
+      const next=node.state.slice();next[node.blank]=id;next[pos]=null;
+      const nextKey=stateKeyFor(next),old=best.get(nextKey);
+      if(old!==undefined&&old<=g)continue;
+      best.set(nextKey,g);
+      push({state:next,blank:pos,g,h,f:g+1.8*h,prev:node,via:pos,priorBlank:node.blank});
+    }
+  }
+  return null;
+}
+function chooseSolution(current){
+  const staged=solutionPath(current),known=knownPath(current);
+  let chosen=known&&(!staged||known.length<=staged.length)?known:staged;
+  if(!chosen)return null;
+  if(chosen.length<=8)return chosen;
+  const bridge=connectKnown(current,chosen.length);
+  if(bridge&&bridge.length<chosen.length)chosen=bridge;
+  if(chosen.length<=24)return chosen;
+  const shorter=searchShortPath(current,chosen.length);
+  return shorter&&shorter.length<chosen.length?shorter:chosen;
+}
+function solutionPath(current){
+  const work=current.slice(),steps=[],fixed=new Set();
+  const goals=Array.from({length:COUNT},(_,i)=>i===0?null:i);
+  // 空白と今回そろえる１～３枚の位置だけを状態として扱い、
+  // 既に完成したマスを通らない最短経路を幅優先探索する。
+  function stage(goalPositions){
+    const ids=goalPositions.map(p=>goals[p]);
+    const initial=[work.indexOf(null),...ids.map(id=>work.indexOf(id))];
+    const nodes=[{state:initial,prev:-1,via:-1}];
+    const seen=new Set([initial.join(',')]);
+    let found=-1;
+    for(let head=0;head<nodes.length;head++){
+      const {state}=nodes[head];
+      if(goalPositions.every((pos,i)=>state[i+1]===pos)){
+        found=head;break;
+      }
+      for(const pos of neighbors(state[0])){
+        if(fixed.has(pos))continue;
+        const next=state.slice();next[0]=pos;
+        for(let i=1;i<next.length;i++)if(next[i]===pos){next[i]=state[0];break;}
+        const key=next.join(',');
+        if(seen.has(key))continue;
+        seen.add(key);nodes.push({state:next,prev:head,via:pos});
+      }
+    }
+    if(found===-1)return false;
+    const path=[];
+    for(let node=found;nodes[node].prev!==-1;node=nodes[node].prev)path.push(nodes[node].via);
+    path.reverse();
+    for(const pos of path){
+      const blank=work.indexOf(null);
+      work[blank]=work[pos];work[pos]=null;steps.push(pos);
+    }
+    goalPositions.forEach(pos=>fixed.add(pos));
+    return true;
+  }
+  // 「下の１列 → 右の１列」を繰り返し、左上２×２を最後に残す。
+  for(let size=N;size>=3;size--){
+    const bottom=size-1;
+    for(let c=0;c<size-2;c++)if(!stage([bottom*N+c]))return null;
+    if(!stage([bottom*N+size-2,bottom*N+size-1]))return null;
+    const right=size-1;
+    for(let r=size-2;r>=2;r--)if(!stage([r*N+right]))return null;
+    if(!stage([N+right,right]))return null;
+  }
+  if(!stage([1,N,N+1]))return null;
+  return work[0]===null&&work.every((id,i)=>id===null||id===i)?steps:null;
+}
+function hintArrow(from,blank){if(from===blank-N)return '↓';if(from===blank+N)return '↑';if(from===blank-1)return '→';return '←';}
+function slotRect(pos){const b=slots[pos].getBoundingClientRect(),base=board.getBoundingClientRect();return {x:b.left-base.left,y:b.top-base.top,w:b.width,h:b.height};}
+function syncTiles(instant=false){
+  const blank=showAnswer?0:order.indexOf(null);
+  slots.forEach((slot,i)=>{
+    slot.classList.toggle('blank',i===blank);
+    // 左上が空白のときに限り、左上にだけ正解を表示する。移動先の空白には表示しない。
+    slot.textContent=(i===0&&blank===0)?String(target[0]):'';
+    const destination=!showAnswer&&!won&&hintPos!==null&&i===blank;
+    slot.classList.toggle('hint-destination',destination);
+    if(destination)slot.dataset.hintArrow=hintArrow(hintPos,blank);
+    else delete slot.dataset.hintArrow;
+  });
+  cards.forEach((card,id)=>{
+    if(!card)return;
+    const pos=showAnswer?id:order.indexOf(id),r=slotRect(pos);
+    card.classList.toggle('correct',target[id]===target[pos]);
+    card.classList.toggle('can-move',!showAnswer&&!won&&!locked&&neighbors(blank).includes(pos));
+    card.classList.toggle('hint-target',!showAnswer&&!won&&hintPos===pos);
+    card.style.width=r.w+'px';card.style.height=r.h+'px';
+    if(instant){card.style.transition='none';card.style.transform=`translate3d(${r.x}px,${r.y}px,0)`;card.getBoundingClientRect();card.style.transition='';}
+    else card.style.transform=`translate3d(${r.x}px,${r.y}px,0)`;
+  });
+}
+function buildBoard(){
+  board.replaceChildren();slots=[];cards=[];
+  board.append(square('×','corner'));cols.forEach(c=>board.append(square(c,'header')));
+  for(let r=0;r<N;r++){
+    board.append(square(rows[r],'header'));
+    for(let c=0;c<N;c++){const pos=r*N+c,slot=square('','slot');slot.dataset.pos=pos;slots.push(slot);board.append(slot);}
+  }
+  layer=document.createElement('div');layer.className='tile-layer';board.append(layer);
+  target.forEach((value,id)=>{if(id===0){cards.push(null);return;}const card=document.createElement('div');card.className='tile';card.textContent=value;card.dataset.id=id;card.setAttribute('aria-label',`${value}のパネル`);layer.append(card);cards.push(card);});
+  requestAnimationFrame(()=>syncTiles(true));
+}
+function refreshControls(){movesEl.textContent=moves;answerBtn.textContent=showAnswer?'パズルに戻る':'完成形を見る';hintBtn.disabled=showAnswer||won;}
+function move(pos){
+  if(won||showAnswer||locked)return false;
+  const blank=order.indexOf(null);
+  if(!neighbors(blank).includes(pos))return false;
+  // 提示した１手を正しく動かした場合だけ解法の続きを保持する。
+  // ほかの手を選んだ場合、次回のヒントはその時点の盤面から再計算する。
+  const followsPlan=hintPlanKey===stateKey()&&hintPlan[0]===pos;
+  startClock();moves++;refreshControls();
+  order[blank]=order[pos];order[pos]=null;
+  if(followsPlan){hintPlan.shift();hintPlanKey=stateKey();}
+  else{hintPlan=[];hintPlanKey=null;}
+  hintPos=null;
+  const moved=cards[order[blank]];moved.classList.add('moving');
+  syncTiles();
+  window.setTimeout(()=>moved.classList.remove('moving'),190);
+  if(solved()){won=true;updateTime();stopClock();setMessage(`完成！ ${moves}手・${fmt(elapsed)}でクリア！ 🎉`,true);refreshControls();syncTiles();scheduleClear();}
+  else setMessage('上と左の数字を掛け算して、パネルを正しい位置に並べよう。');
+  return true;
+}
+board.addEventListener('pointerdown',e=>{
+  if(e.button!==0||drag||won||showAnswer||locked)return;
+  const card=e.target.closest('.tile[data-id]');if(!card||!board.contains(card))return;
+  const id=Number(card.dataset.id),pos=order.indexOf(id);
+  if(!neighbors(order.indexOf(null)).includes(pos))return;
+  e.preventDefault();drag={id,pos,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY};
+  board.setPointerCapture(e.pointerId);
+});
+board.addEventListener('pointerup',e=>{
+  if(!drag||drag.pointerId!==e.pointerId)return;
+  e.preventDefault();const d=drag;drag=null;
+  if(board.hasPointerCapture(e.pointerId))board.releasePointerCapture(e.pointerId);
+  const blank=order.indexOf(null),rect=slots[blank].getBoundingClientRect();
+  const overBlank=e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY>=rect.top&&e.clientY<=rect.bottom;
+  const dx=e.clientX-d.startX,dy=e.clientY-d.startY;
+  const isTap=Math.hypot(dx,dy)<12;
+  if(isTap||overBlank)move(d.pos);
+});
+board.addEventListener('pointercancel',()=>{drag=null;});
+window.addEventListener('resize',()=>{drag=null;syncTiles(true);});
+function shuffle(){
+  // 完成状態から選択した回数だけ合法手で混ぜる。左上への復帰も回数に含む。
+  const shuffleSteps=Number(difficultyEl.value);
+  for(let attempt=0;attempt<40;attempt++){
+    order=Array.from({length:COUNT},(_,i)=>i===0?null:i);
+    let blank=0,previous=-1;
+    const trace=[{key:stateKey(),blank}];
+    for(let k=0;k<shuffleSteps;k++){
+      const remaining=shuffleSteps-k-1;
+      // 残り手数で左上に帰れる候補だけを選ぶ（５×５盤面で左上までの距離は行＋列）。
+      let options=neighbors(blank).filter(p=>{
+        const distance=Math.floor(p/N)+p%N;
+        return distance<=remaining&&(remaining-distance)%2===0;
+      });
+      const noBacktrack=options.filter(p=>p!==previous);
+      if(noBacktrack.length)options=noBacktrack;
+      const next=options[Math.floor(Math.random()*options.length)];
+      order[blank]=order[next];order[next]=null;previous=blank;blank=next;
+      trace.push({key:stateKey(),blank});
+    }
+    if(blank===0&&!solved()){
+      saveKnownPaths(trace);
+      return;
+    }
+  }
+  // 極めてまれに完成形に戻り続けた場合の、合法手による予備配置。
+  // ８手の輪と４手の輪を組み合わせ、合計手数を難易度と一致させる。
+  order=Array.from({length:COUNT},(_,i)=>i===0?null:i);
+  const longLoop=[1,2,7,12,11,10,5,0],shortLoop=[1,6,5,0];
+  let blank=0,remaining=shuffleSteps;
+  const trace=[{key:stateKey(),blank}];
+  while(remaining>=8){for(const next of longLoop){order[blank]=order[next];order[next]=null;blank=next;trace.push({key:stateKey(),blank});}remaining-=8;}
+  while(remaining>=4){for(const next of shortLoop){order[blank]=order[next];order[next]=null;blank=next;trace.push({key:stateKey(),blank});}remaining-=4;}
+  saveKnownPaths(trace);
+}
+
+function fresh(){closeClear(false);drag=null;locked=false;hintPos=null;hintPlan=[];hintPlanKey=null;stopClock();cols=choice5();rows=choice5();target=rows.flatMap(r=>cols.map(c=>r*c));shuffle();
+  moves=0;elapsed=0;startedAt=null;won=false;showAnswer=false;timeEl.textContent='0:00';
+  setMessage('空白の上下左右にあるパネルをタップ、または空白へスライドさせよう。');refreshControls();buildBoard();
+}
+document.getElementById('restart').addEventListener('click',fresh);
+difficultyEl.addEventListener('change',fresh);
+hintBtn.addEventListener('click',()=>{
+  if(drag||locked||won||showAnswer)return;
+  const key=stateKey();
+  if(hintPlanKey!==key||hintPlan.length===0){
+    hintPlan=chooseSolution(order);hintPlanKey=key;
+  }
+  const blank=order.indexOf(null),next=hintPlan?.[0];
+  if(next===undefined||!neighbors(blank).includes(next)){
+    hintPlan=[];hintPlanKey=null;
+    setMessage('手順を計算できませんでした。「新しい問題」でやり直してください。');return;
+  }
+  hintPos=next;syncTiles();
+  setMessage(`ヒント：紫の「${target[order[next]]}」を空白へ。一時的に正解パネルを動かすこともありますが、続けてヒントどおり動かせば完成します。`);
+});
+answerBtn.addEventListener('click',()=>{
+  if(drag||locked)return;hintPos=null;showAnswer=!showAnswer;
+  if(showAnswer)setMessage('完成形を表示中です。「パズルに戻る」で再開できます。');
+  else if(won)setMessage(`完成！ ${moves}手・${fmt(elapsed)}でクリア！ 🎉`,true);
+  else setMessage('パズルに戻りました。空白の隣のパネルを動かそう。');
+  refreshControls();syncTiles();
+});
+fresh();
+})();
+</script>
+</body>
+</html>
