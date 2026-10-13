@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f4f7f4">
+  <meta name="description" content="同じイラストが別のことわざを表すこともある推理型の神経衰弱ゲーム。オリジナルイラストを使った推理型の神経衰弱ゲーム。">
+  <title>ことわざ神経衰弱 | ガクハコ</title>
+  <style>
+    :root{
+      --ink:#203348; --muted:#647487; --navy:#27405b; --sea:#087f8b; --gold:#eaae3c;
+      --mint:#e5f5ec; --edge:#d5e2e2; --paper:#fffef9; --bg:#f3f7f5;
+    }
+    *{box-sizing:border-box}
+    html{height:100%;-webkit-text-size-adjust:100%}
+    body{min-height:100%;margin:0;background:radial-gradient(circle at 12% 0,#e5f4ef 0,transparent 35%),var(--bg);color:var(--ink);font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+    button{font:inherit;cursor:pointer;touch-action:manipulation}
+    button:focus-visible{outline:3px solid #ea9937;outline-offset:3px}
+    .container{width:min(100% - 28px,850px);margin:0 auto;padding-bottom:24px}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 0 9px}
+    .home-link{color:#155969;text-decoration:none;font-weight:800;font-size:13px;background:#fff;border:1px solid var(--edge);border-radius:999px;padding:8px 12px;white-space:nowrap;box-shadow:0 2px 4px #18354c0b}
+    .head-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+    .control{border:1px solid var(--edge);border-radius:999px;background:white;color:var(--navy);padding:8px 12px;font-weight:800;font-size:12px;box-shadow:0 2px 4px #18354c0b}
+    .control:active,.home-link:active{transform:translateY(1px)}
+    .hero{display:flex;align-items:end;justify-content:space-between;gap:14px;margin:1px 0 10px}
+    h1{margin:0;font-size:clamp(22px,4vw,30px);line-height:1.3;letter-spacing:.025em}
+    .sub{font-size:12px;margin:3px 0 0;color:var(--muted);font-weight:650}
+    .metrics{display:flex;gap:7px;flex-shrink:0}
+    .metric{border:1px solid var(--edge);background:#fff;border-radius:13px;padding:7px 12px;min-width:65px;text-align:center;box-shadow:0 2px 6px #152c4009}
+    .metric .number{display:block;font-size:21px;line-height:1.1;font-weight:900;font-variant-numeric:tabular-nums;color:var(--sea)}
+    .metric .label{display:block;color:var(--muted);font-size:10px;font-weight:750;margin-top:2px}
+    .metric.miss .number{color:#c26140}
+    .section-label{display:flex;align-items:center;gap:7px;margin:12px 0 7px;font-size:13px;font-weight:900}
+    .section-label .pill{font-size:10px;color:var(--sea);background:#e4f2f2;border:1px solid #cde3e2;padding:3px 7px;border-radius:12px}
+    .section-caption{font-size:11px;color:var(--muted);font-weight:650;margin-left:auto;text-align:right}
+    .meaning-grid,.proverb-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+    .meaning-card{height:146px;border-radius:12px;background:var(--paper);border:2px solid #d5ddd6;box-shadow:0 4px 0 #cdd7d29c;position:relative;padding:9px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;transition:background .3s,border .3s,transform .3s}
+    .meaning-card:before,.meaning-card:after{content:"";position:absolute;width:48px;height:48px;border-radius:50%;background:#e7f4eb90}
+    .meaning-card:before{left:-21px;top:-25px}.meaning-card:after{right:-24px;bottom:-23px}
+    .meaning-card .mean-head{color:#348177;font-size:10px;font-weight:900;letter-spacing:.06em;margin-bottom:7px;z-index:1}
+    .meaning-card .mean-copy{font-size:clamp(10px,1.6vw,13px);font-weight:850;line-height:1.5;z-index:1;overflow-wrap:anywhere}
+    .meaning-card .mean-mark{display:none;font-size:10px;background:#d9f5df;color:#22754a;font-weight:900;padding:3px 6px;border-radius:9px;margin-top:5px;z-index:1}
+    .meaning-card.acquired{background:#edf9e9;border-color:#63b38f;box-shadow:0 4px 0 #82cda98a;animation:acquire .5s ease}
+    .meaning-card.acquired .mean-head{color:#1b8350}.meaning-card.acquired .mean-mark{display:block}
+    .meaning-card.acquired:after{content:"✓";width:auto;height:auto;background:transparent;font-size:50px;font-weight:900;color:#2ba76e24;top:-15px;right:-7px;bottom:auto}
+    @keyframes acquire{0%{transform:scale(1)}55%{transform:scale(1.065)}100%{transform:scale(1)}}
+    .proverb-card{position:relative;aspect-ratio:1.04/1;border:0;padding:0;border-radius:14px;background:transparent;perspective:800px;user-select:none;-webkit-tap-highlight-color:transparent}
+    .tile-inner{display:block;position:absolute;inset:0;transform-style:preserve-3d;transition:transform .48s cubic-bezier(.2,.75,.23,1)}
+    .proverb-card.is-flipped .tile-inner,.proverb-card.is-found .tile-inner{transform:rotateY(180deg)}
+    .tile-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;border-radius:14px;border:2px solid #d8e5e5;box-shadow:0 3px 0 #c7d5d5;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .tile-art{background:linear-gradient(150deg,#f9fefd,#e8f3f0)}
+    .tile-art:before{position:absolute;content:"";inset:7px;border:1px dashed #8dadb77a;border-radius:9px;pointer-events:none}
+     .tile-art svg{height:100%;width:100%;position:relative;z-index:1}
+    .tile-art .art-wrap{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%;padding:6px}
+    .tile-art .art-photo{max-width:100%;max-height:100%;object-fit:contain;position:relative;z-index:2;filter:drop-shadow(0 1px 1px rgba(0,0,0,.08))}
+    .tile-art .art-wrap svg{position:absolute;inset:0;z-index:1}
+    .tile-art .art-wrap.has-loaded-photo svg{display:none}
+    .tile-art .art-wrap.use-fallback .art-photo{display:none}
+
+    .tile-back{transform:rotateY(180deg);background:linear-gradient(145deg,#fffef5,#fff4d9);border-color:#e8ba6b;padding:7px;gap:5px}
+    .tile-back .tag{background:#f7e4bb;color:#81592b;border-radius:20px;padding:3px 7px;font-weight:900;font-size:10px;letter-spacing:.04em;white-space:nowrap}
+    .tile-back .proverb-text{font-size:clamp(12px,1.9vw,17px);line-height:1.38;font-weight:900;overflow-wrap:anywhere;text-align:center;text-wrap:balance;max-width:100%;word-break:normal}
+    .proverb-card:not([disabled]):hover .tile-art{border-color:#73aab1;background:linear-gradient(145deg,#f0fffd,#dff1ed)}
+    .proverb-card:active{transform:translateY(1px)}
+    .proverb-card.is-found{cursor:default}
+    .proverb-card.is-found .tile-back{background:linear-gradient(145deg,#e7f8eb,#d5efdc);border-color:#74c39c;box-shadow:0 3px 0 #94c9ad}
+    .proverb-card .found-mark{position:absolute;right:3px;top:3px;z-index:3;width:24px;height:24px;display:none;align-items:center;justify-content:center;color:white;font-weight:900;border-radius:50%;background:#289d69;border:2px solid white;transform:translateZ(5px)}
+    .proverb-card.is-found .found-mark{display:flex}
+    .notice{margin:12px 0 0;border:1px solid #cce1e0;background:#edf8f5;border-radius:12px;min-height:43px;padding:9px 13px;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.55}
+    .notice.bad{border-color:#efd1ba;background:#fff1e8;color:#a55435}
+    .notice.good{border-color:#c1e1cd;background:#ebfaef;color:#197b50}
+    .footer{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:9px;color:#8a9b9a;font-size:10px}
+    .overlay{position:fixed;inset:0;z-index:20;background:#1f3344b9;display:none;align-items:center;justify-content:center;padding:18px}
+    .overlay.show{display:flex}
+    .dialog{background:#fffefa;border:2px solid #cfe1d9;border-radius:22px;padding:24px 21px 20px;width:min(100%,410px);box-shadow:0 18px 80px #082b4b4d;text-align:center;max-height:85dvh;overflow:auto}
+    .dialog .medal{font-size:56px;line-height:1.3}
+    .dialog h2{font-size:23px;margin:4px 0 11px}
+    .dialog p{font-size:14px;line-height:1.8;margin:10px 0}
+    .dialog .big-score{font-weight:950;font-size:40px;color:var(--sea);margin:8px 0}
+    .primary{background:var(--sea);color:white;border:none;border-radius:13px;padding:12px 20px;font-weight:900;font-size:15px;width:100%;margin-top:8px;box-shadow:0 4px 0 #07626d}
+    .secondary{background:#eef4f1;color:var(--navy);border:1px solid #c4d6d6;border-radius:13px;padding:10px 20px;font-weight:800;width:100%;margin-top:12px}
+    .rules-list{text-align:left;font-size:13px;line-height:1.9;margin:12px 0 17px;padding-left:22px}
+    .rules-list li{margin-bottom:5px}
+    @media(min-width:680px){.container{padding-top:5px}.meaning-card{height:143px}.proverb-card{aspect-ratio:1.28/1}.tile-art svg{height:95%}.notice{font-size:13px}}
+    @media(max-width:520px){
+      .container{width:calc(100% - 18px);padding-bottom:16px}
+      .header{padding:9px 0 9px}
+      .home-link,.control{font-size:11px;padding:7px 9px}
+      .hero{align-items:center;margin-bottom:4px}
+      h1{font-size:20px}.sub{font-size:10px;max-width:200px}
+      .metrics{gap:5px}.metric{padding:5px 7px;min-width:51px;border-radius:10px}.metric .number{font-size:18px}.metric .label{font-size:9px}
+      .section-label{margin:9px 0 6px;font-size:12px}.section-label .pill{font-size:9px}.section-caption{font-size:9px}
+      .meaning-grid,.proverb-grid{gap:5px}
+      .meaning-card{height:120px;padding:6px 3px;border-radius:8px;border-width:1.5px;box-shadow:0 2px 0 #cdd7d2}
+      .meaning-card .mean-head{font-size:9px;margin-bottom:4px}.meaning-card .mean-copy{font-size:clamp(9px,2.65vw,11px);line-height:1.35}
+      .meaning-card .mean-mark{font-size:8px;padding:2px 3px;line-height:1.2}
+      .proverb-card{aspect-ratio:.76/1}.tile-face{border-radius:9px;border-width:1.5px;box-shadow:0 2px 0 #c7d5d5}.tile-art:before{inset:4px;border-radius:6px}
+      .tile-back{padding:4px 3px;gap:4px}.tile-back .tag{font-size:8px;padding:2px 4px}.tile-back .proverb-text{font-size:clamp(10px,2.7vw,12px);line-height:1.36}
+      .proverb-card .found-mark{width:17px;height:17px;font-size:11px;right:1px;top:1px}
+      .notice{margin-top:10px;min-height:40px;font-size:11px;padding:8px 9px}.footer{font-size:9px;margin-top:7px}
+    }
+    @media(max-width:360px){.sub{font-size:9px}.meaning-card{height:126px}.meaning-card .mean-copy{font-size:9px}.tile-back .proverb-text{font-size:10px}.section-caption{font-size:8px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+    .result-ad{margin-top:26px;padding:18px 12px 4px;border-top:1px solid var(--edge);text-align:left;font-size:13px;line-height:1.8;color:var(--navy);overflow-wrap:anywhere}
+    .result-ad-heading{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:800}
+    .result-ad-label{font-size:11px;border:1px solid var(--edge);border-radius:6px;padding:0 6px}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <a class="home-link" href="https://manabigames.jp/" aria-label="ガクハコのトップへ戻る">← ガクハコ</a>
+      <div class="head-actions">
+        <button id="soundBtn" class="control" type="button" aria-label="効果音のオンオフ">♪ 音あり</button>
+        <button id="rulesBtn" class="control" type="button">遊び方</button>
+        <button id="restartBtn" class="control" type="button">やり直し</button>
+      </div>
+    </header>
+    <div class="hero">
+      <div>
+        <h1>ことわざ神経衰弱</h1>
+        <p class="sub">絵と意味を手がかりに、同じ意味の2枚を探そう！</p>
+      </div>
+      <div class="metrics" aria-live="polite">
+        <div class="metric"><span class="number" id="foundCount">0<span aria-hidden="true" style="font-size:12px;color:#95a4a4">/5</span></span><span class="label">そろえた組</span></div>
+        <div class="metric miss"><span class="number" id="missCount">0</span><span class="label">ミス</span></div>
+      </div>
+    </div>
+    <section aria-labelledby="meaningHeading">
+      <div class="section-label" id="meaningHeading">① ことわざの意味 <span class="pill">5枚</span><span class="section-caption">5つの意味が手がかり</span></div>
+      <div id="meaningGrid" class="meaning-grid"></div>
+    </section>
+    <section aria-labelledby="cardsHeading">
+      <div class="section-label" id="cardsHeading">② イラストカードをめくる <span class="pill">10枚</span><span class="section-caption">同じ絵でも意味は別かも？</span></div>
+      <div id="proverbGrid" class="proverb-grid"></div>
+    </section>
+    <div class="notice" id="notice" aria-live="polite">同じ絵でも同じ意味とは限らないよ。絵と意味から推理しよう！</div>
+    <footer class="footer"><span>© ガクハコ ～学習おもちゃ箱～・イラスト：AI生成素材</span><span id="bestDisplay">ベスト：―</span></footer>
+  </main>
+  <div class="overlay" id="rulesOverlay" role="dialog" aria-modal="true" aria-labelledby="rulesTitle" aria-hidden="true">
+    <div class="dialog">
+      <div class="medal" aria-hidden="true">📖</div>
+      <h2 id="rulesTitle">遊び方</h2>
+      <ol class="rules-list">
+        <li>上の5枚には、ことわざの<strong>意味</strong>が書いてあるよ。</li>
+        <li>下のイラストカードを1枚選ぶと、裏の<strong>ことわざ</strong>が読めるよ。同じ絵でも、意味の異なることわざの場合があるよ！</li>
+        <li>絵・ことわざの知識・上の意味カードから推理してね。同じ意味になる2枚をそろえると、2枚のことわざと対応する意味カードをゲット！ 1グループに3種類以上ある場合も、出るのは2枚だよ。</li>
+        <li>ちがう組み合わせなら<strong>ミスが1回</strong>増えるよ。全25ことわざ・10グループから毎回5グループを出題するよ。</li>
+      </ol>
+      <button class="primary" id="closeRulesBtn" type="button">ゲームにもどる</button>
+    </div>
+  </div>
+  <div class="overlay" id="winOverlay" role="dialog" aria-modal="true" aria-labelledby="winTitle" aria-hidden="true">
+    <div class="dialog">
+      <div class="medal" id="winMedal" aria-hidden="true">🏆</div>
+      <h2 id="winTitle">すべてそろった！</h2>
+      <p>ことわざ5組と意味カード5枚を獲得！</p>
+      <div class="big-score" id="winScore">ミス 0回</div>
+      <p id="winComment">すばらしい！</p>
+      <p id="winBest" style="font-size:12px;color:#638078"></p>
+      <button class="primary" id="againBtn" type="button">もう一度あそぶ</button>
+      <button class="secondary" id="reviewBtn" type="button">そろえたことわざを見る</button>
+      <div id="resultAdSlot"></div>
+    </div>
+  </div>
+  <template id="resultAdTemplate">
+    <section class="result-ad" aria-label="保護者の方へ・広告">
+      <div class="result-ad-heading">保護者の方へ <span class="result-ad-label">PR</span></div>
+      <a class="parent-pr-link" href="https://px.a8.net/svt/ejp?a8mat=4BC0UC+14HHWY+4CT0+5YJRM" rel="nofollow">自宅での学習をサポートする無学年式オンライン教材【すらら】</a><img border="0" width="1" height="1" src="https://www17.a8.net/0.gif?a8mat=4BC0UC+14HHWY+4CT0+5YJRM" alt="">
+    </section>
+  </template>
+  <script>
+  (() => {
+    'use strict';
+    // 10意味グループ・25ことわざ。1ゲームでは5グループから各2ことわざを出す。
+    // art はイラストの識別子。違う意味グループでも同じ絵を参照できる。
+    // 蜂：虻蜂取らず／泣きっ面に蜂、河童：河童の川流れ／河童に水練。
+    const PAIR_BANK = [
+      {id:'value',meaning:'価値のあるものや言葉でも、相手に伝わらなければ役に立たない。',cards:[
+        {text:'猫に小判',art:'cat'},{text:'豚に真珠',art:'pig'},{text:'馬の耳に念仏',art:'horse'}]},
+      {id:'expert',meaning:'名人や得意な人でも、ときには失敗する。',cards:[
+        {text:'猿も木から落ちる',art:'monkey'},{text:'河童の川流れ',art:'kappa'},{text:'弘法にも筆の誤り',art:'monk'}]},
+      {id:'greed',meaning:'二つを欲張ると、どちらも手に入らない。',cards:[
+        {text:'二兎を追う者は一兎をも得ず',art:'rabbits'},{text:'虻蜂取らず',art:'bee'}]},
+      {id:'power',meaning:'強い者がさらに力を得て、もっと強くなる。',cards:[
+        {text:'鬼に金棒',art:'oni'},{text:'虎に翼',art:'tiger'}]},
+      {id:'misfortune',meaning:'悪いことが起きたうえに、さらに災難が重なる。',cards:[
+        {text:'泣きっ面に蜂',art:'bee'},{text:'弱り目に祟り目',art:'eye'},{text:'踏んだり蹴ったり',art:'foot'}]},
+      {id:'futile',meaning:'その道の達人に、わざわざその技や知識を教えるのは無意味。',cards:[
+        {text:'河童に水練',art:'kappa'},{text:'釈迦に説法',art:'shaka'},{text:'孔子に論語',art:'koshi'}]},
+      {id:'noeffect',meaning:'何をしても手応えがなく、効果がない。',cards:[
+        {text:'暖簾に腕押し',art:'noren'},{text:'糠に釘',art:'nail'},{text:'豆腐に鎹',art:'tofu'}]},
+      {id:'smallsteps',meaning:'小さなことでも、積み重なると大きな結果になる。',cards:[
+        {text:'塵も積もれば山となる',art:'mountain'},{text:'雨垂れ石を穿つ',art:'rain'}]},
+      {id:'prepared',meaning:'前もって備えておけば、困らずにすむ。',cards:[
+        {text:'転ばぬ先の杖',art:'cane'},{text:'備えあれば憂いなし',art:'emergency'}]},
+      {id:'trapped',meaning:'逃げ場がなく、自分ではどうにもできない。',cards:[
+        {text:'袋の鼠',art:'mouse'},{text:'まな板の鯉',art:'carp'}]},
+    ];
+    const PAIR_LOOKUP = new Map(PAIR_BANK.map(pair=>[pair.id,pair]));
+    let activePairs=[];
+    const $ = id => document.getElementById(id);
+    const meaningGrid=$('meaningGrid'),proverbGrid=$('proverbGrid'),notice=$('notice');
+    const rulesOverlay=$('rulesOverlay'),winOverlay=$('winOverlay');
+    let cards=[],selected=[],found=new Set(),mistakes=0,locked=false,timers=[];
+    let soundOn=true,audioCtx=null;
+    const storeKey='gakuhako-kotowaza-memory-best-v5';
+
+    function shuffled(input){let a=[...input];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+    const svgStart=(bg='#eaf5f2')=>`<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 140"><rect width="160" height="140" fill="${bg}"/><circle cx="17" cy="22" r="15" fill="#fff" opacity=".5"/><circle cx="142" cy="111" r="23" fill="#fff" opacity=".42"/>`;
+    const svgEnd='</svg>';
+    const oval=(x,y,rx,ry,fill,stroke='none',sw=2)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+    const circ=(x,y,r,fill,stroke='none',sw=2)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+    const path=(d,stroke,sw,fill='none')=>`<path d="${d}" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" fill="${fill}"/>`;
+    const E='#253b42';
+    function fallbackArtwork(key){
+      const eye=(x,y)=>circ(x,y,3.2,E), bl=(x,y)=>circ(x,y,3,'#f9b6ac');
+      let p='';let bg='#e8f3f0';
+      switch(key){
+      case 'cat':
+        bg='#fff0d9'; p+=`<g transform="translate(-16,0)">`;
+        p+=`<path d="M38 43 L42 12 L65 29 L87 16 L92 48" fill="#e9a86a" stroke="#a66541" stroke-width="4" stroke-linejoin="round"/>`;
+        p+=oval(65,76,43,44,'#e9a86a','#a66541',3)+oval(65,94,20,16,'#fff3e4');
+        p+=eye(50,72)+eye(79,72)+path('M60 84 L69 84 L64 90 Z','#9b594b',2,'#a96057');
+        p+=path('M43 90 L20 86 M43 96 L22 99 M85 90 L105 84 M85 96 L108 101','#845642',2.4)+`</g>`;
+        p+=circ(119,91,25,'#f7ca4e','#c48627',4)+circ(119,91,19,'none','#e9a62a',2)+`<text x="119" y="103" font-size="26" text-anchor="middle" font-family="serif" font-weight="bold" fill="#b87b1b">小</text>`;
+        break;
+      case 'pig':
+        bg='#fcebea';p+=`<path d="M34 57 L30 24 Q53 24 58 47 M99 48 Q108 23 134 30 L117 62" fill="#f3abb4" stroke="#d97c90" stroke-width="4"/>`;
+        p+=circ(83,77,50,'#ffc0c8','#d97c90',3)+oval(82,93,29,22,'#ef93a7','#cc6b82',2)+circ(72,92,5,'#b66e7b')+circ(93,92,5,'#b66e7b');
+        p+=eye(65,69)+eye(101,69)+bl(53,81)+bl(112,81);
+        p+=circ(133,29,19,'#fffefa','#a8cbd5',4)+circ(126,23,5,'white');
+        break;
+      case 'monkey':
+        bg='#e4f1db';p+=`<rect x="127" y="-5" width="18" height="145" rx="8" fill="#b57a49"/>`+path('M138 26 Q98 25 46 25','#b57a49',12);
+        p+=`<path d="M90 86 Q125 112 99 127 Q79 134 80 112" fill="none" stroke="#95623c" stroke-width="9" stroke-linecap="round"/>`;
+        p+=oval(67,84,29,33,'#95623c')+circ(67,56,31,'#95623c')+circ(42,57,11,'#bf9369')+circ(94,57,11,'#bf9369');
+        p+=oval(67,64,23,22,'#edc69b')+eye(58,58)+eye(77,58)+oval(67,70,7,4,'#b16c63');
+        p+=path('M50 105 L40 125 M83 103 L97 121','#95623c',11)+path('M41 89 L23 75 M92 87 L108 77','#95623c',10);
+        p+=`<path d="M23 12 l-8 -8 m7 9 -12 1" stroke="#d8a744" stroke-width="4"/>`;
+        break;
+      case 'kappa':
+        bg='#dff3f9';p+=`<path d="M0 91 Q22 77 43 91 T86 91 T130 91 T175 91 L175 145 L0 145" fill="#7ccde3"/>`;
+        p+=`<path d="M0 105 Q22 93 43 105 T86 105 T130 105 T175 105 M-2 120 Q18 109 42 120 T84 120 T128 120 T175 120" stroke="#f2ffff" stroke-width="4" fill="none"/>`;
+        p+=circ(79,69,42,'#7ac66e','#3e9569',3);
+        p+=`<path d="M43 44 L36 29 L55 34 L64 21 L81 30 L94 20 L107 36 L117 29 L119 48" fill="#3a8564"/>`;
+        p+=oval(79,31,25,9,'#daed89','#638e59',2)+eye(64,66)+eye(94,66)+oval(78,79,20,8,'#f2c66b','#b68e49',2);
+        p+=path('M44 83 L24 93 M113 83 L132 91','#58a85f',11);
+        break;
+      case 'horse':
+        bg='#e5f1df';
+        p+=`<path d="M17 134 Q32 115 63 119 L114 119 Q132 99 131 77 L119 37 Q111 21 93 31 L77 58 L59 67 L55 91 Q55 110 39 126 Z" fill="#b77e56" stroke="#78543f" stroke-width="3"/>`;
+        p+=`<path d="M95 31 Q82 28 79 56 L67 69 L77 76 L102 50" fill="#78543f"/>`;
+        p+=`<path d="M120 52 L146 71 L138 82 L119 80" fill="#bb855d" stroke="#78543f" stroke-width="3"/>`;
+        p+=eye(115,59)+`<path d="M127 23 L136 4 L144 33" fill="#a97650" stroke="#78543f" stroke-width="3"/>`;
+        p+=`<path d="M15 36 L39 36 L39 83 L14 83 Z" fill="#fffbe9" stroke="#98b8a8" stroke-width="3"/><path d="M23 48 H32 M23 57 H32 M23 67 H32" stroke="#85a0a0" stroke-width="2"/>`;
+        break;
+      case 'monk':
+        bg='#f7ecdc';p+=`<rect x="24" y="30" width="111" height="87" rx="5" fill="#fffdf5" stroke="#d6c4ae" stroke-width="3"/>`;
+        p+=`<path d="M51 41 Q35 75 65 88 Q94 103 81 56 Q70 47 61 77" stroke="#353b44" stroke-width="7" fill="none"/>`;
+        p+=`<path d="M138 14 L78 87" stroke="#896241" stroke-width="10"/><path d="M78 87 L71 106 L91 92" fill="#2f3538" stroke="#333" stroke-width="2"/>`;
+        p+=circ(91,96,4,'#34383e')+circ(103,106,3,'#34383e')+`<path d="M117 124 Q126 130 139 124" stroke="#d5b78f" stroke-width="5" fill="none"/>`;
+        break;
+      case 'foot':
+        bg='#f5e9df';p+=`<path d="M31 39 Q58 10 80 42 L101 76 Q124 79 129 91 Q134 108 111 111 L50 108 Q23 105 27 82 Z" fill="#e5ad80" stroke="#a77159" stroke-width="4"/>`;
+        p+=`<path d="M25 104 Q41 118 57 121 M100 113 Q111 127 135 117" stroke="#b57d5b" stroke-width="5" fill="none"/>`;
+        p+=`<path d="M22 28 L42 42 M10 58 L31 64 M123 29 L110 46" stroke="#eb8e62" stroke-width="5" stroke-linecap="round"/>`;
+        p+=`<path d="M74 58 Q90 62 96 78" stroke="#b77962" stroke-width="5" fill="none"/>`;
+        break;
+      case 'koshi':
+        bg='#ecf3e6';p+=`<path d="M27 24 Q24 15 37 15 H125 Q137 16 133 28 L127 114 Q126 125 137 126 H37 Q24 125 27 114 Z" fill="#f9edcf" stroke="#ad996f" stroke-width="3"/>`;
+        p+=`<rect x="33" y="12" width="101" height="14" rx="7" fill="#ac7657"/><rect x="33" y="118" width="101" height="14" rx="7" fill="#ac7657"/>`;
+        p+=`<path d="M47 45 H115 M47 58 H115 M47 71 H106 M47 84 H114 M47 98 H95" stroke="#8d967d" stroke-width="4" stroke-linecap="round"/>`;
+        p+=`<circle cx="116" cy="99" r="13" fill="#e9a796" opacity=".5"/>`;
+        break;
+      case 'noren':
+        bg='#e9f3e8';p+=`<path d="M14 18 H145" stroke="#7e6d5c" stroke-width="8"/>`;
+        p+=`<path d="M24 23 H139 L137 109 L110 98 L82 111 L54 98 L27 111 Z" fill="#7aa5ae" stroke="#507984" stroke-width="3"/>`;
+        p+=`<path d="M55 24 V99 M83 24 V110 M111 24 V100" stroke="#dbece5" stroke-width="4"/>`;
+        p+=`<path d="M4 73 L41 73 L49 82 L70 69" stroke="#e7ad87" stroke-width="15" fill="none" stroke-linecap="round"/>`;
+        break;
+      case 'nail':
+        bg='#f5e9d7';p+=`<rect x="20" y="95" width="125" height="35" rx="7" fill="#c59a68" stroke="#8c6749" stroke-width="3"/>`;
+        p+=`<path d="M20 112 L145 112 M40 99 L43 128 M91 96 L92 129" stroke="#a17954" stroke-width="2"/>`;
+        p+=`<path d="M81 24 L82 96 M70 27 H93" stroke="#727c82" stroke-width="9" stroke-linecap="round"/>`;
+        p+=`<path d="M82 99 L78 108 L86 108 Z" fill="#5f6b73"/>`;
+        p+=`<path d="M102 30 L132 50 L116 65" stroke="#bf875d" stroke-width="8" fill="none" stroke-linecap="round"/>`;
+        break;
+      case 'tofu':
+        bg='#e6f2e7';p+=`<path d="M25 67 L76 43 L133 63 L85 89 Z" fill="#fffef0" stroke="#c6cbbd" stroke-width="3"/>`;
+        p+=`<path d="M25 67 L25 109 L85 132 L85 89 Z" fill="#eeeede" stroke="#c6cbbd" stroke-width="3"/>`;
+        p+=`<path d="M85 89 L133 63 L133 107 L85 132 Z" fill="#e2e8d8" stroke="#c6cbbd" stroke-width="3"/>`;
+        p+=`<path d="M56 17 L56 58 L117 80 L117 39" stroke="#687c86" stroke-width="8" fill="none" stroke-linejoin="round"/>`;
+        p+=`<path d="M51 17 H61 M112 39 H123" stroke="#687c86" stroke-width="6" stroke-linecap="round"/>`;
+        break;
+      case 'mountain':
+        bg='#f1f0df';p+=`<path d="M8 122 Q28 96 42 106 Q53 72 77 81 Q89 58 109 85 Q136 83 152 122 Z" fill="#a6875c" stroke="#795e47" stroke-width="3"/>`;
+        p+=`<path d="M16 118 Q30 95 44 110 M68 90 L74 85 M97 83 L110 96" stroke="#ccb391" stroke-width="5" fill="none"/>`;
+        for(const [x,y,r] of [[26,38,5],[62,34,6],[97,25,5],[125,45,6],[44,63,4],[117,65,4]])p+=circ(x,y,r,'#bca886','#8c785e',1);
+        p+=`<path d="M48 24 L51 32 M107 11 L107 18" stroke="#bca886" stroke-width="4"/>`;
+        break;
+      case 'rain':
+        bg='#e4f4fa';p+=`<path d="M12 122 Q29 105 52 117 Q86 101 110 115 Q130 102 151 118 L151 140 L12 140 Z" fill="#9fafa4" stroke="#738d86" stroke-width="3"/>`;
+        p+=`<path d="M47 116 Q79 102 111 117 L99 128 L60 128 Z" fill="#588fa9"/>`;
+        p+=`<path d="M77 15 Q74 35 66 45 Q56 57 61 69 Q67 82 82 77 Q97 75 98 61 Q98 54 89 43 Z" fill="#77c5e6" stroke="#389bc0" stroke-width="3"/>`;
+        p+=`<path d="M26 63 L38 79 M126 58 L115 76" stroke="#83c7e6" stroke-width="4" stroke-linecap="round"/>`;
+        break;
+      case 'cane':
+        bg='#f0eedf';p+=`<path d="M105 21 Q90 3 71 18 Q61 30 71 39" fill="none" stroke="#946c48" stroke-width="12" stroke-linecap="round"/>`;
+        p+=`<path d="M105 21 L125 121 Q128 132 139 124" fill="none" stroke="#946c48" stroke-width="12" stroke-linecap="round"/>`;
+        p+=`<path d="M37 72 Q45 56 61 65 L84 102 Q73 111 54 111 L29 88 Z" fill="#bed0bb" stroke="#789477" stroke-width="3"/>`;
+        p+=`<path d="M17 120 H85" stroke="#9aa884" stroke-width="5" stroke-linecap="round"/>`;
+        break;
+      case 'emergency':
+        bg='#e6f3f4';p+=`<path d="M27 62 Q46 4 81 19 Q126 10 145 64 Q132 53 118 64 Q103 52 84 64 Q65 53 46 64 Q36 55 27 62 Z" fill="#6fafa8" stroke="#397f84" stroke-width="3"/>`;
+        p+=`<path d="M84 61 L84 117 Q83 136 67 124" stroke="#746950" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+        for(const [x,y] of [[30,89],[51,100],[114,89],[131,109]])p+=`<path d="M${x} ${y} l-5 11" stroke="#74c5df" stroke-width="4" stroke-linecap="round"/>`;
+        break;
+      case 'mouse':
+        bg='#f4ebdf';p+=`<path d="M58 24 Q68 38 80 36 Q92 39 105 24 L100 44 Q135 77 127 111 Q118 131 79 130 Q36 131 30 111 Q23 80 61 44 Z" fill="#c29b70" stroke="#8a694a" stroke-width="4"/>`;
+        p+=`<path d="M61 43 Q80 49 100 43" stroke="#7d583b" stroke-width="6"/>`;
+        p+=circ(62,80,17,'#adb4b4','#717c85',2)+circ(97,80,17,'#adb4b4','#717c85',2)+oval(81,94,30,24,'#a8b2b2','#717c85',2)+eye(67,89)+eye(94,89)+circ(81,103,4,'#d78785');
+        p+=path('M55 107 L42 110 M105 107 L119 109','#747e81',2);
+        break;
+      case 'carp':
+        bg='#e8f3ef';p+=`<rect x="16" y="39" width="128" height="92" rx="10" fill="#ca9d73" stroke="#95704f" stroke-width="4"/>`;
+        p+=`<path d="M29 116 H132 M29 52 H132" stroke="#b4855a" stroke-width="3"/>`;
+        p+=oval(79,87,39,19,'#a0b6b9','#668a97',3)+`<path d="M41 87 L19 67 L19 107 Z" fill="#8eafb5" stroke="#668a97" stroke-width="3"/>`;
+        p+=`<path d="M65 79 L79 64 L93 79" fill="#8ba5ac" stroke="#668a97" stroke-width="2"/>`;
+        p+=eye(103,82)+`<path d="M110 87 L118 91" stroke="#557781" stroke-width="3"/>`;
+        break;
+      case 'detour':
+        bg='#e8f1d9';p+=`<path d="M33 143 Q34 113 64 108 C128 100 138 76 109 68 C49 54 64 31 117 -7" fill="none" stroke="#b6bfab" stroke-width="38"/>`;
+        p+=path('M33 143 Q34 113 64 108 C128 100 138 76 109 68 C49 54 64 31 117 -7','#fffefa',3);
+        p+=`<path d="M120 16 L120 46 M120 18 L145 24 L120 31" stroke="#8a7c59" stroke-width="4" fill="#f08a65"/>`;
+        p+=circ(35,96,10,'#e5ad85',E,2)+path('M36 106 L42 127 M41 110 L25 119 M42 127 L28 139 M42 127 L58 136',E,6);
+        p+=`<path d="M14 34 Q22 29 31 34 M30 31 Q39 23 47 28" stroke="#87b883" stroke-width="5" fill="none"/>`;
+        break;
+      case 'hurry':
+        bg='#fff0de';p+=`<path d="M12 47 H56 M7 67 H44 M15 86 H37" stroke="#e8bf91" stroke-width="6" stroke-linecap="round"/>`;
+        p+=circ(91,34,14,'#f0bb8f',E,2)+path('M80 49 L69 79 L99 77 L110 59',E,10)+path('M67 79 L45 105 L24 112 M69 79 L95 107 L121 100 M79 60 L57 55',E,8);
+        p+=`<g transform="translate(118,104) rotate(23)"><rect x="-14" y="-12" width="29" height="24" rx="2" fill="#d1a56f" stroke="#8d694a" stroke-width="3"/><path d="M-14 -12 L1 -2 L15 -12" fill="none" stroke="#8d694a" stroke-width="2"/></g>`;
+        p+=`<path d="M117 69 L112 51 M124 69 L135 55" stroke="#e68154" stroke-width="4"/>`;
+        break;
+      case 'rabbits':
+        bg='#ebf4db';
+        for(const r of [{x:46,y:84,s:1},{x:118,y:75,s:-.9}]){
+          p+=`<g transform="translate(${r.x},${r.y}) scale(${r.s},${Math.abs(r.s)})">`;
+          p+=oval(0,13,23,19,'#f7f6ec','#9aafa9',2)+oval(19,-15,8,29,'#faf9ee','#a1b2b0',2)+oval(1,-17,8,30,'#faf9ee','#a1b2b0',2);
+          p+=circ(11,0,20,'#fffef5','#9aafa9',2)+eye(17,-2)+circ(27,9,3,'#de8d91');
+          p+=oval(-16,29,15,8,'#fffefa')+`</g>`;
+        }
+        p+=`<path d="M10 117 Q50 107 80 118 T155 117" stroke="#82b779" stroke-width="4" fill="none"/>`;
+        break;
+      case 'insects':
+        bg='#edf0dd';
+        p+=`<path d="M83 30 Q111 54 93 85 M40 36 Q69 47 76 69" stroke="#96b4a3" stroke-width="2" stroke-dasharray="4 5" fill="none"/>`;
+        p+=`<g transform="translate(47,52) rotate(-18)">`+oval(-9,-12,16,12,'#c6e9ee','#96c7c9')+oval(10,-13,15,12,'#c6e9ee','#96c7c9')+oval(0,0,22,16,'#f8cf4e','#9c874d',2);
+        p+=`<path d="M-9 -14 L-9 13 M3 -14 L3 13" stroke="#73574a" stroke-width="6"/>`+circ(19,-1,3,E)+`</g>`;
+        p+=`<g transform="translate(111,91) rotate(20)">`+oval(-7,-10,15,11,'#c8e3ee','#a7c5ca')+oval(9,-11,14,11,'#c8e3ee','#a7c5ca')+oval(0,0,18,13,'#b28e6b','#775940',2)+circ(12,-3,3,E)+`</g>`;
+        p+=`<path d="M69 107 Q84 97 98 110" stroke="#bb9a6c" stroke-width="7" fill="none"/>`;
+        break;
+      case 'bee':
+        // 同じ蜂の絵を「虻蜂取らず」と「泣きっ面に蜂」で完全共通にする。
+        bg='#edf4dd';
+        p+=`<g transform="translate(78,75) rotate(-12)">`;
+        p+=oval(-9,-22,26,17,'#d3eef3','#91c7cb',3)+oval(22,-24,25,17,'#d3eef3','#91c7cb',3);
+        p+=oval(-3,4,41,28,'#ffd25c','#a17b39',3);
+        p+=`<path d="M-22 -19 L-22 27 M-2 -22 L-2 30 M18 -19 L18 26" stroke="#8a6242" stroke-width="11"/>`;
+        p+=circ(30,-5,22,'#eec34f','#9c7a45',3)+eye(38,-9);
+        p+=`<path d="M-42 1 L-58 8 L-42 16" fill="#80664b" stroke="#80664b" stroke-width="3"/>`;
+        p+=path('M29 -24 L24 -37 M43 -25 L47 -38','#705b41',3);
+        p+=`</g>`;
+        p+=`<path d="M12 30 Q22 19 34 28 M116 112 Q125 104 140 108" stroke="#92b983" stroke-width="5" stroke-linecap="round" fill="none"/>`;
+        break;
+      case 'eye':
+        bg='#e7eafa';
+        p+=`<path d="M0 121 Q31 112 57 124 Q93 110 160 121 L160 140 L0 140" fill="#afbbdb" opacity=".75"/>`;
+        p+=circ(78,43,24,'#f5cfaf','#bd987b',3)+eye(69,42)+eye(87,42);
+        p+=path('M69 57 Q78 49 87 57','#946e63',3);
+        p+=path('M53 79 Q77 66 104 79 L115 122 L42 122 Z','#7ca7c0',4,'#9eb8d8');
+        p+=path('M57 83 L44 100 L33 90 M98 83 L112 100 L128 88','#678fb9',9);
+        p+=`<path d="M107 7 L129 27 L109 33 L119 50" stroke="#dfaf53" stroke-width="7" fill="none"/>`;
+        p+=`<path d="M18 12 L36 29 M35 10 L16 31" stroke="#92aad4" stroke-width="6" stroke-linecap="round"/>`;
+        break;
+      case 'shaka':
+        bg='#f7efdb';
+        p+=`<path d="M14 119 Q80 103 148 119 L160 140 L0 140" fill="#ecd4a3"/>`;
+        p+=oval(86,100,39,32,'#d89c6a','#a77853',3);
+        p+=circ(85,51,28,'#edc49a','#a77957',3);
+        p+=`<path d="M59 38 Q61 20 84 20 Q109 19 113 40" fill="#536a60"/>`;
+        p+=path('M71 52 Q78 47 83 52 M91 52 Q97 47 103 52','#835d4b',2.5);
+        p+=path('M74 67 Q85 72 98 67','#ae7654',3);
+        p+=`<path d="M41 74 L26 65 L27 37 L48 46 Z" fill="#fffef5" stroke="#ab967b" stroke-width="3"/>`;
+        p+=`<path d="M49 71 Q65 79 71 93" stroke="#a7774f" stroke-width="8" fill="none"/>`;
+        p+=`<path d="M16 24 Q14 8 30 10 M38 21 Q40 4 56 10" stroke="#d6b457" stroke-width="4" fill="none"/>`;
+        break;
+      case 'oni':
+        bg='#fff1de';p+=`<g transform="translate(-14,0)">`;
+        p+=`<path d="M41 51 L34 10 L61 39 M107 41 L131 10 L130 56" stroke="#c77347" stroke-width="4" fill="#f7d58a"/>`;
+        p+=oval(86,78,47,44,'#ea726c','#a84752',3)+path('M48 52 Q72 20 111 47','#6e5862',13);
+        p+=eye(69,72)+eye(101,72)+path('M67 101 Q84 110 105 101','#913e40',3)+`<path d="M81 101 L85 112 L91 101" fill="white"/>`;
+        p+=`</g><g transform="rotate(-27 126 68)"><rect x="116" y="24" width="19" height="98" rx="8" fill="#a67b51"/><rect x="111" y="16" width="29" height="64" rx="13" fill="#656c72" stroke="#3d454c" stroke-width="3"/>`;
+        for(let y=25;y<77;y+=18) p+=`<path d="M112 ${y} l-10 6 M140 ${y} l10 6" stroke="#656c72" stroke-width="7"/>`;
+        p+=`</g>`;
+        break;
+      case 'tiger':
+        bg='#e5f2f4';
+        p+=`<path d="M57 92 Q22 68 18 38 Q55 44 65 76 M100 80 Q122 45 150 28 Q149 73 113 100" fill="#fffef5" stroke="#9abed1" stroke-width="3"/>`;
+        p+=`<path d="M48 82 Q28 64 26 50 M110 82 Q133 60 140 40" stroke="#c3dce6" stroke-width="3" fill="none"/>`;
+        p+=`<path d="M43 62 L43 26 L65 43 M98 45 L120 26 L118 64" fill="#ebad56" stroke="#af7238" stroke-width="3"/>`;
+        p+=oval(81,79,43,44,'#f0b75f','#b87b36',3)+oval(81,99,28,18,'#fff2d8');
+        p+=`<path d="M76 38 L81 60 L87 39 M45 59 L64 71 M117 60 L98 71 M46 82 L64 85 M115 82 L98 85" stroke="#80552f" stroke-width="5" stroke-linecap="round"/>`;
+        p+=eye(67,81)+eye(95,81)+path('M75 94 L85 94 L80 101 Z','#754b30',2,'#aa7751')+path('M80 103 Q73 113 66 107 M80 103 Q87 113 94 107','#754b30',2);
+        break;
+      default: p+=circ(80,70,40,'#b9dcd8');
+      }
+      return svgStart(bg)+p+svgEnd;
+    }
+
+const ART_META={
+  cat:{label:'猫',file:'assets/cat.png'}, pig:{label:'豚',file:'assets/pig.png'}, horse:{label:'馬',file:'assets/horse.png'},
+  monkey:{label:'猿',file:'assets/monkey.png'}, kappa:{label:'河童',file:'assets/kappa.png'}, monk:{label:'僧侶',file:'assets/monk.png'},
+  rabbits:{label:'兎',file:'assets/rabbits.png'}, bee:{label:'蜂',file:'assets/bee.png'}, oni:{label:'鬼',file:'assets/oni.png'},
+  tiger:{label:'虎',file:'assets/tiger.png'}, eye:{label:'目',file:'assets/eye.png'}, foot:{label:'足',file:'assets/foot.png'},
+  shaka:{label:'釈迦',file:'assets/shaka.png'}, koshi:{label:'孔子',file:'assets/koshi.png'}, noren:{label:'暖簾',file:'assets/noren.png'},
+  nail:{label:'釘',file:'assets/nail.png'}, tofu:{label:'豆腐',file:'assets/tofu.png'}, mountain:{label:'山',file:'assets/mountain.png'},
+  rain:{label:'雨',file:'assets/rain.png'}, cane:{label:'杖',file:'assets/cane.png'}, emergency:{label:'非常グッズ',file:'assets/emergency.png'},
+  mouse:{label:'ネズミ',file:'assets/mouse.png'}, carp:{label:'鯉',file:'assets/carp.png'}
+};
+function artwork(key){
+  const meta=ART_META[key];
+  const fallback=fallbackArtwork(key);
+  if(!meta)return fallback;
+  return `<span class="art-wrap" aria-hidden="true"><img class="art-photo" src="${meta.file}" alt="${meta.label}のイラスト" onload="this.parentElement.classList.add('has-loaded-photo')" onerror="this.parentElement.classList.add('use-fallback');this.remove()">${fallback}</span>`;
+}
+    function addTimer(fn,ms){const t=window.setTimeout(()=>{timers=timers.filter(x=>x!==t);fn();},ms);timers.push(t);return t;}
+    function clearTimers(){for(const t of timers)window.clearTimeout(t);timers=[];}
+    function getBest(){try{const n=localStorage.getItem(storeKey);return n===null?null:Number(n);}catch{return null;}}
+    function setBest(v){try{localStorage.setItem(storeKey,String(v));}catch{}}
+    function updateBest(){const b=getBest();$('bestDisplay').textContent=b===null?'ベスト：―':`ベスト：ミス ${b}回`;}
+    function updateStats(){$('foundCount').innerHTML=`${found.size}<span aria-hidden="true" style="font-size:12px;color:#95a4a4">/5</span>`;$('missCount').textContent=mistakes;}
+    function setNotice(text,type=''){notice.textContent=text;notice.className='notice'+(type?' '+type:'');}
+    function playSound(kind){if(!soundOn)return;try{
+      const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+      if(!audioCtx)audioCtx=new C();if(audioCtx.state==='suspended')audioCtx.resume();
+      const now=audioCtx.currentTime;
+      const tones=kind==='win'?[[523,.00,.16],[659,.13,.16],[784,.26,.25]]:kind==='good'?[[587,0,.11],[783,.11,.18]]:kind==='bad'?[[190,0,.14]]:[[430,0,.035]];
+      for(const [frequency,delay,dur] of tones){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=kind==='bad'?'triangle':'sine';o.frequency.setValueAtTime(frequency,now+delay);g.gain.setValueAtTime(.0001,now+delay);g.gain.exponentialRampToValueAtTime(.045,now+delay+.01);g.gain.exponentialRampToValueAtTime(.0001,now+delay+dur);o.connect(g);g.connect(audioCtx.destination);o.start(now+delay);o.stop(now+delay+dur+.02);}
+    }catch{}}
+    function showModal(el){el.classList.add('show');el.setAttribute('aria-hidden','false');const b=el.querySelector('button');if(b)b.focus();}
+    function hideModal(el){el.classList.remove('show');el.setAttribute('aria-hidden','true');}
+    function render(){
+      meaningGrid.innerHTML='';proverbGrid.innerHTML='';
+      for(const pair of shuffled(activePairs)){
+        const el=document.createElement('div');el.className='meaning-card';el.id=`mean-${pair.id}`;
+        el.innerHTML=`<span class="mean-head">ことわざの意味</span><span class="mean-copy"></span><span class="mean-mark">✓ 獲得！</span>`;
+        el.querySelector('.mean-copy').textContent=pair.meaning;
+        meaningGrid.append(el);
+      }
+      for(const card of cards){
+        const btn=document.createElement('button');btn.type='button';btn.className='proverb-card';btn.dataset.cardId=card.uid;btn.dataset.pairId=card.pairId;btn.dataset.artId=card.art;
+        btn.setAttribute('aria-label',`ことわざカード、イラスト ${card.position}枚目。めくる`);
+        const safe=document.createElement('span');safe.className='proverb-text';safe.textContent=card.text;
+        btn.innerHTML=`<span class="tile-inner"><span class="tile-face tile-art">${artwork(card.art)}</span><span class="tile-face tile-back"><span class="tag">ことわざ</span></span></span><span class="found-mark" aria-hidden="true">✓</span>`;
+        btn.querySelector('.tile-back').append(safe);
+        btn.addEventListener('click',()=>flipCard(card,btn));
+        proverbGrid.append(btn);
+      }
+    }
+    function flipCard(card,element){
+      if(locked||found.has(card.pairId)||selected.some(c=>c.uid===card.uid))return;
+      playSound('flip');selected.push(card);element.classList.add('is-flipped');
+      element.setAttribute('aria-label',`めくったカード：${card.text}`);
+      if(selected.length===1){setNotice('あと1枚！ 同じ意味のことわざを探そう。');return;}
+      locked=true;
+      const [a,b]=selected;
+      if(a.pairId===b.pairId){
+        addTimer(()=>{
+          found.add(a.pairId);
+          for(const c of selected){const el=proverbGrid.querySelector(`[data-card-id="${c.uid}"]`);el.classList.add('is-found');el.disabled=true;el.setAttribute('aria-label',`獲得済み：${c.text}`);}
+          const meaning=$(`mean-${a.pairId}`);meaning.classList.add('acquired');
+          meaning.setAttribute('aria-label',`獲得済み：${PAIR_LOOKUP.get(a.pairId).meaning}`);
+          updateStats();playSound(found.size===5?'win':'good');
+          setNotice(`正解！「${a.text}」と「${b.text}」は同じ意味！`,'good');
+          selected=[];locked=false;
+          if(found.size===5)addTimer(showWin,850);
+        },530);
+      } else {
+        mistakes++;updateStats();
+        addTimer(()=>{
+          setNotice('残念！ この2枚はちがう意味。場所を覚えて次へ！','bad');playSound('bad');
+          for(const c of selected){const el=proverbGrid.querySelector(`[data-card-id="${c.uid}"]`);el.classList.remove('is-flipped');el.setAttribute('aria-label',`ことわざカード、イラスト ${c.position}枚目。めくる`);}
+          selected=[];locked=false;
+        },1900);
+      }
+    }
+    function showWin(){
+      const old=getBest(),isBest=old===null||mistakes<old;
+      if(isBest)setBest(mistakes);
+      updateBest();
+      $('winScore').textContent=`ミス ${mistakes}回`;
+      $('winMedal').textContent=mistakes===0?'🏆':mistakes<=3?'🥇':mistakes<=7?'🥈':'🎉';
+      $('winComment').textContent=mistakes===0?'パーフェクト！ 一度もまちがえずにクリア！':mistakes<=3?'すごい！ よく覚えたね！':mistakes<=7?'お見事！ 5組すべてそろったね！':'クリアおめでとう！ 次はミスを減らしてみよう！';
+      $('winBest').textContent=isBest?'★ ベスト記録を更新！':`これまでのベスト：ミス ${old}回`;
+      $('resultAdSlot').replaceChildren($('resultAdTemplate').content.cloneNode(true));
+      showModal(winOverlay);
+    }
+    // 絵の使い回しが少なくとも1組は起こるよう、異なる意味のカードに
+    // 同じ art ID が含まれる組合せを採用する。10グループは毎回抽選。
+    function hasSharedArt(drawn){
+      const seen=new Map();
+      for(const choice of drawn){
+        for(const c of choice.cards){
+          if(seen.has(c.art)&&seen.get(c.art)!==choice.pair.id)return true;
+          seen.set(c.art,choice.pair.id);
+        }
+      }
+      return false;
+    }
+    function chooseRound(){
+      for(let attempt=0;attempt<250;attempt++){
+        const choices=shuffled(PAIR_BANK).slice(0,5).map(pair=>({pair,cards:shuffled(pair.cards).slice(0,2)}));
+        if(hasSharedArt(choices))return choices;
+      }
+      // 理論上は上記で見つかるが、乱数の偏りがあっても進行できる保険。
+      const a=PAIR_LOOKUP.get('greed'),b=PAIR_LOOKUP.get('misfortune');
+      const rest=shuffled(PAIR_BANK.filter(p=>p.id!==a.id&&p.id!==b.id)).slice(0,3);
+      return [
+        {pair:a,cards:[a.cards.find(c=>c.art==='bee'),a.cards.find(c=>c.art!=='bee')]},
+        {pair:b,cards:[b.cards.find(c=>c.art==='bee'),shuffled(b.cards.filter(c=>c.art!=='bee'))[0]]},
+        ...rest.map(pair=>({pair,cards:shuffled(pair.cards).slice(0,2)})),
+      ];
+    }
+    function restart(){
+      clearTimers();hideModal(winOverlay);hideModal(rulesOverlay);
+      $('resultAdSlot').replaceChildren();
+      const round=chooseRound();
+      activePairs=round.map(item=>item.pair);
+      cards=shuffled(round.flatMap(item=>item.cards.map((c,index)=>({...c,pairId:item.pair.id,uid:item.pair.id+'-'+index}))));
+      cards.forEach((c,i)=>c.position=i+1);
+      selected=[];found=new Set();mistakes=0;locked=false;updateStats();render();
+      setNotice('同じ絵でも同じ意味とは限らないよ。絵と意味から推理しよう！');updateBest();
+    }
+    $('restartBtn').addEventListener('click',restart);
+    $('againBtn').addEventListener('click',restart);
+    $('reviewBtn').addEventListener('click',()=>{hideModal(winOverlay);$('restartBtn').focus();});
+    $('rulesBtn').addEventListener('click',()=>showModal(rulesOverlay));
+    $('closeRulesBtn').addEventListener('click',()=>{hideModal(rulesOverlay);$('rulesBtn').focus();});
+    $('soundBtn').addEventListener('click',()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♪ 音あり':'♪ 音なし';$('soundBtn').setAttribute('aria-pressed',String(soundOn));if(soundOn)playSound('flip');});
+    rulesOverlay.addEventListener('click',e=>{if(e.target===rulesOverlay)hideModal(rulesOverlay);});
+    window.addEventListener('keydown',e=>{if(e.key==='Escape'&&rulesOverlay.classList.contains('show'))hideModal(rulesOverlay);});
+    restart();
+  })();
+  </script>
+</body>
+</html>
